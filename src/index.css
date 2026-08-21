@@ -1,0 +1,186 @@
+:root {
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #211619;
+  background: #ffffff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --brand: #b9243c;
+  --brand-dark: #7f1628;
+  --brand-soft: #f9e7eb;
+  --ink: #211619;
+  --muted: #6f6467;
+  --line: #eadde0;
+  --surface: #ffffff;
+  --page: #fbf8f9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.auth-page,
+.dashboard-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(90deg, rgba(185, 36, 60, 0.09), transparent 42%),
+    var(--page);
+}
+
+.auth-page {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-panel {
+  width: min(100%, 460px);
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 20px 60px rgba(75, 22, 32, 0.12);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--brand);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.lede {
+  margin: 16px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.login-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.login-form input {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+}
+
+.login-form input:focus {
+  border-color: var(--brand);
+  outline: 3px solid var(--brand-soft);
+}
+
+.login-form button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: var(--brand);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.login-form button:hover {
+  background: var(--brand-dark);
+}
+
+.api-note {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.dashboard-page {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
+.sidebar {
+  display: flex;
+  align-items: center;
+  align-content: start;
+  gap: 12px;
+  padding: 28px 20px;
+  color: #fff;
+  background: var(--brand);
+}
+
+.sidebar strong,
+.sidebar span {
+  display: block;
+}
+
+.sidebar span {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.86rem;
+}
+
+.brand-mark {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.dashboard-shell {
+  display: grid;
+  align-content: center;
+  max-width: 780px;
+  min-height: 100vh;
+  padding: 40px;
+}
+
+@media (max-width: 760px) {
+  .dashboard-page {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    min-height: auto;
+  }
+
+  .dashboard-shell,
+  .auth-panel {
+    padding: 24px;
+  }
+}
