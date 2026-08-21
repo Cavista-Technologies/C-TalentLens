@@ -1,13 +1,21 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { setAccessToken } from '../lib/authToken'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { ApiError } from '../lib/apiClient'
+import { useAuth } from '../features/auth/authContext'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { login, status } = useAuth()
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  if (status === 'authenticated') {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
@@ -19,8 +27,16 @@ export function LoginPage() {
       return
     }
 
-    setAccessToken('demo-token')
-    navigate('/dashboard')
+    setIsSubmitting(true)
+
+    try {
+      await login({ email, password })
+      navigate(getRedirectPath(location.state), { replace: true })
+    } catch (err) {
+      setError(getLoginError(err))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -39,9 +55,39 @@ export function LoginPage() {
             <input type="password" name="password" placeholder="Enter password" />
           </label>
           {error && <p className="form-error">{error}</p>}
-          <button type="submit">Sign in</button>
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Signing in...' : 'Sign in'}
+          </button>
         </form>
       </section>
     </main>
   )
+}
+
+function getRedirectPath(state: unknown) {
+  if (
+    typeof state === 'object' &&
+    state !== null &&
+    'from' in state &&
+    typeof state.from === 'object' &&
+    state.from !== null &&
+    'pathname' in state.from &&
+    typeof state.from.pathname === 'string'
+  ) {
+    return state.from.pathname
+  }
+
+  return '/dashboard'
+}
+
+function getLoginError(error: unknown) {
+  if (error instanceof ApiError && error.status === 401) {
+    return 'Email or password is incorrect.'
+  }
+
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return 'Sign in failed.'
 }
