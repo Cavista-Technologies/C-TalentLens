@@ -453,6 +453,25 @@ a {
   font-weight: 800;
 }
 
+.file-field {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.file-field input {
+  display: block;
+  padding: 9px 12px;
+}
+
+.file-field span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .form-panel input,
 .form-panel select,
 .form-panel textarea {
