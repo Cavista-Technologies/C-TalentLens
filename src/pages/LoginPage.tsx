@@ -12,7 +12,7 @@ export function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (status === 'authenticated') {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to={getRedirectPath(location.state)} replace />
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

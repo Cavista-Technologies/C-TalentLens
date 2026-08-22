@@ -1,49 +1,70 @@
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../features/auth/authContext'
+import { canUseRecruitmentWrite, canViewAnalytics } from '../../features/auth/roleAccess'
 
 type AppLayoutProps = {
   title: string
+  eyebrow?: string
   children: ReactNode
 }
 
-export function AppLayout({ title, children }: AppLayoutProps) {
+export function AppLayout({ title, eyebrow = 'TalentLens', children }: AppLayoutProps) {
   const { logout, user } = useAuth()
+  const showAnalytics = canViewAnalytics(user)
+  const showImport = canUseRecruitmentWrite(user)
 
   return (
     <main className="app-layout">
-      <aside className="app-sidebar">
-        <div className="sidebar-brand">
-          <img className="sidebar-logo" src="/cavista-logo.png" alt="Cavista" />
+      <header className="app-header">
+        <div className="app-brand">
+          <img className="app-logo" src="/cavista-logo.png" alt="Cavista" />
           <div>
             <strong>TalentLens</strong>
-            <span>Recruitment dashboard</span>
           </div>
         </div>
 
-        <nav className="sidebar-nav" aria-label="Main navigation">
+        <nav className="app-nav" aria-label="Main navigation">
           <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             Dashboard
           </NavLink>
+          <NavLink to="/requisitions" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            Requisitions
+          </NavLink>
+          <NavLink to="/referrals" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            Referrals
+          </NavLink>
+          {showAnalytics && (
+            <NavLink to="/analytics" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              Analytics
+            </NavLink>
+          )}
+          {showImport && (
+            <NavLink to="/imports" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              Import
+            </NavLink>
+          )}
+          <NavLink to="/alerts" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            Alerts
+          </NavLink>
         </nav>
 
-        <div className="sidebar-account">
+        <div className="app-account">
           {user && (
             <div>
               <strong>{user.fullName}</strong>
-              <span>{user.roles.join(', ')}</span>
             </div>
           )}
           <button type="button" onClick={logout}>
             Logout
           </button>
         </div>
-      </aside>
+      </header>
 
       <section className="app-main">
         <header className="app-topbar">
           <div>
-            <p className="eyebrow">TalentLens</p>
+            <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>
           </div>
         </header>
