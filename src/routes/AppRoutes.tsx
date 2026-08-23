@@ -5,6 +5,7 @@ import { DashboardPage } from '../pages/DashboardPage'
 import { ImportsPage } from '../pages/ImportsPage'
 import { LoginPage } from '../pages/LoginPage'
 import { NewReferralPage } from '../pages/NewReferralPage'
+import { PublicReferralPage } from '../pages/PublicReferralPage'
 import { ReferralAnalyticsPage } from '../pages/ReferralAnalyticsPage'
 import { ReferralDetailPage } from '../pages/ReferralDetailPage'
 import { ReferralsPage } from '../pages/ReferralsPage'
@@ -21,6 +22,7 @@ export function AppRoutes() {
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/refer" element={<PublicReferralPage />} />
       <Route
         path="/dashboard"
         element={

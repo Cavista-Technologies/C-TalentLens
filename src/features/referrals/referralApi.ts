@@ -1,7 +1,9 @@
 import { apiRequest } from '../../lib/apiClient'
 import type {
   CreateReferralRequest,
+  CreatePublicReferralRequest,
   ImportResult,
+  PublicRequisition,
   Referral,
   ReferralAnalytics,
   ReferralQuery,
@@ -34,6 +36,24 @@ export function getReferral(id: string) {
 
 export function createReferral(request: CreateReferralRequest) {
   return apiRequest<Referral>('/api/referrals', {
+    method: 'POST',
+    body: request,
+  })
+}
+
+export function searchPublicRequisitions(search: string) {
+  const params = new URLSearchParams()
+
+  if (search.trim()) {
+    params.set('search', search.trim())
+  }
+
+  const queryString = params.toString()
+  return apiRequest<PublicRequisition[]>(queryString ? `/api/public/requisitions?${queryString}` : '/api/public/requisitions')
+}
+
+export function createPublicReferral(request: CreatePublicReferralRequest) {
+  return apiRequest<Referral>('/api/public/referrals', {
     method: 'POST',
     body: request,
   })

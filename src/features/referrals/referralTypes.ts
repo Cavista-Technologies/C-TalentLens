@@ -64,6 +64,27 @@ export type CreateReferralRequest = {
   candidateAlignmentComment?: string | null
 }
 
+export type PublicRequisition = {
+  id: string
+  requisitionCode: string
+  roleName: string
+  department: string
+}
+
+export type CreatePublicReferralRequest = {
+  requisitionId: string
+  referrerName: string
+  referrerEmail: string
+  referrerDepartment: string
+  candidateName: string
+  candidateEmail: string
+  candidatePhoneNumber?: string | null
+  resumeUrl?: string | null
+  candidateRelationship?: string | null
+  candidateKnownDuration?: string | null
+  candidateAlignmentComment?: string | null
+}
+
 export type UpdateReferralStatusRequest = {
   status: string
   hiringOutcome?: string | null

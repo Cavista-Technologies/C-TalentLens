@@ -1,10 +1,11 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/feedback/StateMessage'
 import { AppLayout } from '../components/layout/AppLayout'
 import { PageContainer } from '../components/layout/PageContainer'
 import { useAuth } from '../features/auth/authContext'
 import { canUseRecruitmentWrite } from '../features/auth/roleAccess'
+import { ReferralForm } from '../features/referrals/ReferralForm'
 import { getReferrals, updateReferralStatus } from '../features/referrals/referralApi'
 import { formatDate, formatValue, referralStatuses } from '../features/referrals/referralDisplay'
 import type { Referral } from '../features/referrals/referralTypes'
@@ -19,6 +20,8 @@ export function ReferralsPage() {
   const [activeOnly, setActiveOnly] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [reloadKey, setReloadKey] = useState(0)
+  const [isAddingReferral, setIsAddingReferral] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -57,7 +60,7 @@ export function ReferralsPage() {
     return () => {
       isMounted = false
     }
-  }, [submittedSearch, status, activeOnly])
+  }, [submittedSearch, status, activeOnly, reloadKey])
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -66,6 +69,11 @@ export function ReferralsPage() {
 
   function handleReferralUpdated(updated: Referral) {
     setReferrals((current) => current.map((referral) => (referral.id === updated.id ? updated : referral)))
+  }
+
+  function handleReferralCreated() {
+    setIsAddingReferral(false)
+    setReloadKey((current) => current + 1)
   }
 
   return (
@@ -97,9 +105,9 @@ export function ReferralsPage() {
               Active
             </label>
             {canWrite && (
-              <Link className="action-link" to="/referrals/new">
+              <button className="action-link" type="button" onClick={() => setIsAddingReferral(true)}>
                 New referral
-              </Link>
+              </button>
             )}
           </div>
         </section>
@@ -174,8 +182,40 @@ export function ReferralsPage() {
             </div>
           </section>
         )}
+
+        {canWrite && isAddingReferral && (
+          <Modal title="New referral" wide onClose={() => setIsAddingReferral(false)}>
+            <ReferralForm onCancel={() => setIsAddingReferral(false)} onSaved={handleReferralCreated} />
+          </Modal>
+        )}
       </PageContainer>
     </AppLayout>
+  )
+}
+
+function Modal({
+  children,
+  onClose,
+  title,
+  wide = false,
+}: {
+  children: ReactNode
+  onClose: () => void
+  title: string
+  wide?: boolean
+}) {
+  return (
+    <div className="modal-backdrop" role="presentation">
+      <section className={`modal-panel${wide ? ' wide-modal' : ''}`} aria-modal="true" role="dialog" aria-labelledby="referral-modal-title">
+        <div className="modal-heading">
+          <h2 id="referral-modal-title">{title}</h2>
+          <button type="button" onClick={onClose} aria-label="Close modal">
+            Close
+          </button>
+        </div>
+        {children}
+      </section>
+    </div>
   )
 }
 
