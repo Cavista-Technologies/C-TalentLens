@@ -14,3 +14,8 @@ export type Alert = {
   createdAt: string
   metadata: Record<string, string>
 }
+
+export type AlertQuery = {
+  severity?: string | null
+  type?: string | null
+}

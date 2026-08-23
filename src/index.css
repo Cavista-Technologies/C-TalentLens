@@ -407,6 +407,95 @@ a {
   accent-color: var(--brand);
 }
 
+.segmented-control {
+  display: inline-flex;
+  width: fit-content;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(75, 22, 32, 0.08);
+}
+
+.segmented-control button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  color: var(--ink);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.segmented-control button:first-child {
+  border-left: 0;
+}
+
+.segmented-control button.active {
+  color: #fff;
+  background: var(--brand);
+}
+
+.segmented-control button:hover,
+.segmented-control button:focus-visible {
+  outline: 3px solid var(--brand-soft);
+  outline-offset: -3px;
+}
+
+.alert-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(75, 22, 32, 0.08);
+}
+
+.alert-filter-bar label {
+  display: grid;
+  gap: 6px;
+  min-width: 180px;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.alert-filter-bar select {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+}
+
+.alert-filter-bar select:focus {
+  border-color: var(--brand);
+  outline: 3px solid var(--brand-soft);
+}
+
+.alert-filter-bar button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.alert-filter-bar button:hover,
+.alert-filter-bar button:focus-visible {
+  border-color: var(--brand);
+  color: var(--brand);
+  outline: 3px solid var(--brand-soft);
+}
+
 .action-link {
   display: inline-flex;
   align-items: center;
@@ -826,19 +915,33 @@ a {
 .report-filter button {
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--brand);
   border-radius: 8px;
-  color: var(--ink);
-  background: #fff;
+  color: #fff;
+  background: var(--brand);
   cursor: pointer;
   font-weight: 900;
 }
 
 .report-filter button:hover,
 .report-filter button:focus-visible {
+  border-color: var(--brand-dark);
+  background: var(--brand-dark);
+  color: #fff;
+  outline: 3px solid var(--brand-soft);
+}
+
+.report-filter .secondary-filter-action {
+  border-color: var(--line);
+  color: var(--ink);
+  background: #fff;
+}
+
+.report-filter .secondary-filter-action:hover,
+.report-filter .secondary-filter-action:focus-visible {
   border-color: var(--brand);
   color: var(--brand);
-  outline: 3px solid var(--brand-soft);
+  background: #fff;
 }
 
 .panel {
@@ -888,6 +991,11 @@ a {
   font-size: 1.22rem;
 }
 
+.analytics-panel-heading {
+  justify-content: center;
+  text-align: center;
+}
+
 .pipeline-list,
 .summary-list {
   display: grid;
@@ -907,6 +1015,17 @@ a {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
+}
+
+.summary-list a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.summary-list a:hover,
+.summary-list a:focus-visible {
+  border-color: var(--brand);
+  outline: 3px solid var(--brand-soft);
 }
 
 .pipeline-row {
@@ -1022,6 +1141,100 @@ a {
   font-weight: 800;
 }
 
+.hiring-movement-card {
+  display: grid;
+  gap: 14px;
+  min-height: 132px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.hiring-movement-card > strong {
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.hiring-movement-card > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hiring-movement-card span {
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  border-radius: 8px;
+  color: var(--brand);
+  background: #fbf8f9;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.hiring-movement-card small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.hiring-movement-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.source-performance-card {
+  display: grid;
+  gap: 14px;
+  min-height: 132px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.source-performance-card > strong {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 0.98rem;
+  overflow-wrap: anywhere;
+}
+
+.source-performance-card > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.source-performance-card span {
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  border-radius: 8px;
+  color: var(--brand);
+  background: #fbf8f9;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.source-performance-card small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.source-performance-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
 .breakdown-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1112,6 +1325,10 @@ a {
   text-transform: uppercase;
 }
 
+.recruiter-performance-row.table-head span:not(:first-child) {
+  text-align: center;
+}
+
 .recruiter-performance-row div {
   min-width: 0;
 }
@@ -1145,6 +1362,13 @@ a {
 .empty-panel p {
   margin: 8px 0 0;
   color: var(--muted);
+}
+
+.centered-empty-panel {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  text-align: center;
 }
 
 .alerts-list {

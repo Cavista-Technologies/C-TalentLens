@@ -15,6 +15,10 @@ export function canViewAnalytics(user: UserProfile | null) {
   return hasAnyRole(user, [appRoles.talentAcquisitionManager, appRoles.leadership])
 }
 
+export function canViewAllAlerts(user: UserProfile | null) {
+  return hasAnyRole(user, [appRoles.talentAcquisitionManager, appRoles.leadership])
+}
+
 export function canUseRecruitmentWrite(user: UserProfile | null) {
   return hasAnyRole(user, [appRoles.recruiter, appRoles.talentAcquisitionManager])
 }

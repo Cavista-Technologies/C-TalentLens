@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/feedback/StateMessage'
 import { AppLayout } from '../components/layout/AppLayout'
 import { PageContainer } from '../components/layout/PageContainer'
@@ -8,13 +9,17 @@ import { formatValue } from '../features/referrals/referralDisplay'
 import { getRequisitions } from '../features/requisitions/requisitionApi'
 import type { Requisition } from '../features/requisitions/requisitionTypes'
 
+const defaultDateRange = getDefaultDateRange()
+
 export function AnalyticsPage() {
   const [leadership, setLeadership] = useState<LeadershipSummary | null>(null)
   const [sources, setSources] = useState<SourceAnalytics | null>(null)
   const [trends, setTrends] = useState<HiringTrendResponse | null>(null)
   const [requisitions, setRequisitions] = useState<Requisition[]>([])
-  const [fromDate, setFromDate] = useState('')
-  const [toDate, setToDate] = useState('')
+  const [fromDate, setFromDate] = useState(defaultDateRange.fromDate)
+  const [toDate, setToDate] = useState(defaultDateRange.toDate)
+  const [draftFromDate, setDraftFromDate] = useState(defaultDateRange.fromDate)
+  const [draftToDate, setDraftToDate] = useState(defaultDateRange.toDate)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -69,28 +74,22 @@ export function AnalyticsPage() {
   return (
     <AppLayout title="Analytics">
       <PageContainer>
-        {isLoading && (
-          <div className="page-loader">
-            <LoadingState branded message="Loading analytics" />
-          </div>
-        )}
+        {isLoading && <LoadingState message="Loading analytics" />}
         {!isLoading && error && <ErrorState title="Analytics unavailable" message={error} />}
         {!isLoading && leadership && sources && trends && (
           <>
-            <form className="report-filter" aria-label="Analytics reporting period">
+            <form className="report-filter" aria-label="Analytics reporting period" onSubmit={handleApplyDateFilter}>
               <label>
                 From
-                <input type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} />
+                <input type="date" value={draftFromDate} onChange={(event) => setDraftFromDate(event.target.value)} />
               </label>
               <label>
                 To
-                <input type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} />
+                <input type="date" value={draftToDate} onChange={(event) => setDraftToDate(event.target.value)} />
               </label>
-              <button type="button" onClick={() => {
-                setFromDate('')
-                setToDate('')
-              }}>
-                Reset
+              <button type="submit">Filter</button>
+              <button className="secondary-filter-action" type="button" onClick={handleClearDateFilter}>
+                Clear
               </button>
             </form>
 
@@ -102,48 +101,57 @@ export function AnalyticsPage() {
 
             <section className="dashboard-grid">
               <article className="panel">
-                <div className="panel-heading">
+                <div className="panel-heading analytics-panel-heading">
                   <h2>Source performance</h2>
                 </div>
                 <div className="analytics-card-list">
                   {filteredSourceMetrics.map((source) => (
-                    <div className="analytics-stat-card" key={source.source}>
-                      <span>{formatValue(source.source)}</span>
-                      <strong>{source.hires}/{source.activities}</strong>
-                      <small>{source.sourceToHireConversionRate}% conversion</small>
+                    <div className="source-performance-card" key={source.source}>
+                      <strong>{formatValue(source.source)}</strong>
+                      <div>
+                        <span>
+                          <small>Candidates</small>
+                          {source.activities}
+                        </span>
+                        <span>
+                          <small>Hires</small>
+                          {source.hires}
+                        </span>
+                      </div>
+                      <p>Conversion: {source.sourceToHireConversionRate}%</p>
                     </div>
                   ))}
                 </div>
               </article>
 
               <article className="panel">
-                <div className="panel-heading">
+                <div className="panel-heading analytics-panel-heading">
                   <h2>Leadership risk</h2>
                 </div>
                 <dl className="summary-list">
-                  <div>
+                  <Link to="/requisitions?openOnly=true&nearSlaBreach=true">
                     <dt>At risk</dt>
                     <dd>{leadership.riskSummary.totalAtRiskRequisitions}</dd>
-                  </div>
-                  <div>
+                  </Link>
+                  <Link to="/alerts?scope=all&severity=Critical">
                     <dt>Critical</dt>
                     <dd>{leadership.riskSummary.criticalRiskRoles}</dd>
-                  </div>
-                  <div>
+                  </Link>
+                  <Link to="/requisitions?openOnly=true&overdueOnly=true">
                     <dt>Breaching SLA</dt>
                     <dd>{leadership.riskSummary.rolesBreachingSla}</dd>
-                  </div>
-                  <div>
+                  </Link>
+                  <Link to="/alerts?scope=all&type=OpenBottleneck">
                     <dt>Open bottlenecks</dt>
                     <dd>{leadership.riskSummary.openBottlenecks}</dd>
-                  </div>
+                  </Link>
                 </dl>
               </article>
             </section>
 
             <section className="dashboard-grid">
               <article className="panel">
-                <div className="panel-heading">
+                <div className="panel-heading analytics-panel-heading">
                   <h2>Time to fill breakdowns</h2>
                 </div>
                 <div className="breakdown-grid">
@@ -154,13 +162,13 @@ export function AnalyticsPage() {
               </article>
 
               <article className="panel">
-                <div className="panel-heading">
+                <div className="panel-heading analytics-panel-heading">
                   <h2>Recruiter performance</h2>
                 </div>
                 <div className="recruiter-performance-table">
                   <div className="recruiter-performance-row table-head">
                     <span>Recruiter</span>
-                    <span>Active</span>
+                    <span>Open reqs</span>
                     <span>Avg. TTF</span>
                     <span>SLA</span>
                     <span>Risk</span>
@@ -186,22 +194,31 @@ export function AnalyticsPage() {
 
             <section className="dashboard-grid">
               <article className="panel">
-                <div className="panel-heading">
+                <div className="panel-heading analytics-panel-heading">
                   <h2>Hiring movement</h2>
                 </div>
                 <div className="analytics-card-list">
                   {filteredHiringTrends.map((trend) => (
-                    <div className="analytics-stat-card" key={trend.month}>
-                      <span>{trend.month}</span>
-                      <strong>{trend.rolesFilled}/{trend.rolesOpened}</strong>
-                      <small>{trend.averageTimeToFill}d avg. TTF</small>
+                    <div className="hiring-movement-card" key={trend.month}>
+                      <strong>{trend.month}</strong>
+                      <div>
+                        <span>
+                          <small>Opened</small>
+                          {trend.rolesOpened}
+                        </span>
+                        <span>
+                          <small>Filled</small>
+                          {trend.rolesFilled}
+                        </span>
+                      </div>
+                      <p>Avg. time to fill: {trend.averageTimeToFill}d</p>
                     </div>
                   ))}
                 </div>
               </article>
 
               <article className="panel">
-                <div className="panel-heading">
+                <div className="panel-heading analytics-panel-heading">
                   <h2>Executive notes</h2>
                 </div>
                 <div className="stack-list">
@@ -219,6 +236,19 @@ export function AnalyticsPage() {
       </PageContainer>
     </AppLayout>
   )
+
+  function handleApplyDateFilter(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setFromDate(draftFromDate)
+    setToDate(draftToDate)
+  }
+
+  function handleClearDateFilter() {
+    setDraftFromDate(defaultDateRange.fromDate)
+    setDraftToDate(defaultDateRange.toDate)
+    setFromDate(defaultDateRange.fromDate)
+    setToDate(defaultDateRange.toDate)
+  }
 }
 
 function Metric({ label, value }: { label: string; value: number | string }) {
@@ -428,4 +458,22 @@ function percentage(value: number, total: number) {
   }
 
   return Math.round((value / total) * 1000) / 10
+}
+
+function getDefaultDateRange() {
+  const today = new Date()
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+
+  return {
+    fromDate: toDateInputValue(firstDayOfMonth),
+    toDate: toDateInputValue(today),
+  }
+}
+
+function toDateInputValue(value: Date) {
+  const year = value.getFullYear()
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
 }

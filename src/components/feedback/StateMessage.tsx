@@ -9,19 +9,17 @@ type LoadingStateProps = {
   branded?: boolean
 }
 
-export function LoadingState({ branded = false, message = 'Loading...' }: LoadingStateProps) {
-  if (branded) {
-    return (
+export function LoadingState({ message = 'Loading' }: LoadingStateProps) {
+  return (
+    <div className="page-loader">
       <div className="brand-loader" role="status" aria-live="polite">
         <img src="/cavista-logo.png" alt="Cavista" />
         <strong>TalentLens</strong>
         <span>{message}</span>
         <div />
       </div>
-    )
-  }
-
-  return <StateMessage title={message} />
+    </div>
+  )
 }
 
 export function ErrorState({ title, message }: Omit<StateMessageProps, 'tone'>) {
