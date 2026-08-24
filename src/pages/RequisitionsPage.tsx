@@ -160,6 +160,7 @@ export function RequisitionsPage() {
                 <span>Role</span>
                 <span>Recruiter</span>
                 <span>Status</span>
+                <span>Priority</span>
                 <span>SLA</span>
                 <span>Progress</span>
                 <span>Actions</span>
@@ -179,16 +180,16 @@ export function RequisitionsPage() {
                     <strong>{requisition.recruiter}</strong>
                   </div>
                   <div>
-                    <span className={`status-pill ${requisition.currentStatus.toLowerCase()}`}>
-                      {formatValue(requisition.currentStatus)}
-                    </span>
-                    <span>{formatValue(requisition.priority)}</span>
+                    <strong className="status-text">{formatValue(requisition.currentStatus)}</strong>
+                  </div>
+                  <div>
+                    <span className={`priority-pill ${requisition.priority.toLowerCase()}`}>{formatValue(requisition.priority)}</span>
                   </div>
                   <div>
                     <span className={`sla-pill ${requisition.slaState.toLowerCase()}`}>
                       {formatValue(requisition.slaState)}
                     </span>
-                    <span>{requisition.daysOpen} days open</span>
+                    <span className={`days-open ${requisition.slaState.toLowerCase()}`}>{requisition.daysOpen} days open</span>
                   </div>
                   <div>
                     <strong>

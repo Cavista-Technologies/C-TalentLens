@@ -1585,7 +1585,7 @@ a {
 }
 
 .requisition-table {
-  min-width: 1020px;
+  min-width: 1120px;
 }
 
 .referral-table {
@@ -1603,7 +1603,7 @@ a {
 }
 
 .requisition-row {
-  grid-template-columns: minmax(240px, 1.45fr) minmax(160px, 0.9fr) minmax(130px, 0.7fr) minmax(130px, 0.7fr) minmax(120px, 0.6fr) minmax(96px, 0.4fr);
+  grid-template-columns: minmax(240px, 1.45fr) minmax(150px, 0.82fr) minmax(130px, 0.62fr) minmax(110px, 0.52fr) minmax(130px, 0.62fr) minmax(115px, 0.55fr) minmax(96px, 0.4fr);
 }
 
 .referral-row {
@@ -1694,7 +1694,8 @@ a {
 }
 
 .status-pill,
-.sla-pill {
+.sla-pill,
+.priority-pill {
   display: inline-flex;
   align-items: center;
   width: fit-content;
@@ -1707,40 +1708,65 @@ a {
   font-weight: 900;
 }
 
-.status-pill.filled,
-.status-pill.closed,
+.status-pill {
+  color: var(--ink);
+  background: #f1eef0;
+}
+
+.status-text {
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.days-open {
+  font-weight: 800;
+}
+
+.days-open.ontrack,
+.days-open.closed {
+  color: #1f5c3a;
+}
+
+.days-open.warning {
+  color: #8a5500;
+}
+
+.days-open.breached {
+  color: var(--brand);
+}
+
+.sla-pill.ontrack,
+.sla-pill.closed,
 .sla-pill.withinsla {
   color: #1f5c3a;
   background: #d8f0e3;
 }
 
-.status-pill.offer,
-.status-pill.offerextended,
+.sla-pill.warning,
 .sla-pill.approachingsla {
   color: #66420a;
   background: #f7dfaa;
 }
 
-.status-pill.cancelled,
-.status-pill.rejected,
-.status-pill.withdrawn,
-.status-pill.ineligible,
 .sla-pill.breached {
   color: #fff;
   background: var(--brand);
 }
 
-.status-pill.hired {
+.priority-pill.low {
   color: #1f5c3a;
   background: #d8f0e3;
 }
 
-.status-pill.underreview,
-.status-pill.screening,
-.status-pill.interviewing,
-.status-pill.offerextended {
+.priority-pill.medium {
   color: #66420a;
   background: #f7dfaa;
+}
+
+.priority-pill.high {
+  color: #fff;
+  background: var(--brand);
 }
 
 .table-link {
