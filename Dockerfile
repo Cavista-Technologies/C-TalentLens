@@ -15,7 +15,7 @@ RUN npm ci
 copy . .
 RUN npm run build
 
-from nginx:1.27alpine AS runtime
+from nginx:1.27-alpine AS runtime
 copy nginx.conf /etc/nginx/conf.d/default.conf
 copy --from=build /app/dist /usr/share/nginx/html
 
