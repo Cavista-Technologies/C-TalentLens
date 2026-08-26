@@ -98,13 +98,13 @@ function AnalyticsContent({ analytics }: { analytics: ReferralAnalytics }) {
         <article className="panel">
           <div className="panel-heading">
             <p className="eyebrow">Top Referrers</p>
-            <h2>{analytics.topReferringDepartment ?? 'Departments'}</h2>
+            <h2>{analytics.topReferringDepartment ?? 'Teams'}</h2>
           </div>
           <dl className="summary-list">
             {analytics.topReferrers.slice(0, 5).map((item) => (
               <div key={`${item.referrerName}-${item.department}`}>
                 <dt>
-                  {item.referrerName} - {item.department}
+                  {item.referrerName} - {formatValue(item.department)}
                 </dt>
                 <dd>{item.referralsSubmitted}</dd>
               </div>

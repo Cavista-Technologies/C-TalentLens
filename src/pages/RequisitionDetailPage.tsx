@@ -156,13 +156,16 @@ function RequisitionDetail({
           <p className="eyebrow">{requisition.requisitionCode}</p>
           <h2>{requisition.roleName}</h2>
           <p>
-            {requisition.department} - {requisition.recruiter}
+            {formatValue(requisition.department)} - {requisition.recruiter}
           </p>
         </div>
 
         <div className="detail-status-stack">
           <span className={`status-pill ${requisition.currentStatus.toLowerCase()}`}>
             {formatValue(requisition.currentStatus)}
+          </span>
+          <span className="status-pill">
+            {formatValue(requisition.currentStage)}
           </span>
           <span className={`sla-pill ${requisition.slaState.toLowerCase()}`}>{formatValue(requisition.slaState)}</span>
         </div>
@@ -193,7 +196,7 @@ function RequisitionDetail({
                   <DetailItem label="Posting" value={formatValue(requisition.postingType)} />
                   <DetailItem label="Days open" value={`${requisition.daysOpen}`} />
                   <DetailItem label="Opened" value={formatDate(requisition.dateOpened)} />
-                  <DetailItem label="Advertised" value={formatDate(requisition.advertisementDate)} />
+                  <DetailItem label="Closed" value={requisition.closedDate ? formatDate(requisition.closedDate) : 'Not closed'} />
                 </dl>
               </DetailPanel>
 
@@ -216,11 +219,17 @@ function RequisitionDetail({
           {activeSection === 'bottlenecks' && (
             <DetailPanel
               title="Bottlenecks"
-              action={canWrite && (
-                <button className="small-action" type="button" onClick={() => setIsAddingBottleneck((current) => !current)}>
+              action={
+                <button
+                  className="small-action"
+                  type="button"
+                  disabled={!canWrite}
+                  title={canWrite ? undefined : 'Only recruiters and Talent Acquisition Managers can add bottlenecks'}
+                  onClick={() => setIsAddingBottleneck((current) => !current)}
+                >
                   Add bottleneck
                 </button>
-              )}
+              }
             >
               {openBottlenecks.length === 0 ? (
                 <p className="quiet-text">No open bottlenecks.</p>
@@ -243,11 +252,17 @@ function RequisitionDetail({
           {activeSection === 'actions' && (
             <DetailPanel
               title="Action Items"
-              action={canWrite && (
-                <button className="small-action" type="button" onClick={() => setIsAddingAction((current) => !current)}>
+              action={
+                <button
+                  className="small-action"
+                  type="button"
+                  disabled={!canWrite}
+                  title={canWrite ? undefined : 'Only recruiters and Talent Acquisition Managers can add actions'}
+                  onClick={() => setIsAddingAction((current) => !current)}
+                >
                   Add action
                 </button>
-              )}
+              }
             >
               {openActions.length === 0 ? (
                 <p className="quiet-text">No open action items.</p>
@@ -330,8 +345,8 @@ function Modal({ children, onClose, title }: { children: ReactNode; onClose: () 
       <section className="modal-panel" aria-modal="true" role="dialog" aria-labelledby="modal-title">
         <div className="modal-heading">
           <h2 id="modal-title">{title}</h2>
-          <button type="button" onClick={onClose} aria-label="Close modal">
-            Close
+          <button type="button" onClick={onClose} aria-label="Cancel">
+            Cancel
           </button>
         </div>
         {children}
@@ -363,6 +378,10 @@ function BottleneckCard({
   const [isSaving, setIsSaving] = useState(false)
 
   async function handleResolve() {
+    if (!canResolve) {
+      return
+    }
+
     setIsSaving(true)
     try {
       await resolveBottleneck(requisitionId, bottleneck.id, { resolutionSummary: 'Resolved from dashboard.' })
@@ -382,11 +401,15 @@ function BottleneckCard({
       <span className="meta-line">
         {formatValue(bottleneck.priority)} - {bottleneck.daysOpen} days open
       </span>
-      {canResolve && (
-        <button className="small-action" type="button" disabled={isSaving} onClick={handleResolve}>
-          {isSaving ? 'Resolving...' : 'Resolve'}
-        </button>
-      )}
+      <button
+        className="small-action"
+        type="button"
+        disabled={!canResolve || isSaving}
+        onClick={handleResolve}
+        title={canResolve ? undefined : 'Only the owner or Talent Acquisition Manager can resolve this bottleneck'}
+      >
+        {isSaving ? 'Resolving...' : 'Resolve'}
+      </button>
     </article>
   )
 }
@@ -405,6 +428,10 @@ function ActionCard({
   const [isSaving, setIsSaving] = useState(false)
 
   async function handleComplete() {
+    if (!canComplete) {
+      return
+    }
+
     setIsSaving(true)
     try {
       await completeActionItem(requisitionId, action.id, { completionNotes: 'Completed from dashboard.' })
@@ -425,11 +452,15 @@ function ActionCard({
         {formatValue(action.priority)}
         {action.dueDate ? ` - Due ${formatDate(action.dueDate)}` : ''}
       </span>
-      {canComplete && (
-        <button className="small-action" type="button" disabled={isSaving} onClick={handleComplete}>
-          {isSaving ? 'Completing...' : 'Complete'}
-        </button>
-      )}
+      <button
+        className="small-action"
+        type="button"
+        disabled={!canComplete || isSaving}
+        onClick={handleComplete}
+        title={canComplete ? undefined : 'Only the owner or Talent Acquisition Manager can complete this action'}
+      >
+        {isSaving ? 'Completing...' : 'Complete'}
+      </button>
     </article>
   )
 }
@@ -446,6 +477,7 @@ function BottleneckForm({
   requisitionId: string
 }) {
   const [isSaving, setIsSaving] = useState(false)
+  const [category, setCategory] = useState(bottleneckCategories[0])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -457,6 +489,7 @@ function BottleneckForm({
         reason: value(form, 'reason'),
         ownerUserId: value(form, 'ownerUserId'),
         category: value(form, 'category') || 'Other',
+        customCategory: nullableValue(form.get('customCategory')),
         priority: value(form, 'priority') || 'Medium',
         description: nullableValue(form.get('description')),
         businessImpact: nullableValue(form.get('businessImpact')),
@@ -475,7 +508,13 @@ function BottleneckForm({
         <input name="reason" required />
       </label>
       <Select label="Owner" name="ownerUserId" options={owners.map((owner) => [owner.id, owner.name])} />
-      <Select label="Category" name="category" options={bottleneckCategories.map((item) => [item, formatValue(item)])} />
+      <Select label="Category" name="category" onChange={setCategory} options={bottleneckCategories.map((item) => [item, formatValue(item)])} />
+      {category === 'Other' && (
+        <label>
+          Custom category
+          <input name="customCategory" required />
+        </label>
+      )}
       <Select label="Priority" name="priority" options={bottleneckPriorities.map((item) => [item, formatValue(item)])} />
       <label>
         Description
@@ -511,6 +550,7 @@ function ActionItemForm({
   requisitionId: string
 }) {
   const [isSaving, setIsSaving] = useState(false)
+  const [category, setCategory] = useState(actionCategories[0])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -523,6 +563,7 @@ function ActionItemForm({
         description: value(form, 'description'),
         ownerUserId: value(form, 'ownerUserId'),
         category: value(form, 'category') || 'Other',
+        customCategory: nullableValue(form.get('customCategory')),
         priority: value(form, 'priority') || 'Medium',
         dueDate: nullableValue(form.get('dueDate')),
       })
@@ -544,7 +585,13 @@ function ActionItemForm({
         <input name="description" required />
       </label>
       <Select label="Owner" name="ownerUserId" options={owners.map((owner) => [owner.id, owner.name])} />
-      <Select label="Category" name="category" options={actionCategories.map((item) => [item, formatValue(item)])} />
+      <Select label="Category" name="category" onChange={setCategory} options={actionCategories.map((item) => [item, formatValue(item)])} />
+      {category === 'Other' && (
+        <label>
+          Custom category
+          <input name="customCategory" required />
+        </label>
+      )}
       <Select label="Priority" name="priority" options={actionPriorities.map((item) => [item, formatValue(item)])} />
       <label>
         Due date
@@ -564,11 +611,21 @@ function ActionItemForm({
   )
 }
 
-function Select({ label, name, options }: { label: string; name: string; options: Array<[string, string]> }) {
+function Select({
+  label,
+  name,
+  onChange,
+  options,
+}: {
+  label: string
+  name: string
+  onChange?: (value: string) => void
+  options: Array<[string, string]>
+}) {
   return (
     <label>
       {label}
-      <select name={name} required>
+      <select name={name} onChange={(event) => onChange?.(event.target.value)} required>
         {options.map(([value, label]) => (
           <option value={value} key={value}>
             {label}

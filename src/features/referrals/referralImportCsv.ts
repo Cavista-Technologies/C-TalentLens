@@ -1,3 +1,5 @@
+import { normalizeCsvHeader, parseCsv, toCsvCell } from '../../lib/csv'
+
 export type ReferralImportRow = {
   roleReferredFor?: string | null
   email?: string | null
@@ -89,7 +91,7 @@ export function parseReferralCsv(text: string) {
     throw new Error('CSV must include a header row and at least one data row.')
   }
 
-  const headers = table[0].map((header) => normalizeHeader(header))
+  const headers = table[0].map((header) => normalizeCsvHeader(header))
 
   return table
     .slice(1)
@@ -115,60 +117,4 @@ export function parseReferralCsv(text: string) {
 
 export function getReferralTemplateUrl() {
   return URL.createObjectURL(new Blob([referralTemplateCsv], { type: 'text/csv;charset=utf-8' }))
-}
-
-function parseCsv(text: string) {
-  const rows: string[][] = []
-  let row: string[] = []
-  let value = ''
-  let isQuoted = false
-
-  for (let index = 0; index < text.length; index += 1) {
-    const char = text[index]
-    const nextChar = text[index + 1]
-
-    if (char === '"' && isQuoted && nextChar === '"') {
-      value += '"'
-      index += 1
-      continue
-    }
-
-    if (char === '"') {
-      isQuoted = !isQuoted
-      continue
-    }
-
-    if (char === ',' && !isQuoted) {
-      row.push(value)
-      value = ''
-      continue
-    }
-
-    if ((char === '\n' || char === '\r') && !isQuoted) {
-      if (char === '\r' && nextChar === '\n') {
-        index += 1
-      }
-
-      row.push(value)
-      rows.push(row)
-      row = []
-      value = ''
-      continue
-    }
-
-    value += char
-  }
-
-  row.push(value)
-  rows.push(row)
-
-  return rows.filter((cells) => cells.some((cell) => cell.trim()))
-}
-
-function normalizeHeader(value: string) {
-  return value.trim().toLowerCase().replace(/\s+/g, ' ')
-}
-
-function toCsvCell(value: string) {
-  return `"${value.replaceAll('"', '""')}"`
 }

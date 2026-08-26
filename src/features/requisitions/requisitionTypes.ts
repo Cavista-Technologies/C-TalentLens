@@ -9,7 +9,6 @@ export type Requisition = {
   recruiter: string
   priority: string
   dateOpened: string
-  advertisementDate: string
   hiringGoal: number
   openingReason: string
   customOpeningReason?: string | null
@@ -19,6 +18,7 @@ export type Requisition = {
   filledGoal: number
   remainingGoal: number
   currentStatus: string
+  currentStage: string
   offerExtendedDate?: string | null
   closedDate?: string | null
   daysOpen: number
@@ -84,6 +84,8 @@ export type RequisitionQuery = {
   openOnly?: boolean
   overdueOnly?: boolean
   nearSlaBreach?: boolean
+  status?: string
+  stage?: string
 }
 
 export type CreateRequisitionRequest = {
@@ -94,7 +96,6 @@ export type CreateRequisitionRequest = {
   recruiterUserId: string
   priority: string
   dateOpened: string
-  advertisementDate: string
   hiringGoal: number
   openingReason: string
   customOpeningReason?: string | null
@@ -105,11 +106,17 @@ export type CreateRequisitionRequest = {
 
 export type UpdateRequisitionRequest = Omit<CreateRequisitionRequest, 'requisitionCode'> & {
   filledGoal: number
+  currentStatus: string
+  closedDate?: string | null
 }
 
-export type UpdateRequisitionStatusRequest = {
-  status: string
+export type UpdateRequisitionStageRequest = {
+  stage: string
   effectiveDate?: string | null
+}
+
+export type ReassignRequisitionRecruiterRequest = {
+  recruiterUserId: string
 }
 
 export type CreateBottleneckRequest = {

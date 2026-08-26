@@ -1,27 +1,37 @@
-import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/feedback/StateMessage'
 import { AppLayout } from '../components/layout/AppLayout'
 import { PageContainer } from '../components/layout/PageContainer'
 import { useAuth } from '../features/auth/authContext'
-import { canUseRecruitmentWrite } from '../features/auth/roleAccess'
-import { ReferralForm } from '../features/referrals/ReferralForm'
+import { canUpdateReferralStatus } from '../features/auth/roleAccess'
 import { getReferrals, updateReferralStatus } from '../features/referrals/referralApi'
 import { formatDate, formatValue, referralStatuses } from '../features/referrals/referralDisplay'
 import type { Referral } from '../features/referrals/referralTypes'
+import type { PagedResponse } from '../lib/paginationTypes'
+
+const referralFilterStorageKey = 'c-talentlens:referral-filters'
 
 export function ReferralsPage() {
   const { user } = useAuth()
-  const canWrite = canUseRecruitmentWrite(user)
-  const [referrals, setReferrals] = useState<Referral[]>([])
-  const [search, setSearch] = useState('')
-  const [submittedSearch, setSubmittedSearch] = useState('')
-  const [status, setStatus] = useState('')
-  const [activeOnly, setActiveOnly] = useState(true)
+  const canUpdateStatus = canUpdateReferralStatus(user)
+  const storedFilters = readStoredReferralFilters()
+  const [response, setResponse] = useState<PagedResponse<Referral> | null>(null)
+  const referrals = response?.items ?? []
+  const [search, setSearch] = useState(storedFilters.search)
+  const [submittedSearch, setSubmittedSearch] = useState(storedFilters.search)
+  const [draftStatus, setDraftStatus] = useState(storedFilters.status)
+  const [status, setStatus] = useState(storedFilters.status)
+  const [draftSubmittedFrom, setDraftSubmittedFrom] = useState(storedFilters.submittedFrom)
+  const [submittedFrom, setSubmittedFrom] = useState(storedFilters.submittedFrom)
+  const [draftSubmittedTo, setDraftSubmittedTo] = useState(storedFilters.submittedTo)
+  const [submittedTo, setSubmittedTo] = useState(storedFilters.submittedTo)
+  const [drafts, setDrafts] = useState<Record<string, ReferralDraft>>({})
   const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  const [page, setPage] = useState(1)
   const [reloadKey, setReloadKey] = useState(0)
-  const [isAddingReferral, setIsAddingReferral] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -32,16 +42,30 @@ export function ReferralsPage() {
 
       try {
         const data = await getReferrals({
+          page,
+          pageSize: 10,
           search: submittedSearch.trim(),
           status,
-          activeOnly,
+          submittedFrom,
+          submittedTo,
         })
 
         if (!isMounted) {
           return
         }
 
-        setReferrals(data)
+        setResponse(data)
+        setDrafts(
+          Object.fromEntries(
+            data.items.map((referral) => [
+              referral.id,
+              {
+                status: referral.status,
+                hiredAt: referral.hiredAt ?? '',
+              },
+            ]),
+          ),
+        )
       } catch (err) {
         if (!isMounted) {
           return
@@ -60,66 +84,146 @@ export function ReferralsPage() {
     return () => {
       isMounted = false
     }
-  }, [submittedSearch, status, activeOnly, reloadKey])
+  }, [page, submittedSearch, status, submittedFrom, submittedTo, reloadKey])
+
+  useEffect(() => {
+    localStorage.setItem(
+      referralFilterStorageKey,
+      JSON.stringify({ search: submittedSearch, status, submittedFrom, submittedTo }),
+    )
+  }, [submittedSearch, status, submittedFrom, submittedTo])
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setPage(1)
     setSubmittedSearch(search)
+    setStatus(draftStatus)
+    setSubmittedFrom(draftSubmittedFrom)
+    setSubmittedTo(draftSubmittedTo)
   }
 
-  function handleReferralUpdated(updated: Referral) {
-    setReferrals((current) => current.map((referral) => (referral.id === updated.id ? updated : referral)))
+  function clearFilters() {
+    setPage(1)
+    setSearch('')
+    setSubmittedSearch('')
+    setDraftStatus('')
+    setStatus('')
+    setDraftSubmittedFrom('')
+    setSubmittedFrom('')
+    setDraftSubmittedTo('')
+    setSubmittedTo('')
   }
 
-  function handleReferralCreated() {
-    setIsAddingReferral(false)
-    setReloadKey((current) => current + 1)
+  function updateDraft(referralId: string, draft: Partial<ReferralDraft>) {
+    setDrafts((current) => ({
+      ...current,
+      [referralId]: {
+        ...current[referralId],
+        ...draft,
+      },
+    }))
   }
+
+  async function handleSaveChanges() {
+    if (!canUpdateStatus) {
+      return
+    }
+
+    const changedReferrals = referrals.filter((referral) => hasReferralChanged(referral, drafts[referral.id]))
+
+    if (changedReferrals.length === 0) {
+      return
+    }
+
+    setIsSaving(true)
+    setError('')
+
+    try {
+      const updated = await Promise.all(
+        changedReferrals.map((referral) => {
+          const draft = drafts[referral.id]
+          return updateReferralStatus(referral.id, {
+            status: draft.status,
+            hiringOutcome: getOutcomeForStatus(draft.status),
+            hiredAt: draft.hiredAt || null,
+          })
+        }),
+      )
+
+      setResponse((current) =>
+        current
+          ? {
+              ...current,
+              items: current.items.map((referral) => updated.find((item) => item.id === referral.id) ?? referral),
+            }
+          : current,
+      )
+      setReloadKey((current) => current + 1)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Referral changes could not be saved.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const changedCount = referrals.filter((referral) => hasReferralChanged(referral, drafts[referral.id])).length
+  const referralUpdateTitle = canUpdateStatus ? undefined : 'Only recruiters and Talent Acquisition Managers can update referrals'
 
   return (
     <AppLayout title="Referrals">
       <PageContainer>
-        <section className="list-toolbar">
-          <form className="search-form" onSubmit={handleSearch}>
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search candidate, referrer, role"
-              aria-label="Search referrals"
-            />
-            <button type="submit">Search</button>
-          </form>
-
-          <div className="inline-filters">
-            <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label="Filter by status">
-              <option value="">All statuses</option>
-              {referralStatuses.map((item) => (
-                <option value={item} key={item}>
-                  {formatValue(item)}
-                </option>
-              ))}
-            </select>
+        <form className="referral-filter-panel" aria-label="Referral filters" onSubmit={handleSearch}>
+          <div className="referral-search-form">
             <label>
-              <input type="checkbox" checked={activeOnly} onChange={(event) => setActiveOnly(event.target.checked)} />
-              Active
+              Search
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Candidate, referrer, or role"
+                aria-label="Search referrals"
+              />
             </label>
-            {canWrite && (
-              <button className="action-link" type="button" onClick={() => setIsAddingReferral(true)}>
-                New referral
-              </button>
-            )}
           </div>
-        </section>
+
+          <div className="referral-filter-grid">
+            <label>
+              Status
+              <select value={draftStatus} onChange={(event) => setDraftStatus(event.target.value)} aria-label="Filter by status">
+                <option value="">All statuses</option>
+                {referralStatuses.map((item) => (
+                  <option value={item} key={item}>
+                    {formatValue(item)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Submitted from
+              <input type="date" value={draftSubmittedFrom} onChange={(event) => setDraftSubmittedFrom(event.target.value)} />
+            </label>
+            <label>
+              Submitted to
+              <input type="date" value={draftSubmittedTo} onChange={(event) => setDraftSubmittedTo(event.target.value)} />
+            </label>
+          </div>
+
+          <div className="referral-filter-actions">
+            <button type="submit">Search</button>
+            <button className="secondary-filter-action" type="button" onClick={clearFilters}>
+              Clear
+            </button>
+          </div>
+        </form>
 
         {isLoading && <LoadingState message="Loading referrals..." />}
 
         {!isLoading && error && <ErrorState title="Referrals unavailable" message={error} />}
 
         {!isLoading && !error && referrals.length === 0 && (
-          <section className="empty-panel">
+          <section className="empty-panel centered-empty-panel">
             <strong>No referrals found</strong>
-            <p>Change the filters and try again.</p>
+            <p>No referrals match the current filters.</p>
           </section>
         )}
 
@@ -133,7 +237,7 @@ export function ReferralsPage() {
                 <span>Status</span>
                 <span>Resume</span>
                 <span>Submitted</span>
-                <span>Update</span>
+                <span>Resumption date</span>
               </div>
 
               {referrals.map((referral) => (
@@ -147,7 +251,7 @@ export function ReferralsPage() {
                   <div>
                     <strong>{referral.roleAppliedFor}</strong>
                     <span>
-                      {referral.requisitionCode} - {referral.department}
+                      {referral.requisitionCode} - {formatValue(referral.department)}
                     </span>
                   </div>
                   <div>
@@ -155,8 +259,25 @@ export function ReferralsPage() {
                     <span>{referral.referrerDepartment}</span>
                   </div>
                   <div>
-                    <span className={`status-pill ${referral.status.toLowerCase()}`}>{formatValue(referral.status)}</span>
-                    <span>{formatValue(referral.hiringOutcome)}</span>
+                    <select
+                      value={drafts[referral.id]?.status ?? referral.status}
+                      disabled={!canUpdateStatus}
+                      onChange={(event) => {
+                        const nextStatus = event.target.value
+                        updateDraft(referral.id, {
+                          status: nextStatus,
+                          hiredAt: nextStatus === 'Hired' ? drafts[referral.id]?.hiredAt || new Date().toISOString().slice(0, 10) : '',
+                        })
+                      }}
+                      aria-label={`Status for ${referral.candidateName}`}
+                      title={referralUpdateTitle}
+                    >
+                      {referralStatuses.map((item) => (
+                        <option value={item} key={item}>
+                          {formatValue(item)}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     {referral.resumeUrl ? (
@@ -170,93 +291,51 @@ export function ReferralsPage() {
                   <div>
                     <strong>{formatDate(referral.submissionDate)}</strong>
                   </div>
-                  {canWrite ? (
-                    <ReferralStatusControl referral={referral} onUpdated={handleReferralUpdated} />
-                  ) : (
-                    <div>
-                      <span className="muted-cell">Read only</span>
-                    </div>
-                  )}
+                  <div>
+                    <input
+                      type="date"
+                      value={drafts[referral.id]?.hiredAt ?? ''}
+                      disabled={!canUpdateStatus}
+                      onChange={(event) => updateDraft(referral.id, { hiredAt: event.target.value })}
+                      aria-label={`Resumption date for ${referral.candidateName}`}
+                      title={referralUpdateTitle}
+                    />
+                  </div>
                 </article>
               ))}
             </div>
+            <div className="table-save-bar">
+              <button type="button" disabled={!canUpdateStatus || isSaving || changedCount === 0} onClick={handleSaveChanges} title={referralUpdateTitle}>
+                {isSaving ? 'Saving' : 'Save'}
+              </button>
+            </div>
+            {response && (
+              <div className="pagination-bar">
+                <span>
+                  Page {response.pagination.page} of {response.pagination.totalPages}
+                </span>
+                <div>
+                  <button
+                    type="button"
+                    disabled={!response.pagination.hasPreviousPage}
+                    onClick={() => setPage((current) => Math.max(1, current - 1))}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!response.pagination.hasNextPage}
+                    onClick={() => setPage((current) => current + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
-        )}
-
-        {canWrite && isAddingReferral && (
-          <Modal title="New referral" wide onClose={() => setIsAddingReferral(false)}>
-            <ReferralForm onCancel={() => setIsAddingReferral(false)} onSaved={handleReferralCreated} />
-          </Modal>
         )}
       </PageContainer>
     </AppLayout>
-  )
-}
-
-function Modal({
-  children,
-  onClose,
-  title,
-  wide = false,
-}: {
-  children: ReactNode
-  onClose: () => void
-  title: string
-  wide?: boolean
-}) {
-  return (
-    <div className="modal-backdrop" role="presentation">
-      <section className={`modal-panel${wide ? ' wide-modal' : ''}`} aria-modal="true" role="dialog" aria-labelledby="referral-modal-title">
-        <div className="modal-heading">
-          <h2 id="referral-modal-title">{title}</h2>
-          <button type="button" onClick={onClose} aria-label="Close modal">
-            Close
-          </button>
-        </div>
-        {children}
-      </section>
-    </div>
-  )
-}
-
-function ReferralStatusControl({ onUpdated, referral }: { referral: Referral; onUpdated: (referral: Referral) => void }) {
-  const [nextStatus, setNextStatus] = useState(referral.status)
-  const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState('')
-
-  async function handleSave() {
-    setIsSaving(true)
-    setError('')
-
-    try {
-      const updated = await updateReferralStatus(referral.id, {
-        status: nextStatus,
-        hiringOutcome: getOutcomeForStatus(nextStatus),
-        hiredAt: nextStatus === 'Hired' ? new Date().toISOString().slice(0, 10) : null,
-      })
-
-      onUpdated(updated)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Status update failed.')
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  return (
-    <div className="row-actions">
-      <select value={nextStatus} onChange={(event) => setNextStatus(event.target.value)} aria-label="Update referral status">
-        {referralStatuses.map((item) => (
-          <option value={item} key={item}>
-            {formatValue(item)}
-          </option>
-        ))}
-      </select>
-      <button type="button" disabled={isSaving || nextStatus === referral.status} onClick={handleSave}>
-        {isSaving ? 'Saving' : 'Save'}
-      </button>
-      {error && <span>{error}</span>}
-    </div>
   )
 }
 
@@ -274,4 +353,33 @@ function getOutcomeForStatus(status: string) {
   }
 
   return 'Pending'
+}
+
+type ReferralDraft = {
+  status: string
+  hiredAt: string
+}
+
+function hasReferralChanged(referral: Referral, draft?: ReferralDraft) {
+  if (!draft) {
+    return false
+  }
+
+  return draft.status !== referral.status || draft.hiredAt !== (referral.hiredAt ?? '')
+}
+
+function readStoredReferralFilters() {
+  const fallback = {
+    search: '',
+    status: '',
+    submittedFrom: '',
+    submittedTo: '',
+  }
+
+  try {
+    const stored = localStorage.getItem(referralFilterStorageKey)
+    return stored ? { ...fallback, ...JSON.parse(stored) } : fallback
+  } catch {
+    return fallback
+  }
 }

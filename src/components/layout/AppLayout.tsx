@@ -9,7 +9,7 @@ type AppLayoutProps = {
   children: ReactNode
 }
 
-export function AppLayout({ title, eyebrow = 'TalentLens', children }: AppLayoutProps) {
+export function AppLayout({ title, eyebrow = 'C-TalentLens', children }: AppLayoutProps) {
   const { logout, user } = useAuth()
   const showAnalytics = canViewAnalytics(user)
   const showImport = canUseRecruitmentWrite(user)
@@ -20,7 +20,7 @@ export function AppLayout({ title, eyebrow = 'TalentLens', children }: AppLayout
         <div className="app-brand">
           <img className="app-logo" src="/cavista-logo.png" alt="Cavista" />
           <div>
-            <strong>TalentLens</strong>
+            <strong>C-TalentLens</strong>
           </div>
         </div>
 

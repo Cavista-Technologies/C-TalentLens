@@ -22,3 +22,11 @@ export function canViewAllAlerts(user: UserProfile | null) {
 export function canUseRecruitmentWrite(user: UserProfile | null) {
   return hasAnyRole(user, [appRoles.recruiter, appRoles.talentAcquisitionManager])
 }
+
+export function canUpdateReferralStatus(user: UserProfile | null) {
+  return hasAnyRole(user, [appRoles.recruiter, appRoles.talentAcquisitionManager])
+}
+
+export function canReassignRecruiter(user: UserProfile | null) {
+  return hasAnyRole(user, [appRoles.talentAcquisitionManager])
+}

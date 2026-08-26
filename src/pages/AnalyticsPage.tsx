@@ -78,19 +78,24 @@ export function AnalyticsPage() {
         {!isLoading && error && <ErrorState title="Analytics unavailable" message={error} />}
         {!isLoading && leadership && sources && trends && (
           <>
-            <form className="report-filter" aria-label="Analytics reporting period" onSubmit={handleApplyDateFilter}>
-              <label>
-                From
-                <input type="date" value={draftFromDate} onChange={(event) => setDraftFromDate(event.target.value)} />
-              </label>
-              <label>
-                To
-                <input type="date" value={draftToDate} onChange={(event) => setDraftToDate(event.target.value)} />
-              </label>
-              <button type="submit">Filter</button>
-              <button className="secondary-filter-action" type="button" onClick={handleClearDateFilter}>
-                Clear
-              </button>
+            <form className="analytics-filter-panel" aria-label="Analytics reporting period" onSubmit={handleApplyDateFilter}>
+              <div className="analytics-date-controls">
+                <label>
+                  From
+                  <input type="date" value={draftFromDate} onChange={(event) => setDraftFromDate(event.target.value)} />
+                </label>
+                <label>
+                  To
+                  <input type="date" value={draftToDate} onChange={(event) => setDraftToDate(event.target.value)} />
+                </label>
+              </div>
+
+              <div className="analytics-filter-actions">
+                <button type="submit">Filter</button>
+                <button className="secondary-filter-action" type="button" onClick={handleClearDateFilter}>
+                  Clear
+                </button>
+              </div>
             </form>
 
             <section className="metric-grid" aria-label="Executive KPIs">
@@ -126,22 +131,22 @@ export function AnalyticsPage() {
 
               <article className="panel">
                 <div className="panel-heading analytics-panel-heading">
-                  <h2>Leadership risk</h2>
+                  <h2>Hiring risk</h2>
                 </div>
-                <dl className="summary-list">
-                  <Link to="/requisitions?openOnly=true&nearSlaBreach=true">
+                <dl className="summary-list status-summary-list">
+                  <Link className="summary-warning" to="/requisitions?openOnly=true&nearSlaBreach=true">
                     <dt>At risk</dt>
                     <dd>{leadership.riskSummary.totalAtRiskRequisitions}</dd>
                   </Link>
-                  <Link to="/alerts?scope=all&severity=Critical">
+                  <Link className="summary-danger" to="/alerts?scope=all&severity=Critical">
                     <dt>Critical</dt>
                     <dd>{leadership.riskSummary.criticalRiskRoles}</dd>
                   </Link>
-                  <Link to="/requisitions?openOnly=true&overdueOnly=true">
+                  <Link className="summary-danger" to="/requisitions?openOnly=true&overdueOnly=true">
                     <dt>Breaching SLA</dt>
                     <dd>{leadership.riskSummary.rolesBreachingSla}</dd>
                   </Link>
-                  <Link to="/alerts?scope=all&type=OpenBottleneck">
+                  <Link className="summary-warning" to="/alerts?scope=all&type=OpenBottleneck">
                     <dt>Open bottlenecks</dt>
                     <dd>{leadership.riskSummary.openBottlenecks}</dd>
                   </Link>
@@ -156,7 +161,7 @@ export function AnalyticsPage() {
                 </div>
                 <div className="breakdown-grid">
                   <BreakdownList title="Recruiter" items={timeToFillBreakdowns.byRecruiter} />
-                  <BreakdownList title="Department" items={timeToFillBreakdowns.byDepartment} />
+                  <BreakdownList title="Team" items={timeToFillBreakdowns.byDepartment} />
                   <BreakdownList title="Priority" items={timeToFillBreakdowns.byPriority} />
                 </div>
               </article>
@@ -323,7 +328,7 @@ function getTimeToFillBreakdowns(requisitions: Requisition[]) {
 
   return {
     byRecruiter: groupAverageTimeToFill(closed, (requisition) => requisition.recruiter),
-    byDepartment: groupAverageTimeToFill(closed, (requisition) => requisition.department),
+    byDepartment: groupAverageTimeToFill(closed, (requisition) => formatValue(requisition.department)),
     byPriority: groupAverageTimeToFill(closed, (requisition) => formatValue(requisition.priority)),
   }
 }

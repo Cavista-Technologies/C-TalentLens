@@ -11,6 +11,18 @@ export const referralStatuses = [
 ]
 
 export function formatValue(value: string) {
+  const displayNames: Record<string, string> = {
+    ClientExperience: 'Client Experience',
+    ITInfrastructure: 'IT/Infrastructure',
+    MarketingAndCommunications: 'Marketing and Communications',
+    OfferExtended: 'Offer Extended',
+    UnderReview: 'Under Review',
+  }
+
+  if (displayNames[value]) {
+    return displayNames[value]
+  }
+
   return value.replace(/([a-z])([A-Z])/g, '$1 $2')
 }
 

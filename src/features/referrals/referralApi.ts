@@ -1,4 +1,5 @@
 import { apiRequest } from '../../lib/apiClient'
+import type { PagedResponse } from '../../lib/paginationTypes'
 import type {
   CreateReferralRequest,
   CreatePublicReferralRequest,
@@ -11,7 +12,10 @@ import type {
 } from './referralTypes'
 
 export function getReferrals(query: ReferralQuery = {}) {
-  const params = new URLSearchParams()
+  const params = new URLSearchParams({
+    page: String(query.page ?? 1),
+    pageSize: String(query.pageSize ?? 10),
+  })
 
   if (query.search) {
     params.set('search', query.search)
@@ -25,9 +29,17 @@ export function getReferrals(query: ReferralQuery = {}) {
     params.set('activeOnly', 'true')
   }
 
+  if (query.submittedFrom) {
+    params.set('submittedFrom', query.submittedFrom)
+  }
+
+  if (query.submittedTo) {
+    params.set('submittedTo', query.submittedTo)
+  }
+
   const queryString = params.toString()
 
-  return apiRequest<Referral[]>(queryString ? `/api/referrals?${queryString}` : '/api/referrals')
+  return apiRequest<PagedResponse<Referral>>(`/api/referrals?${queryString}`)
 }
 
 export function getReferral(id: string) {

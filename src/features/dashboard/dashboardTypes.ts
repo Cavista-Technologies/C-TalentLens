@@ -17,10 +17,12 @@ export type RecruitmentOverview = {
 }
 
 export type PipelineDashboard = {
-  rolesInSourcing: number
-  rolesInScreening: number
+  rolesInJobPosting: number
+  rolesInPipeliningSourcing: number
+  rolesInSparkHire: number
   rolesInInterviewStage: number
-  rolesInOfferStage: number
+  rolesInRequestToHire: number
+  rolesOfferedOrHired: number
   rolesFilled: number
 }
 

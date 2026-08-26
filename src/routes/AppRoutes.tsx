@@ -4,7 +4,6 @@ import { AnalyticsPage } from '../pages/AnalyticsPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { ImportsPage } from '../pages/ImportsPage'
 import { LoginPage } from '../pages/LoginPage'
-import { NewReferralPage } from '../pages/NewReferralPage'
 import { PublicReferralPage } from '../pages/PublicReferralPage'
 import { ReferralAnalyticsPage } from '../pages/ReferralAnalyticsPage'
 import { ReferralDetailPage } from '../pages/ReferralDetailPage'
@@ -76,14 +75,6 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ReferralsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/referrals/new"
-        element={
-          <ProtectedRoute allowedRoles={recruitmentWriteRoles}>
-            <NewReferralPage />
           </ProtectedRoute>
         }
       />

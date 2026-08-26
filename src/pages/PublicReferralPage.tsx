@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { formatValue, recruitmentTeams } from '../features/requisitions/requisitionDisplay'
 import { createPublicReferral, searchPublicRequisitions } from '../features/referrals/referralApi'
 import { uploadReferralResume } from '../features/referrals/resumeUpload'
 import type { PublicRequisition } from '../features/referrals/referralTypes'
@@ -155,7 +156,7 @@ export function PublicReferralPage() {
         {isSubmitted ? (
           <section className="state-message success">
             <strong>Referral submitted</strong>
-            <p>The recruiting team can now review this referral in TalentLens.</p>
+            <p>The recruiting team can now review this referral in C-TalentLens.</p>
           </section>
         ) : (
           <form className="form-panel public-referral-form" onSubmit={handleSubmit}>
@@ -188,7 +189,7 @@ export function PublicReferralPage() {
                   <button type="button" key={requisition.id} onClick={() => handleSelectRequisition(requisition)}>
                     <strong>{requisition.roleName}</strong>
                     <span>
-                      {requisition.requisitionCode} - {requisition.department}
+                      {requisition.requisitionCode} - {formatValue(requisition.department)}
                     </span>
                   </button>
                 ))}
@@ -246,8 +247,15 @@ export function PublicReferralPage() {
                   <input name="referrerEmail" type="email" required />
                 </label>
                 <label>
-                  Your department
-                  <input name="referrerDepartment" required />
+                  Your team
+                  <select name="referrerDepartment" defaultValue="" required>
+                    <option value="">Select team</option>
+                    {recruitmentTeams.map((team) => (
+                      <option value={formatValue(team)} key={team}>
+                        {formatValue(team)}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label>
                   Relationship to candidate

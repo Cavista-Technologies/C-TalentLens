@@ -67,11 +67,12 @@ function DashboardContent({ dashboard, user }: { dashboard: DashboardResponse; u
   const metrics = getRoleMetrics(dashboard, user)
   const attentionItems = getAttentionItems(dashboard, user)
   const pipeline = [
-    ['Sourcing', dashboard.pipeline.rolesInSourcing],
-    ['Screening', dashboard.pipeline.rolesInScreening],
+    ['JD / Job Posting', dashboard.pipeline.rolesInJobPosting],
+    ['Pipelining / Sourcing', dashboard.pipeline.rolesInPipeliningSourcing],
+    ['Spark Hire', dashboard.pipeline.rolesInSparkHire],
     ['Interview', dashboard.pipeline.rolesInInterviewStage],
-    ['Offer', dashboard.pipeline.rolesInOfferStage],
-    ['Filled', dashboard.pipeline.rolesFilled],
+    ['Request-to-Hire', dashboard.pipeline.rolesInRequestToHire],
+    ['Offered / Hired', dashboard.pipeline.rolesOfferedOrHired],
   ] as const
   const totalPipelineRequisitions = pipeline.reduce((total, [, count]) => total + count, 0)
 
@@ -79,7 +80,7 @@ function DashboardContent({ dashboard, user }: { dashboard: DashboardResponse; u
     <>
       <section className="metric-grid" aria-label="Recruitment metrics">
         {metrics.map((metric) => (
-          <Link className="metric-card dashboard-link-card" key={metric.label} to={metric.href}>
+          <Link className={`metric-card metric-${metric.tone} dashboard-link-card`} key={metric.label} to={metric.href}>
             <span>{metric.label}</span>
             <strong>{metric.value}</strong>
             <p>{metric.detail}</p>
@@ -160,36 +161,36 @@ function DashboardContent({ dashboard, user }: { dashboard: DashboardResponse; u
 function getRoleMetrics(dashboard: DashboardResponse, user: UserProfile | null) {
   if (hasAnyRole(user, [appRoles.hiringManager])) {
     return [
-      metric('My open requisitions', dashboard.recruitmentOverview.totalOpenRoles, `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`),
-      metric('Feedback actions', dashboard.actions.totalOpenActions, `${dashboard.actions.overdueActions} overdue`, 'neutral', '/alerts'),
-      metric('Open bottlenecks', dashboard.bottlenecks.totalOpenBottlenecks, `${dashboard.bottlenecks.escalatedBottlenecks} escalated`, 'neutral', '/alerts'),
-      metric('Near SLA breach', dashboard.risk.rolesNearSlaBreach, `${dashboard.risk.overdueRoles} overdue`, 'neutral', '/requisitions?nearSlaBreach=true'),
+      metric('My open requisitions', dashboard.recruitmentOverview.totalOpenRoles, `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`, 'success'),
+      metric('Feedback actions', dashboard.actions.totalOpenActions, `${dashboard.actions.overdueActions} overdue`, dashboard.actions.overdueActions > 0 ? 'warning' : 'success', '/alerts'),
+      metric('Open bottlenecks', dashboard.bottlenecks.totalOpenBottlenecks, `${dashboard.bottlenecks.escalatedBottlenecks} escalated`, dashboard.bottlenecks.escalatedBottlenecks > 0 ? 'danger' : 'warning', '/alerts'),
+      metric('Near SLA breach', dashboard.risk.rolesNearSlaBreach, `${dashboard.risk.overdueRoles} overdue`, dashboard.risk.overdueRoles > 0 ? 'danger' : 'warning', '/requisitions?nearSlaBreach=true'),
     ]
   }
 
   if (hasAnyRole(user, [appRoles.leadership])) {
     return [
-      metric('Open requisitions', dashboard.recruitmentOverview.totalOpenRoles, `${dashboard.recruitmentOverview.outstandingGoals} outstanding positions`),
-      metric('Filled requisitions', dashboard.pipeline.rolesFilled, `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`),
-      metric('Avg. time to fill', `${dashboard.timeToFill.averageTimeToFill}d`, `${dashboard.slaCompliance.complianceRate}% SLA compliance`, 'neutral', '/analytics'),
-      metric('At risk', dashboard.risk.items.length, `${dashboard.risk.stalledRequisitions} stalled`, 'neutral', '/alerts'),
+      metric('Open requisitions', dashboard.recruitmentOverview.totalOpenRoles, `${dashboard.recruitmentOverview.outstandingGoals} outstanding positions`, 'success'),
+      metric('Filled requisitions', dashboard.pipeline.rolesFilled, `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`, 'success'),
+      metric('Avg. time to fill', `${dashboard.timeToFill.averageTimeToFill}d`, `${dashboard.slaCompliance.complianceRate}% SLA compliance`, dashboard.slaCompliance.complianceRate >= 80 ? 'success' : 'warning', '/analytics'),
+      metric('At risk', dashboard.risk.items.length, `${dashboard.risk.stalledRequisitions} stalled`, dashboard.risk.items.length > 0 ? 'danger' : 'success', '/alerts'),
     ]
   }
 
   if (hasAnyRole(user, [appRoles.talentAcquisitionManager])) {
     return [
-      metric('Open requisitions', dashboard.recruitmentOverview.totalOpenRoles, `${dashboard.recruitmentOverview.outstandingGoals} outstanding positions`),
-      metric('SLA compliance', `${dashboard.slaCompliance.complianceRate}%`, `${dashboard.slaCompliance.rolesBreachingSla} breaching`, 'neutral', '/requisitions?overdueOnly=true'),
-      metric('Escalated bottlenecks', dashboard.bottlenecks.escalatedBottlenecks, `${dashboard.bottlenecks.highRiskBottlenecks} high risk`, 'neutral', '/alerts'),
-      metric('Overdue actions', dashboard.actions.overdueActions, `${dashboard.actions.highPriorityActions} high priority`, 'neutral', '/alerts'),
+      metric('Open requisitions', dashboard.recruitmentOverview.totalOpenRoles, `${dashboard.recruitmentOverview.outstandingGoals} outstanding positions`, 'success'),
+      metric('SLA compliance', `${dashboard.slaCompliance.complianceRate}%`, `${dashboard.slaCompliance.rolesBreachingSla} breaching`, dashboard.slaCompliance.rolesBreachingSla > 0 ? 'danger' : 'success', '/requisitions?overdueOnly=true'),
+      metric('Escalated bottlenecks', dashboard.bottlenecks.escalatedBottlenecks, `${dashboard.bottlenecks.highRiskBottlenecks} high risk`, dashboard.bottlenecks.escalatedBottlenecks > 0 ? 'danger' : 'success', '/alerts'),
+      metric('Overdue actions', dashboard.actions.overdueActions, `${dashboard.actions.highPriorityActions} high priority`, dashboard.actions.overdueActions > 0 ? 'warning' : 'success', '/alerts'),
     ]
   }
 
   return [
-    metric('My open requisitions', dashboard.recruitmentOverview.totalOpenRoles, `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`),
-    metric('Filled requisitions', dashboard.pipeline.rolesFilled, `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`, 'neutral', '/requisitions?openOnly=false'),
-    metric('Overdue actions', dashboard.actions.overdueActions, `${dashboard.actions.totalOpenActions} open actions`, 'neutral', '/alerts'),
-    metric('Open bottlenecks', dashboard.bottlenecks.totalOpenBottlenecks, `${dashboard.bottlenecks.escalatedBottlenecks} escalated`, 'neutral', '/alerts'),
+    metric('My open requisitions', dashboard.recruitmentOverview.totalOpenRoles, `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`, 'success'),
+    metric('Filled requisitions', dashboard.pipeline.rolesFilled, `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`, 'success', '/requisitions?openOnly=false'),
+    metric('Overdue actions', dashboard.actions.overdueActions, `${dashboard.actions.totalOpenActions} open actions`, dashboard.actions.overdueActions > 0 ? 'warning' : 'success', '/alerts'),
+    metric('Open bottlenecks', dashboard.bottlenecks.totalOpenBottlenecks, `${dashboard.bottlenecks.escalatedBottlenecks} escalated`, dashboard.bottlenecks.escalatedBottlenecks > 0 ? 'danger' : 'success', '/alerts'),
   ]
 }
 
@@ -247,7 +248,20 @@ function getPercent(value: number, total: number) {
 }
 
 function getPipelineHref(stage: string) {
-  return stage === 'Filled' ? '/requisitions?openOnly=false' : '/requisitions'
+  const stageFilters: Record<string, string> = {
+    'JD / Job Posting': 'JobPosting',
+    'Pipelining / Sourcing': 'PipeliningSourcing',
+    'Spark Hire': 'SparkHire',
+    Interview: 'Interview',
+    'Request-to-Hire': 'RequestToHire',
+    'Offered / Hired': 'OfferedHired',
+  }
+
+  if (stage === 'Filled') {
+    return '/requisitions?status=Closed'
+  }
+
+  return stageFilters[stage] ? `/requisitions?stage=${stageFilters[stage]}` : '/requisitions'
 }
 
 function getGreeting() {

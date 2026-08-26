@@ -14,7 +14,7 @@ export function LoadingState({ message = 'Loading' }: LoadingStateProps) {
     <div className="page-loader">
       <div className="brand-loader" role="status" aria-live="polite">
         <img src="/cavista-logo.png" alt="Cavista" />
-        <strong>TalentLens</strong>
+        <strong>C-TalentLens</strong>
         <span>{message}</span>
         <div />
       </div>

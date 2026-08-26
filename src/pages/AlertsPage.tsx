@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/feedback/StateMessage'
 import { AppLayout } from '../components/layout/AppLayout'
@@ -19,6 +20,7 @@ export function AlertsPage() {
   const canUseAllAlerts = canViewAllAlerts(user)
   const activeScope: AlertScope = searchParams.get('scope') === 'all' && canUseAllAlerts ? 'all' : 'mine'
   const [alerts, setAlerts] = useState<Alert[]>([])
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -62,6 +64,7 @@ export function AlertsPage() {
   }, [activeScope, searchParams])
 
   const emptyMessage = activeScope === 'all' ? 'There are no team alerts left' : 'You have no alerts left'
+  const alertGroups = getAlertGroups(alerts)
 
   return (
     <AppLayout title="Alerts">
@@ -115,35 +118,55 @@ export function AlertsPage() {
           </section>
         )}
 
-        {alerts.length > 0 && (
+        {alertGroups.length > 0 && (
           <section className="alerts-list" aria-label={activeScope === 'all' ? 'All alerts' : 'My alerts'}>
-            {alerts.map((alert) => (
-              <article className="alert-card" key={alert.id}>
-                <div>
-                  <span className={`severity-pill ${alert.severity.toLowerCase()}`}>
-                    {formatValue(alert.severity)}
+            {alertGroups.map((group) => (
+              <article className="alert-group" key={group.key}>
+                <button
+                  className="alert-group-header"
+                  type="button"
+                  aria-expanded={openGroups.has(group.key)}
+                  onClick={() => toggleAlertGroup(group.key)}
+                >
+                  <span className={`alert-group-chevron ${openGroups.has(group.key) ? 'open' : ''}`}>
+                    <ChevronDown size={18} aria-hidden="true" />
                   </span>
-                  <h2>{alert.roleName}</h2>
-                  <p>{alert.message}</p>
-                </div>
+                  <span className={`severity-pill ${group.severity.toLowerCase()}`}>{formatValue(group.severity)}</span>
+                  <strong>{group.requisitionCode}</strong>
+                  <span>{group.roleName}</span>
+                  <small>{group.alerts.length} {group.alerts.length === 1 ? 'alert' : 'alerts'}</small>
+                </button>
 
-                <dl>
-                  <div>
-                    <dt>Requisition</dt>
-                    <dd>{alert.requisitionCode}</dd>
-                  </div>
-                  <div>
-                    <dt>Reason</dt>
-                    <dd>{alert.reason}</dd>
-                  </div>
-                </dl>
+                {openGroups.has(group.key) && (
+                  <div className="alert-group-items">
+                    {group.alerts.map((alert) => (
+                      <div className="alert-card alert-card-nested" key={alert.id}>
+                        <div>
+                          <h2>{formatValue(alert.type)}</h2>
+                          <p>{alert.message}</p>
+                        </div>
 
-                <div className="alert-action">
-                  <span>Action</span>
-                  <Link className="table-link" to={getAlertTarget(alert)}>
-                    {getAlertLinkLabel(alert)}
-                  </Link>
-                </div>
+                        <dl>
+                          <div>
+                            <dt>Reason</dt>
+                            <dd>{alert.reason}</dd>
+                          </div>
+                          <div>
+                            <dt>Recipient</dt>
+                            <dd>{alert.recipientName}</dd>
+                          </div>
+                        </dl>
+
+                        <div className="alert-action">
+                          <span>Action</span>
+                          <Link className="table-link" to={getAlertTarget(alert)}>
+                            {getAlertLinkLabel(alert)}
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </article>
             ))}
           </section>
@@ -182,6 +205,67 @@ export function AlertsPage() {
     nextParams.delete('type')
     setSearchParams(nextParams)
   }
+
+  function toggleAlertGroup(groupKey: string) {
+    setOpenGroups((current) => {
+      const next = new Set(current)
+
+      if (next.has(groupKey)) {
+        next.delete(groupKey)
+      } else {
+        next.add(groupKey)
+      }
+
+      return next
+    })
+  }
+}
+
+type AlertGroup = {
+  key: string
+  requisitionCode: string
+  roleName: string
+  severity: string
+  alerts: Alert[]
+}
+
+function getAlertGroups(alerts: Alert[]): AlertGroup[] {
+  const groups = new Map<string, AlertGroup>()
+
+  for (const alert of alerts) {
+    const key = `${alert.requisitionId}:${alert.severity}`
+    const existingGroup = groups.get(key)
+
+    if (existingGroup) {
+      existingGroup.alerts.push(alert)
+      continue
+    }
+
+    groups.set(key, {
+      key,
+      requisitionCode: alert.requisitionCode,
+      roleName: alert.roleName,
+      severity: alert.severity,
+      alerts: [alert],
+    })
+  }
+
+  return [...groups.values()].sort(
+    (first, second) =>
+      getSeverityRank(first.severity) - getSeverityRank(second.severity) || first.requisitionCode.localeCompare(second.requisitionCode),
+  )
+}
+
+function getSeverityRank(severity: string) {
+  if (severity === 'Critical') {
+    return 0
+  }
+
+  if (severity === 'Warning') {
+    return 1
+  }
+
+  return 2
 }
 
 function formatValue(value: string) {

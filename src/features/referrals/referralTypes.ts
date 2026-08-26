@@ -39,9 +39,13 @@ export type ReferralHistory = {
 }
 
 export type ReferralQuery = {
+  page?: number
+  pageSize?: number
   search?: string
   status?: string
   activeOnly?: boolean
+  submittedFrom?: string
+  submittedTo?: string
 }
 
 export type CreateReferralRequest = {

@@ -43,7 +43,7 @@ export function LoginPage() {
     <main className="auth-page">
       <section className="auth-panel">
         <img className="auth-logo" src="/cavista-logo.png" alt="Cavista" />
-        <h1>TalentLens</h1>
+        <h1>C-TalentLens</h1>
 
         <form className="login-form" onSubmit={handleSubmit}>
           <label>

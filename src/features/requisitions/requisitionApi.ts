@@ -1,5 +1,6 @@
 import { apiRequest } from '../../lib/apiClient'
 import type { PagedResponse } from '../../lib/paginationTypes'
+import type { ImportResult } from '../referrals/referralTypes'
 import type {
   ActionItem,
   Bottleneck,
@@ -7,11 +8,12 @@ import type {
   CreateActionItemRequest,
   CreateBottleneckRequest,
   CreateRequisitionRequest,
+  ReassignRequisitionRecruiterRequest,
   Requisition,
   RequisitionQuery,
   ResolveBottleneckRequest,
   UpdateRequisitionRequest,
-  UpdateRequisitionStatusRequest,
+  UpdateRequisitionStageRequest,
 } from './requisitionTypes'
 
 export function getRequisitions(query: RequisitionQuery = {}) {
@@ -36,6 +38,14 @@ export function getRequisitions(query: RequisitionQuery = {}) {
     params.set('nearSlaBreach', 'true')
   }
 
+  if (query.status) {
+    params.set('status', query.status)
+  }
+
+  if (query.stage) {
+    params.set('stage', query.stage)
+  }
+
   return apiRequest<PagedResponse<Requisition>>(`/api/requisitions?${params.toString()}`)
 }
 
@@ -57,8 +67,15 @@ export function updateRequisition(id: string, request: UpdateRequisitionRequest)
   })
 }
 
-export function updateRequisitionStatus(id: string, request: UpdateRequisitionStatusRequest) {
-  return apiRequest<Requisition>(`/api/requisitions/${id}/status`, {
+export function updateRequisitionStage(id: string, request: UpdateRequisitionStageRequest) {
+  return apiRequest<Requisition>(`/api/requisitions/${id}/stage`, {
+    method: 'PATCH',
+    body: request,
+  })
+}
+
+export function reassignRequisitionRecruiter(id: string, request: ReassignRequisitionRecruiterRequest) {
+  return apiRequest<Requisition>(`/api/requisitions/${id}/recruiter`, {
     method: 'PATCH',
     body: request,
   })
@@ -89,5 +106,12 @@ export function completeActionItem(requisitionId: string, actionItemId: string, 
   return apiRequest<ActionItem>(`/api/requisitions/${requisitionId}/actions/${actionItemId}/complete`, {
     method: 'PATCH',
     body: request,
+  })
+}
+
+export function importRequisitions(rows: unknown[]) {
+  return apiRequest<ImportResult>('/api/imports/requisitions', {
+    method: 'POST',
+    body: rows,
   })
 }

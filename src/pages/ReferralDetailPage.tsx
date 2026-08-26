@@ -73,7 +73,7 @@ function ReferralDetail({ referral }: { referral: Referral }) {
           <p className="eyebrow">{referral.requisitionCode}</p>
           <h2>{referral.candidateName}</h2>
           <p>
-            {referral.roleAppliedFor} - {referral.department}
+            {referral.roleAppliedFor} - {formatValue(referral.department)}
           </p>
         </div>
         <div className="detail-status-stack">
@@ -106,7 +106,7 @@ function ReferralDetail({ referral }: { referral: Referral }) {
           </div>
           <dl className="detail-list">
             <DetailItem label="Name" value={referral.referrerName} />
-            <DetailItem label="Department" value={referral.referrerDepartment} />
+            <DetailItem label="Team" value={referral.referrerDepartment} />
             <DetailItem label="Employee ID" value={referral.referrerEmployeeId || '-'} />
             <DetailItem label="Submitter" value={referral.submitterName || referral.submitterEmail || '-'} />
           </dl>
