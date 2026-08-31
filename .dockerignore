@@ -1,0 +1,16 @@
+.github
+.git
+.vs
+.vscode
+.idea
+
+node_modules
+dist
+dist_ssr
+coverage
+
+*.log
+*.local
+.env
+
+Dockerfile
