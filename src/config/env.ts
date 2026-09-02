@@ -1,4 +1,4 @@
-const fallbackApiBaseUrl = 'http://localhost:5144'
+const fallbackApiBaseUrl = 'https://c-talentlens-be-latest.onrender.com'
 
 export const env = {
   apiBaseUrl: trimTrailingSlash(readEnvValue(import.meta.env.VITE_API_BASE_URL) || fallbackApiBaseUrl),

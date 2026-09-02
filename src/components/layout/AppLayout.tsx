@@ -1,76 +1,96 @@
-import type { ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
-import { useAuth } from '../../features/auth/authContext'
-import { canUseRecruitmentWrite, canViewAnalytics } from '../../features/auth/roleAccess'
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+
+import { AppFooter } from "./AppFooter";
+import { Sidebar } from "./Sidebar";
+import { Topbar } from "./Topbar";
+
+import "../../styles/AppLayout.css";
 
 type AppLayoutProps = {
-  title: string
-  eyebrow?: string
-  children: ReactNode
-}
+  title: string;
+  children: ReactNode;
+};
 
-export function AppLayout({ title, eyebrow = 'C-TalentLens', children }: AppLayoutProps) {
-  const { logout, user } = useAuth()
-  const showAnalytics = canViewAnalytics(user)
-  const showImport = canUseRecruitmentWrite(user)
+const DESKTOP_COLLAPSE_KEY = "c-talentlens-sidebar-collapsed";
+
+export function AppLayout({ title, children }: AppLayoutProps) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem(DESKTOP_COLLAPSE_KEY) === "true";
+  });
+
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(DESKTOP_COLLAPSE_KEY, String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth > 768) {
+        setMobileSidebarOpen(false);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mobileSidebarOpen) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileSidebarOpen]);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((previous) => !previous);
+  };
+
+  const openMobileSidebar = () => {
+    setMobileSidebarOpen(true);
+  };
+
+  const closeMobileSidebar = () => {
+    setMobileSidebarOpen(false);
+  };
 
   return (
-    <main className="app-layout">
-      <header className="app-header">
-        <div className="app-brand">
-          <img className="app-logo" src="/cavista-logo.png" alt="Cavista" />
-          <div>
-            <strong>C-TalentLens</strong>
-          </div>
-        </div>
+    <main
+      className={[
+        "app-layout",
+        sidebarCollapsed ? "layout-sidebar-collapsed" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        mobileOpen={mobileSidebarOpen}
+        onCloseMobile={closeMobileSidebar}
+        onToggleCollapse={toggleSidebar}
+      />
 
-        <nav className="app-nav" aria-label="Main navigation">
-          <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-            Dashboard
-          </NavLink>
-          <NavLink to="/requisitions" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-            Requisitions
-          </NavLink>
-          <NavLink to="/referrals" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-            Referrals
-          </NavLink>
-          {showAnalytics && (
-            <NavLink to="/analytics" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-              Analytics
-            </NavLink>
-          )}
-          {showImport && (
-            <NavLink to="/imports" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-              Import
-            </NavLink>
-          )}
-          <NavLink to="/alerts" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-            Alerts
-          </NavLink>
-        </nav>
+      <div className="app-content">
+        <Topbar
+          title={title}
+          sidebarCollapsed={sidebarCollapsed}
+          onOpenMobileMenu={openMobileSidebar}
+        />
 
-        <div className="app-account">
-          {user && (
-            <div>
-              <strong>{user.fullName}</strong>
-            </div>
-          )}
-          <button type="button" onClick={logout}>
-            Logout
-          </button>
-        </div>
-      </header>
+        <main className="app-page-content">{children}</main>
 
-      <section className="app-main">
-        <header className="app-topbar">
-          <div>
-            <p className="eyebrow">{eyebrow}</p>
-            <h1>{title}</h1>
-          </div>
-        </header>
-
-        {children}
-      </section>
+        <AppFooter />
+      </div>
     </main>
-  )
+  );
 }

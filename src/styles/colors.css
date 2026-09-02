@@ -1,0 +1,231 @@
+:root {
+  /* --------------------------------------------
+     BRAND
+  -------------------------------------------- */
+
+  --color-brand: #b9243c;
+  --color-brand-dark: #941d31;
+  --color-brand-light: #fdf0f2;
+  --color-brand-lighter: #fff7f8;
+
+
+  /* --------------------------------------------
+     BACKGROUNDS
+  -------------------------------------------- */
+
+  --color-background: #f7f8fa;
+  --color-background-light: #fbfdfc;
+  --color-background-white: #ffffff;
+
+  /* Login page background */
+  --color-auth-background: #f5f9f8;
+
+  /* Card / surface */
+  --color-surface: #ffffff;
+  --color-surface-transparent: rgba(255, 255, 255, 0.94);
+
+
+  /* --------------------------------------------
+     TEXT
+  -------------------------------------------- */
+
+  --color-text: #202124;
+  --color-text-dark: #172b2a;
+  --color-text-secondary: #667085;
+  --color-text-muted: #6d7d7b;
+  --color-text-label: #344a47;
+  --color-text-placeholder: #a3b0ae;
+  --color-text-icon: #879693;
+  --color-text-footer: #9aa8a5;
+
+
+  /* --------------------------------------------
+     BORDERS
+  -------------------------------------------- */
+
+  --color-border: #e7e9ee;
+  --color-border-light: #f0f1f4;
+  --color-border-input: #dfe8e6;
+  --color-border-hover: #c7d7d3;
+  --color-border-brand: #ead2d6;
+  --color-border-divider: #d9e4e1;
+  --color-border-error: #f5d3ce;
+
+
+  /* --------------------------------------------
+     ERROR
+  -------------------------------------------- */
+
+  --color-error: #c0392b;
+  --color-error-background: #fff2f0;
+
+
+  /* --------------------------------------------
+     WHITE / BLACK
+  -------------------------------------------- */
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+
+/* --------------------------------------------
+   SIDEBAR
+-------------------------------------------- */
+
+--color-sidebar-background: #b9243c;
+
+--color-sidebar-text: rgba(255, 255, 255, 0.78);
+--color-sidebar-text-muted: rgba(255, 255, 255, 0.62);
+
+--color-sidebar-icon: rgba(255, 255, 255, 0.82);
+
+--color-sidebar-hover: rgba(255, 255, 255, 0.12);
+
+--color-sidebar-active-background: #ffffff;
+--color-sidebar-active-text: #b9243c;
+
+--color-sidebar-border: rgba(255, 255, 255, 0.16);
+
+--color-sidebar-user-background: rgba(255, 255, 255, 0.12);
+
+--color-sidebar-focus: rgba(255, 255, 255, 0.45);
+
+
+
+  /* --------------------------------------------
+     SPECIAL / DECORATIVE COLORS
+  -------------------------------------------- */
+
+  --color-orb: rgba(8, 108, 96, 0.08);
+  --color-orb-light: rgba(8, 108, 96, 0.07);
+
+  --color-grid: rgba(7, 94, 84, 0.035);
+
+  --color-brand-shadow: rgba(185, 36, 60, 0.20);
+  --color-brand-shadow-light: rgba(185, 36, 60, 0.08);
+
+  --color-auth-shadow: rgba(24, 55, 51, 0.11);
+  --color-auth-shadow-light: rgba(24, 55, 51, 0.05);
+
+  --color-focus: rgba(7, 94, 84, 0.09);
+  --color-focus-strong: rgba(7, 94, 84, 0.20);
+
+  --color-footer-dot: #c3cfcc;
+
+
+  /* --------------------------------------------
+     LOGIN BUTTON
+  -------------------------------------------- */
+
+  --color-login-button-start: #b9243c;
+  --color-login-button-end: #b9243d88;
+
+  --color-login-button-hover-start: #b9243d88;
+  --color-login-button-hover-end: #b9243c;
+
+  --color-login-button-shadow: rgba(7, 94, 84, 0.20);
+  --color-login-button-shadow-hover: rgba(7, 94, 84, 0.25);
+  --color-login-button-shadow-active: rgba(7, 94, 84, 0.18);
+
+  --color-spinner-border: rgba(255, 255, 255, 0.35);
+
+
+  /* --------------------------------------------
+     PRIMARY / TEAL
+  -------------------------------------------- */
+
+  --color-primary: #087568;
+  --color-primary-dark: #075e54;
+  --color-primary-light: #e8f6f3;
+  --color-primary-lighter: #f3fbf9;
+
+
+  /* --------------------------------------------
+     SUCCESS
+  -------------------------------------------- */
+
+  --color-success: #087568;
+  --color-success-dark: #075e54;
+  --color-success-light: #ecfdf3;
+  --color-success-border: #b7e4d8;
+
+
+  /* --------------------------------------------
+     WARNING
+  -------------------------------------------- */
+
+  --color-warning: #b54708;
+  --color-warning-dark: #93370d;
+  --color-warning-light: #fff7ed;
+  --color-warning-border: #fed7aa;
+
+
+  /* --------------------------------------------
+     DANGER
+  -------------------------------------------- */
+
+  --color-danger: #c0392b;
+  --color-danger-dark: #a93226;
+  --color-danger-light: #fff2f0;
+  --color-danger-border: #f5d3ce;
+
+
+  /* --------------------------------------------
+     NEUTRAL
+  -------------------------------------------- */
+
+  --color-neutral: #667085;
+  --color-neutral-dark: #475467;
+  --color-neutral-light: #f8fafc;
+  --color-neutral-border: #e4e7ec;
+
+
+  /* --------------------------------------------
+     DASHBOARD SURFACES
+  -------------------------------------------- */
+
+  --color-background-soft: #f8fafb;
+  --color-border-dark: #d5dadf;
+  --color-text-strong: #172b2a;
+
+
+  /* --------------------------------------------
+     PIPELINE
+  -------------------------------------------- */
+
+  --color-pipeline-track: #e8eeec;
+  --color-pipeline-start: #b9243c;
+  --color-pipeline-end: #b9243c;
+
+
+  /* --------------------------------------------
+     DASHBOARD SHADOWS
+  -------------------------------------------- */
+
+  --shadow-sm:
+    0 1px 2px rgba(24, 55, 51, 0.04),
+    0 4px 12px rgba(24, 55, 51, 0.04);
+
+  --shadow-md:
+    0 8px 24px rgba(24, 55, 51, 0.08),
+    0 2px 6px rgba(24, 55, 51, 0.05);
+
+
+  /* --------------------------------------------
+     DASHBOARD RADII
+  -------------------------------------------- */
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+
+  /* --------------------------------------------
+     DASHBOARD MOTION
+  -------------------------------------------- */
+
+  --transition-fast: 150ms ease;
+  --transition-normal: 220ms ease;
+  --transition-slow: 320ms ease;
+}

@@ -1,0 +1,1457 @@
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.app-sidebar {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  z-index: 1100;
+
+  width: 270px;
+
+  display: flex;
+  flex-direction: column;
+
+  /*
+   * Main Cavista red.
+   */
+  background: #b9243c;
+
+  border-right: 1px solid rgba(255, 255, 255, 0.16);
+
+  box-shadow:
+    6px 0 24px rgba(16, 24, 40, 0.12);
+
+  overflow: hidden;
+
+  transition:
+    width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* =========================================================
+   COLLAPSED SIDEBAR
+========================================================= */
+
+.sidebar-collapsed {
+  width: 82px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.sidebar-header {
+  min-height: 104px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 16px 14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0)
+    );
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.sidebar-brand {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* =========================================================
+   TALENTLENS CSS LOGO
+========================================================= */
+
+.talentlens-logo {
+  height: 68px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  color: #ffffff;
+
+  user-select: none;
+
+  white-space: nowrap;
+
+  transition:
+    transform 0.28s ease,
+    gap 0.28s ease;
+}
+
+
+/* =========================================================
+   STYLIZED C MARK
+========================================================= */
+
+.talentlens-mark {
+  position: relative;
+
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  transition:
+    width 0.28s ease,
+    height 0.28s ease,
+    transform 0.3s ease;
+}
+
+
+/*
+ * Main outer coil.
+ */
+
+.talentlens-coil {
+  position: absolute;
+
+  display: block;
+
+  border: 4px solid #ffffff;
+
+  border-right-color: transparent;
+
+  border-radius: 50%;
+
+  transform: rotate(-35deg);
+
+  transition:
+    width 0.28s ease,
+    height 0.28s ease,
+    border-width 0.28s ease,
+    transform 0.35s ease;
+}
+
+
+/*
+ * Outer ring.
+ */
+
+.talentlens-coil-one {
+  width: 55px;
+  height: 55px;
+
+  opacity: 0.98;
+
+  transform:
+    translateX(-1px)
+    rotate(-38deg);
+}
+
+
+/*
+ * Middle ring.
+ */
+
+.talentlens-coil-two {
+  width: 43px;
+  height: 43px;
+
+  border-width: 4px;
+
+  opacity: 0.92;
+
+  transform:
+    translateX(-3px)
+    rotate(-48deg);
+}
+
+
+/*
+ * Inner ring.
+ */
+
+.talentlens-coil-three {
+  width: 31px;
+  height: 31px;
+
+  border-width: 4px;
+
+  opacity: 0.88;
+
+  transform:
+    translateX(-5px)
+    rotate(-58deg);
+}
+
+
+/*
+ * Core.
+
+ * The red core creates the open-space effect
+ * inside the C.
+ */
+
+.talentlens-mark-core {
+  position: absolute;
+
+  width: 17px;
+  height: 17px;
+
+  border-radius: 50%;
+
+  background: #b9243c;
+
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.10);
+
+  transform:
+    translateX(-4px);
+
+  transition:
+    width 0.28s ease,
+    height 0.28s ease,
+    transform 0.28s ease;
+}
+
+
+/*
+ * Small red accent.
+ *
+ * This gives the C a subtle Cavista-inspired
+ * inner accent.
+ */
+
+.talentlens-mark::after {
+  content: "";
+
+  position: absolute;
+
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  opacity: 0.9;
+
+  transform:
+    translate(-8px, 0)
+    scale(0.65);
+
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+
+/* =========================================================
+   WORDMARK
+========================================================= */
+
+.talentlens-wordmark {
+  display: flex;
+  align-items: baseline;
+
+  gap: 1px;
+
+  color: #ffffff;
+
+  transform-origin: left center;
+
+  transition:
+    opacity 0.22s ease,
+    transform 0.28s ease,
+    max-width 0.28s ease;
+}
+
+
+/*
+ * Hyphen.
+ */
+
+.talentlens-hyphen {
+  color: rgba(255, 255, 255, 0.78);
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  font-size: 24px;
+
+  font-weight: 500;
+
+  line-height: 1;
+
+  transform:
+    translateY(-1px);
+}
+
+
+/*
+ * TalentLens.
+ */
+
+.talentlens-name {
+  color: #ffffff;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  font-size: 22px;
+
+  font-weight: 750;
+
+  letter-spacing: -0.045em;
+
+  line-height: 1;
+
+  text-shadow:
+    0 1px 1px rgba(80, 8, 22, 0.14);
+}
+
+
+/* =========================================================
+   LOGO HOVER
+========================================================= */
+
+.talentlens-logo:hover .talentlens-mark {
+  transform: scale(1.035);
+}
+
+
+.talentlens-logo:hover .talentlens-coil-one {
+  transform:
+    translateX(-1px)
+    rotate(-48deg);
+}
+
+
+.talentlens-logo:hover .talentlens-coil-two {
+  transform:
+    translateX(-3px)
+    rotate(-58deg);
+}
+
+
+.talentlens-logo:hover .talentlens-coil-three {
+  transform:
+    translateX(-5px)
+    rotate(-68deg);
+}
+
+
+.talentlens-logo:hover .talentlens-mark::after {
+  transform:
+    translate(-8px, 0)
+    scale(0.8);
+}
+
+
+/* =========================================================
+   COLLAPSED LOGO
+========================================================= */
+
+.sidebar-collapsed .sidebar-header {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+
+.sidebar-collapsed .talentlens-logo {
+  justify-content: center;
+
+  width: 58px;
+
+  gap: 0;
+}
+
+
+/*
+ * Hide "-TalentLens".
+ */
+
+.sidebar-collapsed .talentlens-wordmark {
+  display: none;
+}
+
+
+/*
+ * Make the C slightly more prominent
+ * when it is the only branding element.
+ */
+
+.sidebar-collapsed .talentlens-mark {
+  width: 56px;
+  height: 56px;
+}
+
+
+.sidebar-collapsed .talentlens-coil-one {
+  width: 54px;
+  height: 54px;
+}
+
+
+.sidebar-collapsed .talentlens-coil-two {
+  width: 42px;
+  height: 42px;
+}
+
+
+.sidebar-collapsed .talentlens-coil-three {
+  width: 30px;
+  height: 30px;
+}
+
+
+/* =========================================================
+   MOBILE CLOSE
+========================================================= */
+
+.sidebar-mobile-close {
+  width: 36px;
+  height: 36px;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.10);
+
+  color: #ffffff;
+
+  flex-shrink: 0;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.sidebar-mobile-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+
+  border-color: rgba(255, 255, 255, 0.40);
+
+  transform: scale(1.03);
+}
+
+
+.sidebar-mobile-close svg {
+  width: 19px;
+  height: 19px;
+
+  color: currentColor;
+
+  stroke: currentColor;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.sidebar-navigation {
+  flex: 1;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 22px 12px 16px;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(255, 255, 255, 0.25)
+    transparent;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+.sidebar-navigation::-webkit-scrollbar {
+  width: 5px;
+}
+
+
+.sidebar-navigation::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.sidebar-navigation::-webkit-scrollbar-thumb {
+  background:
+    rgba(255, 255, 255, 0.25);
+
+  border-radius: 999px;
+}
+
+
+.sidebar-navigation::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(255, 255, 255, 0.38);
+}
+
+
+/* =========================================================
+   NAVIGATION LABEL
+========================================================= */
+
+.sidebar-navigation-label {
+  min-height: 26px;
+
+  padding: 0 13px;
+
+  margin-bottom: 5px;
+
+  color:
+    rgba(255, 255, 255, 0.52);
+
+  font-size: 10px;
+
+  font-weight: 750;
+
+  letter-spacing: 0.13em;
+
+  line-height: 26px;
+
+  transition:
+    opacity 0.2s ease;
+}
+
+
+.sidebar-collapsed .sidebar-navigation-label {
+  text-align: center;
+
+  padding: 0;
+
+  font-size: 0;
+
+  opacity: 0;
+}
+
+
+/* =========================================================
+   NAVIGATION LINK
+========================================================= */
+
+.sidebar-nav-link {
+  position: relative;
+
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 6px;
+
+  padding: 0 14px;
+
+  border: 1px solid transparent;
+
+  border-radius: 10px;
+
+  color:
+    rgba(255, 255, 255, 0.78);
+
+  text-decoration: none;
+
+  font-size: 14px;
+
+  font-weight: 570;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* =========================================================
+   NAVIGATION HOVER
+========================================================= */
+
+.sidebar-nav-link:hover {
+  color: #ffffff;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  border-color:
+    rgba(255, 255, 255, 0.10);
+
+  transform:
+    translateX(2px);
+}
+
+
+/* =========================================================
+   ACTIVE NAVIGATION
+========================================================= */
+
+.sidebar-nav-link.active {
+  color: #b9243c;
+
+  background:
+    #ffffff;
+
+  border-color:
+    rgba(255, 255, 255, 0.92);
+
+  font-weight: 700;
+
+  box-shadow:
+    0 5px 14px rgba(76, 10, 26, 0.17);
+}
+
+
+.sidebar-nav-link.active:hover {
+  background: #ffffff;
+
+  transform: none;
+}
+
+
+/*
+ * Active indicator.
+ */
+
+.sidebar-nav-link.active::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  top: 8px;
+  bottom: 8px;
+
+  width: 3px;
+
+  background: #941d31;
+
+  border-radius:
+    0
+    999px
+    999px
+    0;
+}
+
+
+/* =========================================================
+   NAVIGATION ICON
+========================================================= */
+
+.sidebar-nav-icon {
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  color:
+    rgba(255, 255, 255, 0.84);
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.sidebar-nav-icon svg {
+  width: 21px;
+  height: 21px;
+
+  color: currentColor;
+
+  stroke: currentColor;
+
+  transition:
+    color 0.2s ease,
+    stroke 0.2s ease;
+}
+
+
+/*
+ * Hover icon.
+ */
+
+.sidebar-nav-link:hover .sidebar-nav-icon {
+  color: #ffffff;
+
+  transform:
+    scale(1.04);
+}
+
+
+/*
+ * Active icon.
+ */
+
+.sidebar-nav-link.active .sidebar-nav-icon {
+  color: #b9243c;
+}
+
+
+.sidebar-nav-link.active .sidebar-nav-icon svg {
+  color: #b9243c;
+
+  stroke: #b9243c;
+}
+
+
+/* =========================================================
+   NAVIGATION LABEL
+========================================================= */
+
+.sidebar-nav-label {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: inherit;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   COLLAPSED NAVIGATION
+========================================================= */
+
+.sidebar-collapsed .sidebar-nav-link {
+  justify-content: center;
+
+  gap: 0;
+
+  padding: 0;
+}
+
+
+.sidebar-collapsed .sidebar-nav-link:hover {
+  transform: none;
+}
+
+
+.sidebar-collapsed .sidebar-nav-link.active::before {
+  left: 0;
+}
+
+
+/* =========================================================
+   BOTTOM SECTION
+========================================================= */
+
+.sidebar-bottom {
+  padding: 12px 12px 16px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.16);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(120, 0, 20, 0.04),
+      rgba(120, 0, 20, 0.10)
+    );
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   COLLAPSE BUTTON
+========================================================= */
+
+.sidebar-collapse-button {
+  width: 100%;
+
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 0 12px;
+
+  margin-bottom: 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.20);
+
+  border-radius: 9px;
+
+  background:
+    rgba(255, 255, 255, 0.08);
+
+  color:
+    rgba(255, 255, 255, 0.90);
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.sidebar-collapse-button:hover {
+  color: #b9243c;
+
+  background: #ffffff;
+
+  border-color: #ffffff;
+
+  box-shadow:
+    0 4px 12px rgba(75, 12, 25, 0.14);
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* =========================================================
+   COLLAPSE ICON
+========================================================= */
+
+.sidebar-collapse-icon {
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+
+.sidebar-collapse-icon svg {
+  width: 19px;
+  height: 19px;
+
+  color: currentColor;
+
+  stroke: currentColor;
+}
+
+
+/* =========================================================
+   COLLAPSE LABEL
+========================================================= */
+
+.sidebar-collapse-label {
+  font-size: 12px;
+
+  font-weight: 650;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   COLLAPSED BUTTON
+========================================================= */
+
+.sidebar-collapsed .sidebar-collapse-button {
+  width: 42px;
+
+  min-height: 42px;
+
+  padding: 0;
+
+  margin:
+    0 auto 10px;
+}
+
+
+.sidebar-collapsed .sidebar-collapse-label {
+  display: none;
+}
+
+
+/* =========================================================
+   USER SUMMARY
+========================================================= */
+
+.sidebar-user-summary {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
+
+  padding: 10px;
+
+  margin-bottom: 8px;
+
+  background:
+    rgba(255, 255, 255, 0.11);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.12);
+
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   USER AVATAR
+========================================================= */
+
+.sidebar-user-avatar {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #b9243c;
+
+  font-size: 13px;
+
+  font-weight: 750;
+}
+
+
+/* =========================================================
+   USER DETAILS
+========================================================= */
+
+.sidebar-user-details {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+
+  overflow: hidden;
+}
+
+
+.sidebar-user-details strong {
+  overflow: hidden;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.sidebar-user-details span {
+  overflow: hidden;
+
+  color:
+    rgba(255, 255, 255, 0.68);
+
+  font-size: 10px;
+
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.sidebar-logout {
+  width: 100%;
+
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 13px;
+
+  border: 1px solid transparent;
+
+  border-radius: 9px;
+
+  background: transparent;
+
+  color:
+    rgba(255, 255, 255, 0.78);
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.sidebar-logout:hover {
+  color: #ffffff;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  border-color:
+    rgba(255, 255, 255, 0.10);
+}
+
+
+.sidebar-logout svg {
+  width: 21px;
+  height: 21px;
+
+  flex-shrink: 0;
+
+  color: currentColor;
+
+  stroke: currentColor;
+}
+
+
+/* =========================================================
+   COLLAPSED LOGOUT
+========================================================= */
+
+.sidebar-collapsed .sidebar-logout {
+  justify-content: center;
+
+  gap: 0;
+
+  padding: 0;
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY
+========================================================= */
+
+.sidebar-overlay {
+  display: none;
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.sidebar-nav-link:focus-visible,
+.sidebar-collapse-button:focus-visible,
+.sidebar-mobile-close:focus-visible,
+.sidebar-logout:focus-visible {
+  outline:
+    3px solid rgba(255, 255, 255, 0.45);
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  /* -------------------------------------------------------
+     Sidebar
+  ------------------------------------------------------- */
+
+  .app-sidebar {
+    width: min(290px, 88vw);
+
+    transform:
+      translateX(-105%);
+
+    box-shadow:
+      12px 0 30px rgba(16, 24, 40, 0.20);
+
+    transition:
+      transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+
+  .app-sidebar.sidebar-mobile-open {
+    transform:
+      translateX(0);
+  }
+
+
+  /* -------------------------------------------------------
+     Overlay
+  ------------------------------------------------------- */
+
+  .sidebar-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1050;
+
+    display: block;
+
+    padding: 0;
+
+    border: 0;
+
+    background:
+      rgba(15, 23, 42, 0.48);
+
+    cursor: pointer;
+
+    animation:
+      sidebarOverlayIn 0.2s ease;
+  }
+
+
+  /* -------------------------------------------------------
+     Header
+  ------------------------------------------------------- */
+
+  .sidebar-header {
+    min-height: 92px;
+
+    justify-content: space-between;
+
+    padding:
+      12px 14px;
+  }
+
+
+  .sidebar-brand {
+    justify-content: flex-start;
+
+    overflow: hidden;
+  }
+
+
+  /* -------------------------------------------------------
+     Mobile logo
+     
+     On mobile, we always show the readable
+     C-TalentLens branding when the drawer is open.
+  ------------------------------------------------------- */
+
+  .talentlens-logo {
+    height: 60px;
+
+    gap: 8px;
+  }
+
+
+  .talentlens-mark {
+    width: 50px;
+    height: 50px;
+  }
+
+
+  .talentlens-coil-one {
+    width: 49px;
+    height: 49px;
+
+    border-width: 3.5px;
+  }
+
+
+  .talentlens-coil-two {
+    width: 38px;
+    height: 38px;
+
+    border-width: 3.5px;
+  }
+
+
+  .talentlens-coil-three {
+    width: 27px;
+    height: 27px;
+
+    border-width: 3.5px;
+  }
+
+
+  .talentlens-mark-core {
+    width: 15px;
+    height: 15px;
+  }
+
+
+  .talentlens-hyphen {
+    font-size: 21px;
+  }
+
+
+  .talentlens-name {
+    font-size: 20px;
+  }
+
+
+  /*
+   * Even if desktop state was collapsed,
+   * mobile gets the readable wordmark.
+   */
+
+  .sidebar-collapsed {
+    width: min(290px, 88vw);
+  }
+
+
+  .sidebar-collapsed .sidebar-header {
+    padding:
+      12px 14px;
+  }
+
+
+  .sidebar-collapsed .sidebar-brand {
+    justify-content: flex-start;
+  }
+
+
+  .sidebar-collapsed .talentlens-logo {
+    width: auto;
+
+    height: 60px;
+
+    gap: 8px;
+  }
+
+
+  .sidebar-collapsed .talentlens-wordmark {
+    display: flex;
+  }
+
+
+  .sidebar-collapsed .talentlens-mark {
+    width: 50px;
+    height: 50px;
+  }
+
+
+  .sidebar-collapsed .talentlens-coil-one {
+    width: 49px;
+    height: 49px;
+  }
+
+
+  .sidebar-collapsed .talentlens-coil-two {
+    width: 38px;
+    height: 38px;
+  }
+
+
+  .sidebar-collapsed .talentlens-coil-three {
+    width: 27px;
+    height: 27px;
+  }
+
+
+  /* -------------------------------------------------------
+     Mobile close
+  ------------------------------------------------------- */
+
+  .sidebar-mobile-close {
+    display: flex;
+  }
+
+
+  /* -------------------------------------------------------
+     Navigation
+  ------------------------------------------------------- */
+
+  .sidebar-collapsed .sidebar-navigation-label {
+    text-align: left;
+
+    padding:
+      0 13px;
+
+    font-size: 10px;
+
+    opacity: 1;
+  }
+
+
+  .sidebar-collapsed .sidebar-nav-link {
+    justify-content: flex-start;
+
+    gap: 13px;
+
+    padding:
+      0 14px;
+  }
+
+
+  .sidebar-collapsed .sidebar-nav-link.active::before {
+    left: 0;
+  }
+
+
+  /* -------------------------------------------------------
+     Bottom
+  ------------------------------------------------------- */
+
+  .sidebar-collapsed .sidebar-collapse-button {
+    width: 100%;
+
+    min-height: 42px;
+
+    padding:
+      0 12px;
+
+    margin:
+      0 0 10px;
+  }
+
+
+  .sidebar-collapsed .sidebar-collapse-label {
+    display: inline;
+  }
+
+
+  .sidebar-collapsed .sidebar-logout {
+    justify-content: flex-start;
+
+    gap: 12px;
+
+    padding:
+      0 13px;
+  }
+
+
+  /*
+   * We intentionally keep the user details hidden
+   * on mobile when the sidebar is in the collapsed
+   * desktop state because your JSX uses !collapsed.
+   */
+}
+
+
+/* =========================================================
+   OVERLAY ANIMATION
+========================================================= */
+
+@keyframes sidebarOverlayIn {
+
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .app-sidebar,
+  .talentlens-logo,
+  .talentlens-mark,
+  .talentlens-coil,
+  .talentlens-mark-core,
+  .talentlens-wordmark,
+  .sidebar-nav-link,
+  .sidebar-nav-icon,
+  .sidebar-collapse-button,
+  .sidebar-mobile-close,
+  .sidebar-logout {
+    transition: none;
+  }
+
+
+  .sidebar-overlay {
+    animation: none;
+  }
+
+}
