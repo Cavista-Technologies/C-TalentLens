@@ -1,20 +1,20 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { AlertsPage } from '../pages/AlertsPage'
-import { AnalyticsPage } from '../pages/AnalyticsPage'
-import { DashboardPage } from '../pages/DashboardPage'
-import { ImportsPage } from '../pages/ImportsPage'
-import { LoginPage } from '../pages/LoginPage'
-import { PublicReferralPage } from '../pages/PublicReferralPage'
-import { ReferralAnalyticsPage } from '../pages/ReferralAnalyticsPage'
-import { ReferralDetailPage } from '../pages/ReferralDetailPage'
-import { ReferralsPage } from '../pages/ReferralsPage'
-import { RequisitionDetailPage } from '../pages/RequisitionDetailPage'
-import { RequisitionFormPage } from '../pages/RequisitionFormPage'
-import { RequisitionsPage } from '../pages/RequisitionsPage'
-import { ProtectedRoute } from './ProtectedRoute'
+import { Navigate, Route, Routes } from "react-router-dom";
+import { AlertsPage } from "../pages/AlertsPage";
+import { AnalyticsPage } from "../pages/AnalyticsPage";
+import { DashboardPage } from "../pages/DashboardPage";
+import { ImportsPage } from "../pages/ImportsPage";
+import { LoginPage } from "../pages/LoginPage";
+import { PublicReferralPage } from "../pages/PublicReferralPage";
+import { ReferralAnalyticsPage } from "../pages/ReferralAnalyticsPage";
+import { ReferralDetailPage } from "../pages/ReferralDetailPage";
+import { ReferralsPage } from "../pages/ReferralsPage";
+import { RequisitionDetailPage } from "../pages/RequisitionDetailPage";
+import { RequisitionFormPage } from "../pages/RequisitionFormPage";
+import { RequisitionsPage } from "../pages/RequisitionsPage";
+import { ProtectedRoute } from "./ProtectedRoute";
 
-const analyticsRoles = ['TalentAcquisitionManager', 'Leadership']
-const recruitmentWriteRoles = ['Recruiter', 'TalentAcquisitionManager']
+const analyticsRoles = ["TalentAcquisitionManager", "Leadership"];
+const recruitmentWriteRoles = ["Recruiter", "TalentAcquisitionManager"];
 
 export function AppRoutes() {
   return (
@@ -97,7 +97,7 @@ export function AppRoutes() {
       <Route
         path="/analytics"
         element={
-          <ProtectedRoute allowedRoles={analyticsRoles}>
+          <ProtectedRoute>
             <AnalyticsPage />
           </ProtectedRoute>
         }
@@ -105,12 +105,12 @@ export function AppRoutes() {
       <Route
         path="/analytics/referrals"
         element={
-          <ProtectedRoute allowedRoles={analyticsRoles}>
+          <ProtectedRoute>
             <ReferralAnalyticsPage />
           </ProtectedRoute>
         }
       />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
-  )
+  );
 }

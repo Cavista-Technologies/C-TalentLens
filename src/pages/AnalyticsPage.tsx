@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ErrorState, LoadingState } from "../components/feedback/StateMessage";
 import { AppLayout } from "../components/layout/AppLayout";
@@ -6,32 +6,41 @@ import { PageContainer } from "../components/layout/PageContainer";
 import {
   getHiringTrends,
   getLeadershipSummary,
+  getReportRequisitions,
   getSourceAnalytics,
 } from "../features/analytics/analyticsApi";
 import type {
   HiringTrendResponse,
+  LeadershipRiskSummary,
   LeadershipSummary,
   SourceMetric,
   SourceAnalytics,
 } from "../features/analytics/analyticsTypes";
-import { formatValue } from "../features/referrals/referralDisplay";
-import { getRequisitions } from "../features/requisitions/requisitionApi";
+import { canViewLeadershipAnalytics } from "../features/auth/roleAccess";
+import { useAuth } from "../features/auth/authContext";
+import {
+  formatValue,
+  pipelineStages,
+} from "../features/requisitions/requisitionDisplay";
 import type { Requisition } from "../features/requisitions/requisitionTypes";
 import "../styles/Analytics.css";
 
-const defaultDateRange = getDefaultDateRange();
-
 export function AnalyticsPage() {
+  const { user } = useAuth();
+
   const [leadership, setLeadership] = useState<LeadershipSummary | null>(null);
   const [sources, setSources] = useState<SourceAnalytics | null>(null);
   const [trends, setTrends] = useState<HiringTrendResponse | null>(null);
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
-  const [fromDate, setFromDate] = useState(defaultDateRange.fromDate);
-  const [toDate, setToDate] = useState(defaultDateRange.toDate);
-  const [draftFromDate, setDraftFromDate] = useState(defaultDateRange.fromDate);
-  const [draftToDate, setDraftToDate] = useState(defaultDateRange.toDate);
+
+  // No filter selected by default.
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const showLeadershipAnalytics = canViewLeadershipAnalytics(user);
 
   useEffect(() => {
     let isMounted = true;
@@ -43,10 +52,12 @@ export function AnalyticsPage() {
       try {
         const [leadershipData, sourceData, trendData, requisitionData] =
           await Promise.all([
-            getLeadershipSummary(),
+            showLeadershipAnalytics
+              ? getLeadershipSummary()
+              : Promise.resolve<LeadershipSummary | null>(null),
             getSourceAnalytics(),
             getHiringTrends(),
-            getRequisitions({ page: 1, pageSize: 500 }),
+            getReportRequisitions(),
           ]);
 
         if (!isMounted) {
@@ -56,7 +67,7 @@ export function AnalyticsPage() {
         setLeadership(leadershipData);
         setSources(sourceData);
         setTrends(trendData);
-        setRequisitions(requisitionData.items);
+        setRequisitions(requisitionData);
       } catch (err) {
         if (isMounted) {
           setError(
@@ -77,160 +88,226 @@ export function AnalyticsPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [showLeadershipAnalytics]);
 
   const filteredRequisitions = requisitions.filter((requisition) =>
     requisitionMatchesDateRange(requisition, fromDate, toDate),
   );
+
   const filteredSourceMetrics = sources
     ? getFilteredSourceMetrics(sources, fromDate, toDate)
     : [];
+
   const filteredHiringTrends =
     trends?.monthlyTrends.filter((trend) =>
       monthMatchesDateRange(trend.month, fromDate, toDate),
     ) ?? [];
+
+  const hasDateFilter = Boolean(fromDate || toDate);
+
   const summaryMetrics = getSummaryMetrics(
     filteredRequisitions,
     leadership,
-    Boolean(fromDate || toDate),
+    hasDateFilter,
   );
+
+  const riskSummary = getRiskSummary(filteredRequisitions, leadership);
+
   const timeToFillBreakdowns = getTimeToFillBreakdowns(filteredRequisitions);
+
   const recruiterPerformance = getRecruiterPerformance(filteredRequisitions);
+
+  const stageDistribution = getStageDistribution(filteredRequisitions);
 
   return (
     <AppLayout title="Analytics">
       <PageContainer>
         {isLoading && <LoadingState message="Loading analytics" />}
+
         {!isLoading && error && (
           <ErrorState title="Analytics unavailable" message={error} />
         )}
-        {!isLoading && leadership && sources && trends && (
-          <>
-            <form
+
+        {!isLoading && sources && trends && (
+          <div className="analytics-page">
+            {/* =====================================================
+                FILTERS
+               ===================================================== */}
+
+            <section
               className="analytics-filter-panel"
               aria-label="Analytics reporting period"
-              onSubmit={handleApplyDateFilter}
             >
-              <div className="analytics-date-controls">
-                <label>
-                  From
-                  <input
-                    type="date"
-                    value={draftFromDate}
-                    onChange={(event) => setDraftFromDate(event.target.value)}
-                  />
-                </label>
-                <label>
-                  To
-                  <input
-                    type="date"
-                    value={draftToDate}
-                    onChange={(event) => setDraftToDate(event.target.value)}
-                  />
-                </label>
+              <div className="analytics-filter-copy">
+                <span className="analytics-filter-eyebrow">
+                  Reporting period
+                </span>
+
+                <strong>Analyse hiring performance by date range</strong>
               </div>
 
-              <div className="analytics-filter-actions">
-                <button type="submit">Filter</button>
-                <button
-                  className="secondary-filter-action"
-                  type="button"
-                  onClick={handleClearDateFilter}
-                >
-                  Clear
-                </button>
+              <div className="analytics-filter-controls">
+                <div className="analytics-date-controls">
+                  <label>
+                    <span>From</span>
+                    <input
+                      type="date"
+                      value={fromDate}
+                      onChange={(event) => setFromDate(event.target.value)}
+                    />
+                  </label>
+
+                  <label>
+                    <span>To</span>
+                    <input
+                      type="date"
+                      value={toDate}
+                      onChange={(event) => setToDate(event.target.value)}
+                    />
+                  </label>
+                </div>
+
+                {hasDateFilter && (
+                  <div className="analytics-filter-actions">
+                    <button
+                      className="secondary-filter-action"
+                      type="button"
+                      onClick={handleClearDateFilter}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
               </div>
-            </form>
+            </section>
+
+            {/* =====================================================
+                KPI CARDS
+               ===================================================== */}
 
             <section className="metric-grid" aria-label="Executive KPIs">
               {summaryMetrics.map((metric) => (
                 <Metric
                   label={metric.label}
+                  tone={metric.tone}
                   value={metric.value}
                   key={metric.label}
                 />
               ))}
             </section>
 
+            {/* =====================================================
+                SOURCE + RISK
+               ===================================================== */}
+
             <section className="dashboard-grid">
-              <article className="panel">
+              <article className="analytics-card">
                 <div className="panel-heading analytics-panel-heading">
-                  <h2>Source performance</h2>
+                  <div>
+                    <span className="panel-eyebrow">Acquisition</span>
+                    <h2>Source performance</h2>
+                  </div>
                 </div>
-                <div className="analytics-card-list">
-                  {filteredSourceMetrics.map((source) => (
-                    <div
-                      className="source-performance-card"
-                      key={source.source}
-                    >
-                      <strong>{formatValue(source.source)}</strong>
-                      <div>
-                        <span>
-                          <small>Candidates</small>
-                          {source.activities}
-                        </span>
-                        <span>
-                          <small>Hires</small>
-                          {source.hires}
-                        </span>
-                      </div>
-                      <p>Conversion: {source.sourceToHireConversionRate}%</p>
-                    </div>
-                  ))}
-                </div>
+
+                <SourcePerformanceChart sources={filteredSourceMetrics} />
               </article>
 
-              <article className="panel">
+              <article className="analytics-card">
                 <div className="panel-heading analytics-panel-heading">
-                  <h2>Hiring risk</h2>
+                  <div>
+                    <span className="panel-eyebrow">Operational health</span>
+                    <h2>Hiring risk</h2>
+                  </div>
                 </div>
+
                 <dl className="summary-list status-summary-list">
                   <Link
                     className="summary-warning"
                     to="/requisitions?openOnly=true&nearSlaBreach=true"
                   >
                     <dt>At risk</dt>
-                    <dd>{leadership.riskSummary.totalAtRiskRequisitions}</dd>
+                    <dd>{riskSummary.totalAtRiskRequisitions}</dd>
                   </Link>
+
                   <Link
                     className="summary-danger"
-                    to="/alerts?scope=all&severity=Critical"
+                    to="/alerts?severity=Critical"
                   >
                     <dt>Critical</dt>
-                    <dd>{leadership.riskSummary.criticalRiskRoles}</dd>
+                    <dd>{riskSummary.criticalRiskRoles}</dd>
                   </Link>
+
                   <Link
                     className="summary-danger"
                     to="/requisitions?openOnly=true&overdueOnly=true"
                   >
                     <dt>Breaching SLA</dt>
-                    <dd>{leadership.riskSummary.rolesBreachingSla}</dd>
+                    <dd>{riskSummary.rolesBreachingSla}</dd>
                   </Link>
+
                   <Link
                     className="summary-warning"
-                    to="/alerts?scope=all&type=OpenBottleneck"
+                    to="/alerts?type=OpenBottleneck"
                   >
                     <dt>Open bottlenecks</dt>
-                    <dd>{leadership.riskSummary.openBottlenecks}</dd>
+                    <dd>{riskSummary.openBottlenecks}</dd>
                   </Link>
                 </dl>
               </article>
             </section>
 
+            {/* =====================================================
+                MOVEMENT + PIPELINE
+               ===================================================== */}
+
             <section className="dashboard-grid">
-              <article className="panel">
+              <article className="analytics-card">
                 <div className="panel-heading analytics-panel-heading">
-                  <h2>Time to fill breakdowns</h2>
+                  <div>
+                    <span className="panel-eyebrow">Trend</span>
+                    <h2>Hiring movement</h2>
+                  </div>
                 </div>
+
+                <HiringMovementChart trends={filteredHiringTrends} />
+              </article>
+
+              <article className="analytics-card">
+                <div className="panel-heading analytics-panel-heading">
+                  <div>
+                    <span className="panel-eyebrow">Pipeline</span>
+                    <h2>Pipeline stage distribution</h2>
+                  </div>
+                </div>
+
+                <PipelineStageChart stages={stageDistribution} />
+              </article>
+            </section>
+
+            {/* =====================================================
+                TIME TO FILL + RECRUITER PERFORMANCE
+               ===================================================== */}
+
+            <section className="dashboard-grid">
+              <article className="analytics-card">
+                <div className="panel-heading analytics-panel-heading">
+                  <div>
+                    <span className="panel-eyebrow">Efficiency</span>
+                    <h2>Time to fill breakdowns</h2>
+                  </div>
+                </div>
+
                 <div className="breakdown-grid">
                   <BreakdownList
                     title="Recruiter"
                     items={timeToFillBreakdowns.byRecruiter}
                   />
+
                   <BreakdownList
                     title="Team"
                     items={timeToFillBreakdowns.byDepartment}
                   />
+
                   <BreakdownList
                     title="Priority"
                     items={timeToFillBreakdowns.byPriority}
@@ -238,10 +315,14 @@ export function AnalyticsPage() {
                 </div>
               </article>
 
-              <article className="panel">
+              <article className="analytics-card">
                 <div className="panel-heading analytics-panel-heading">
-                  <h2>Recruiter performance</h2>
+                  <div>
+                    <span className="panel-eyebrow">Performance</span>
+                    <h2>Recruiter performance</h2>
+                  </div>
                 </div>
+
                 <div className="recruiter-performance-table">
                   <div className="recruiter-performance-row table-head">
                     <span>Recruiter</span>
@@ -252,6 +333,7 @@ export function AnalyticsPage() {
                     <span>Blocked</span>
                     <span>Overdue</span>
                   </div>
+
                   {recruiterPerformance.map((recruiter) => (
                     <article
                       className="recruiter-performance-row"
@@ -260,6 +342,7 @@ export function AnalyticsPage() {
                       <div>
                         <strong>{recruiter.name}</strong>
                       </div>
+
                       <strong>{recruiter.activeRequisitions}</strong>
                       <strong>{recruiter.averageTimeToFill}d</strong>
                       <strong>{recruiter.slaBreaches}</strong>
@@ -272,74 +355,212 @@ export function AnalyticsPage() {
               </article>
             </section>
 
-            <section className="dashboard-grid">
-              <article className="panel">
-                <div className="panel-heading analytics-panel-heading">
-                  <h2>Hiring movement</h2>
-                </div>
-                <div className="analytics-card-list">
-                  {filteredHiringTrends.map((trend) => (
-                    <div className="hiring-movement-card" key={trend.month}>
-                      <strong>{trend.month}</strong>
-                      <div>
-                        <span>
-                          <small>Opened</small>
-                          {trend.rolesOpened}
-                        </span>
-                        <span>
-                          <small>Filled</small>
-                          {trend.rolesFilled}
-                        </span>
-                      </div>
-                      <p>Avg. time to fill: {trend.averageTimeToFill}d</p>
-                    </div>
-                  ))}
-                </div>
-              </article>
+            {/* =====================================================
+                EXECUTIVE NOTES
+               ===================================================== */}
 
-              <article className="panel">
-                <div className="panel-heading analytics-panel-heading">
-                  <h2>Executive notes</h2>
-                </div>
-                <div className="stack-list">
-                  {leadership.insights.slice(0, 5).map((insight) => (
-                    <article className="detail-card" key={insight.code}>
-                      <strong>{formatValue(insight.severity)}</strong>
-                      <p>{insight.message}</p>
-                    </article>
-                  ))}
-                </div>
-              </article>
-            </section>
-          </>
+            {leadership && (
+              <section className="dashboard-grid dashboard-grid-single">
+                <article className="analytics-card">
+                  <div className="panel-heading analytics-panel-heading">
+                    <div>
+                      <span className="panel-eyebrow">Leadership</span>
+                      <h2>Executive notes</h2>
+                    </div>
+                  </div>
+
+                  <div className="stack-list">
+                    {leadership.insights.slice(0, 5).map((insight) => (
+                      <article className="detail-card" key={insight.code}>
+                        <strong
+                          className={`insight-severity severity-${insight.severity.toLowerCase()}`}
+                        >
+                          {formatValue(insight.severity)}
+                        </strong>
+
+                        <p>{insight.message}</p>
+                      </article>
+                    ))}
+                  </div>
+                </article>
+              </section>
+            )}
+          </div>
         )}
       </PageContainer>
     </AppLayout>
   );
 
-  function handleApplyDateFilter(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setFromDate(draftFromDate);
-    setToDate(draftToDate);
-  }
-
   function handleClearDateFilter() {
-    setDraftFromDate(defaultDateRange.fromDate);
-    setDraftToDate(defaultDateRange.toDate);
-    setFromDate(defaultDateRange.fromDate);
-    setToDate(defaultDateRange.toDate);
+    setFromDate("");
+    setToDate("");
   }
 }
 
-function Metric({ label, value }: { label: string; value: number | string }) {
+function HiringMovementChart({
+  trends,
+}: {
+  trends: HiringTrendResponse["monthlyTrends"];
+}) {
+  const maxValue = Math.max(
+    1,
+    ...trends.flatMap((trend) => [trend.rolesOpened, trend.rolesFilled]),
+  );
+
+  if (trends.length === 0) {
+    return <p className="chart-empty">No hiring movement for this period</p>;
+  }
+
   return (
-    <article className="metric-card">
+    <div
+      className="movement-chart"
+      role="img"
+      aria-label="Monthly opened and filled requisitions"
+    >
+      <div className="movement-chart-bars">
+        {trends.map((trend) => (
+          <div className="movement-chart-group" key={trend.month}>
+            <div className="movement-bars">
+              <span
+                className="movement-bar movement-bar-opened"
+                style={{
+                  height: `${getChartHeight(trend.rolesOpened, maxValue)}%`,
+                }}
+                title={`${trend.rolesOpened} opened`}
+              >
+                <span className="movement-bar-value">{trend.rolesOpened}</span>
+              </span>
+
+              <span
+                className="movement-bar movement-bar-filled"
+                style={{
+                  height: `${getChartHeight(trend.rolesFilled, maxValue)}%`,
+                }}
+                title={`${trend.rolesFilled} filled`}
+              >
+                <span className="movement-bar-value">{trend.rolesFilled}</span>
+              </span>
+            </div>
+
+            <strong>{formatMonthLabel(trend.month)}</strong>
+          </div>
+        ))}
+      </div>
+
+      <div className="chart-legend">
+        <span className="legend-opened">Opened</span>
+        <span className="legend-filled">Filled</span>
+      </div>
+    </div>
+  );
+}
+
+function PipelineStageChart({ stages }: { stages: StageDistributionMetric[] }) {
+  const total = stages.reduce((sum, stage) => sum + stage.count, 0);
+
+  const maxValue = Math.max(1, ...stages.map((stage) => stage.count));
+
+  if (total === 0) {
+    return <p className="chart-empty">No requisitions in this period</p>;
+  }
+
+  return (
+    <div
+      className="horizontal-chart"
+      role="img"
+      aria-label="Requisitions by pipeline stage"
+    >
+      {stages.map((stage) => (
+        <div className="horizontal-chart-row" key={stage.stage}>
+          <div>
+            <span>{formatValue(stage.stage)}</span>
+            <strong>{stage.count}</strong>
+          </div>
+
+          <div className="horizontal-chart-track">
+            <span
+              style={{
+                width: `${percentage(stage.count, maxValue)}%`,
+              }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SourcePerformanceChart({ sources }: { sources: SourceMetric[] }) {
+  const maxValue = Math.max(1, ...sources.map((source) => source.activities));
+
+  if (sources.length === 0) {
+    return <p className="chart-empty">No source activity for this period</p>;
+  }
+
+  return (
+    <div
+      className="source-chart"
+      role="img"
+      aria-label="Candidates and hires by source"
+    >
+      {sources.map((source) => (
+        <div className="source-chart-row" key={source.source}>
+          <div className="source-chart-label">
+            <strong>{formatValue(source.source)}</strong>
+            <span>{source.sourceToHireConversionRate}% conversion</span>
+          </div>
+
+          <div className="source-chart-bars">
+            <div>
+              <span
+                style={{
+                  width: `${percentage(source.activities, maxValue)}%`,
+                }}
+              />
+            </div>
+
+            <div>
+              <span
+                style={{
+                  width: `${percentage(source.hires, maxValue)}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="source-chart-values">
+            <span>{source.activities}</span>
+            <span>{source.hires}</span>
+          </div>
+        </div>
+      ))}
+
+      <div className="chart-legend">
+        <span className="legend-opened">Candidates</span>
+        <span className="legend-filled">Hires</span>
+      </div>
+    </div>
+  );
+}
+
+function Metric({
+  label,
+  tone,
+  value,
+}: {
+  label: string;
+  tone: MetricTone;
+  value: number | string;
+}) {
+  return (
+    <article className={`metric-card metric-${tone}`}>
       <span>{label}</span>
       <strong>{value}</strong>
-      <p>Current reporting period</p>
     </article>
   );
 }
+
+type MetricTone = "neutral" | "brand" | "success" | "warning" | "danger";
 
 function BreakdownList({
   items,
@@ -351,6 +572,7 @@ function BreakdownList({
   return (
     <article className="breakdown-card">
       <h3>{title}</h3>
+
       {items.length === 0 ? (
         <p>No filled requisitions</p>
       ) : (
@@ -382,6 +604,84 @@ type RecruiterPerformanceMetric = {
   overdueActions: number;
 };
 
+type StageDistributionMetric = {
+  stage: string;
+  count: number;
+};
+
+function getStageDistribution(
+  requisitions: Requisition[],
+): StageDistributionMetric[] {
+  const counts = new Map(pipelineStages.map((stage) => [stage, 0]));
+
+  for (const requisition of requisitions.filter((item) => !isClosed(item))) {
+    counts.set(
+      requisition.currentStage,
+      (counts.get(requisition.currentStage) ?? 0) + 1,
+    );
+  }
+
+  return pipelineStages.map((stage) => ({
+    stage,
+    count: counts.get(stage) ?? 0,
+  }));
+}
+
+function getRiskSummary(
+  requisitions: Requisition[],
+  leadership: LeadershipSummary | null,
+): LeadershipRiskSummary {
+  if (leadership) {
+    return leadership.riskSummary;
+  }
+
+  const active = requisitions.filter((requisition) => !isClosed(requisition));
+
+  return {
+    totalAtRiskRequisitions: active.filter(isAtRisk).length,
+
+    highRiskRoles: active.filter(
+      (requisition) => requisition.priority === "High",
+    ).length,
+
+    criticalRiskRoles: active.filter(
+      (requisition) =>
+        requisition.slaState === "Breached" ||
+        requisition.bottlenecks.some(
+          (bottleneck) =>
+            bottleneck.status !== "Resolved" && bottleneck.daysOpen >= 14,
+        ) ||
+        requisition.actionItems.some((action) => action.daysOverdue >= 7),
+    ).length,
+
+    averageRiskScore: 0,
+
+    rolesBreachingSla: active.filter(
+      (requisition) => requisition.slaState === "Breached",
+    ).length,
+
+    stalledRequisitions: active.filter((requisition) => requisition.isStalled)
+      .length,
+
+    openBottlenecks: active.reduce(
+      (total, requisition) =>
+        total +
+        requisition.bottlenecks.filter(
+          (bottleneck) => bottleneck.status !== "Resolved",
+        ).length,
+      0,
+    ),
+
+    escalationsRequired: active.reduce(
+      (total, requisition) =>
+        total +
+        requisition.actionItems.filter((action) => action.daysOverdue > 0)
+          .length,
+      0,
+    ),
+  };
+}
+
 function getSummaryMetrics(
   requisitions: Requisition[],
   leadership: LeadershipSummary | null,
@@ -392,35 +692,88 @@ function getSummaryMetrics(
       {
         label: "Open requisitions",
         value: leadership.executiveKpis.totalOpenRoles,
+        tone: "brand" as const,
       },
-      { label: "Filled", value: leadership.executiveKpis.totalFilledPositions },
+      {
+        label: "Filled",
+        value: leadership.executiveKpis.totalFilledPositions,
+        tone: "success" as const,
+      },
       {
         label: "Avg. time to fill",
         value: `${leadership.executiveKpis.averageTimeToFill}d`,
+        tone: getTimeToFillTone(leadership.executiveKpis.averageTimeToFill),
       },
-      { label: "SLA", value: `${leadership.executiveKpis.slaComplianceRate}%` },
+      {
+        label: "SLA",
+        value: `${leadership.executiveKpis.slaComplianceRate}%`,
+        tone: getSlaTone(leadership.executiveKpis.slaComplianceRate),
+      },
     ];
   }
 
   const active = requisitions.filter((requisition) => !isClosed(requisition));
+
   const closed = requisitions.filter((requisition) => isClosed(requisition));
+
   const withinSla = active.filter(
     (requisition) =>
       requisition.slaState === "OnTrack" || requisition.slaState === "Closed",
   ).length;
 
+  const averageFilledTimeToFill = averageTimeToFill(closed);
+
+  const slaCompliance = percentage(withinSla, active.length);
+
   return [
-    { label: "Open requisitions", value: active.length },
+    {
+      label: "Open requisitions",
+      value: active.length,
+      tone: "brand" as const,
+    },
     {
       label: "Filled",
       value: requisitions.reduce(
         (total, requisition) => total + requisition.filledGoal,
         0,
       ),
+      tone: "success" as const,
     },
-    { label: "Avg. time to fill", value: `${averageTimeToFill(closed)}d` },
-    { label: "SLA", value: `${percentage(withinSla, active.length)}%` },
+    {
+      label: "Avg. time to fill",
+      value: `${averageFilledTimeToFill}d`,
+      tone: getTimeToFillTone(averageFilledTimeToFill),
+    },
+    {
+      label: "SLA",
+      value: `${slaCompliance}%`,
+      tone: getSlaTone(slaCompliance),
+    },
   ];
+}
+
+function getSlaTone(value: number): MetricTone {
+  if (value >= 80) {
+    return "success";
+  }
+
+  if (value >= 60) {
+    return "warning";
+  }
+
+  return "danger";
+}
+
+function getTimeToFillTone(value: number): MetricTone {
+  if (value <= 30) {
+    return "success";
+  }
+
+  if (value <= 45) {
+    return "warning";
+  }
+
+  return "danger";
 }
 
 function getTimeToFillBreakdowns(requisitions: Requisition[]) {
@@ -431,9 +784,11 @@ function getTimeToFillBreakdowns(requisitions: Requisition[]) {
       closed,
       (requisition) => requisition.recruiter,
     ),
+
     byDepartment: groupAverageTimeToFill(closed, (requisition) =>
       formatValue(requisition.department),
     ),
+
     byPriority: groupAverageTimeToFill(closed, (requisition) =>
       formatValue(requisition.priority),
     ),
@@ -450,13 +805,17 @@ function getRecruiterPerformance(
       return {
         name,
         activeRequisitions: active.length,
+
         averageTimeToFill: averageTimeToFill(
           items.filter((requisition) => isClosed(requisition)),
         ),
+
         slaBreaches: active.filter(
           (requisition) => requisition.slaState === "Breached",
         ).length,
+
         riskCount: active.filter(isAtRisk).length,
+
         openBottlenecks: active.reduce(
           (total, requisition) =>
             total +
@@ -465,6 +824,7 @@ function getRecruiterPerformance(
             ).length,
           0,
         ),
+
         overdueActions: active.reduce(
           (total, requisition) =>
             total +
@@ -493,6 +853,7 @@ function getFilteredSourceMetrics(
   const filteredTrends = sources.monthlyTrends.filter((trend) =>
     monthMatchesDateRange(trend.month, fromDate, toDate),
   );
+
   const totalHires = filteredTrends.reduce(
     (total, trend) => total + trend.hires,
     0,
@@ -504,6 +865,7 @@ function getFilteredSourceMetrics(
         (total, item) => total + item.activities,
         0,
       );
+
       const hires = items.reduce((total, item) => total + item.hires, 0);
 
       return {
@@ -544,6 +906,7 @@ function groupBy<T>(
 
   for (const item of items) {
     const key = selector(item) || "Unassigned";
+
     groups.set(key, [...(groups.get(key) ?? []), item]);
   }
 
@@ -574,6 +937,7 @@ function monthMatchesDateRange(
   }
 
   const monthDate = `${month}-01`;
+
   return dateMatchesDateRange(monthDate, fromDate, toDate);
 }
 
@@ -630,6 +994,7 @@ function daysBetween(start: string, end: string | null | undefined) {
   }
 
   const milliseconds = new Date(end).getTime() - new Date(start).getTime();
+
   return Math.max(0, Math.round(milliseconds / 86_400_000));
 }
 
@@ -641,20 +1006,20 @@ function percentage(value: number, total: number) {
   return Math.round((value / total) * 1000) / 10;
 }
 
-function getDefaultDateRange() {
-  const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+function getChartHeight(value: number, total: number) {
+  if (value === 0) {
+    return 4;
+  }
 
-  return {
-    fromDate: toDateInputValue(firstDayOfMonth),
-    toDate: toDateInputValue(today),
-  };
+  return Math.max(12, percentage(value, total));
 }
 
-function toDateInputValue(value: Date) {
-  const year = value.getFullYear();
-  const month = String(value.getMonth() + 1).padStart(2, "0");
-  const day = String(value.getDate()).padStart(2, "0");
+function formatMonthLabel(month: string) {
+  const [year, monthValue] = month.split("-");
 
-  return `${year}-${month}-${day}`;
+  const date = new Date(Number(year), Number(monthValue) - 1, 1);
+
+  return date.toLocaleString("en", {
+    month: "short",
+  });
 }

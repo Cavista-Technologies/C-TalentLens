@@ -52,6 +52,8 @@ export function formatValue(value: string) {
     OfferedHired: 'Offered / Hired',
     InternalAndExternal: 'Internal and External',
     NewRole: 'New Role',
+    LinkedIn: 'LinkedIn',
+    SmartRecruiters: 'SmartRecruiters',
   }
 
   if (displayNames[value]) {

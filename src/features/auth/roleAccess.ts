@@ -12,6 +12,10 @@ export function hasAnyRole(user: UserProfile | null, roles: string[]) {
 }
 
 export function canViewAnalytics(user: UserProfile | null) {
+  return Boolean(user)
+}
+
+export function canViewLeadershipAnalytics(user: UserProfile | null) {
   return hasAnyRole(user, [appRoles.talentAcquisitionManager, appRoles.leadership])
 }
 

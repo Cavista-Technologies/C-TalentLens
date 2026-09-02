@@ -19,7 +19,6 @@ export function DashboardPage() {
   const { user } = useAuth();
 
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
-
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -201,7 +200,7 @@ function DashboardContent({
           Recruitment overview for {formatToday()}
         </div>
 
-        <div className="dashboard-toolbar-actions">
+        {/* <div className="dashboard-toolbar-actions">
           <div className="dashboard-search">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -226,7 +225,7 @@ function DashboardContent({
             <span>+</span>
             New Requisition
           </Link>
-        </div>
+        </div> */}
       </section>
 
       <section className="dashboard-filters" aria-label="Dashboard filters">
@@ -265,6 +264,9 @@ function DashboardContent({
         </label>
       </section>
 
+      {/* =========================================================
+          METRIC CARDS
+          ========================================================= */}
       <section className="metric-grid" aria-label="Recruitment metrics">
         {metrics.map((metric) => (
           <Link
@@ -272,25 +274,45 @@ function DashboardContent({
             key={metric.label}
             to={metric.href}
           >
-            <div className="metric-card-top">
-              <span className="metric-icon">{metric.icon}</span>
+            <span
+              className={`metric-icon metric-icon-${metric.icon}`}
+              aria-hidden="true"
+            >
+              <MetricIcon icon={metric.icon} />
+            </span>
 
+            <span className="metric-card-content">
               <span className="metric-label">{metric.label}</span>
-            </div>
 
-            <strong>{metric.value}</strong>
+              <span className="metric-value">
+                {metric.value}
+                {metric.valueSuffix && (
+                  <span className="metric-value-suffix">
+                    {metric.valueSuffix}
+                  </span>
+                )}
+              </span>
 
-            <p>
+              {metric.detail && (
+                <span className="metric-detail">{metric.detail}</span>
+              )}
+
               {metric.trend && (
                 <span
                   className={`metric-trend metric-trend-${metric.trendTone}`}
                 >
+                  <span className="metric-trend-arrow">
+                    {metric.trendDirection === "up"
+                      ? "↑"
+                      : metric.trendDirection === "down"
+                        ? "↓"
+                        : "—"}
+                  </span>
+
                   {metric.trend}
                 </span>
               )}
-
-              {metric.detail}
-            </p>
+            </span>
           </Link>
         ))}
       </section>
@@ -314,11 +336,7 @@ function DashboardContent({
                   <span className="pipeline-stage-label">{label}</span>
 
                   <div className="pipeline-bar" aria-label={`${percentage}%`}>
-                    <span
-                      style={{
-                        width: `${percentage}%`,
-                      }}
-                    />
+                    <span style={{ width: `${percentage}%` }} />
                   </div>
 
                   <span className="pipeline-percentage">{percentage}%</span>
@@ -343,9 +361,7 @@ function DashboardContent({
                 to={item.href}
               >
                 <span className="attention-dot" />
-
                 <span className="attention-label">{item.label}</span>
-
                 <strong className="attention-value">{item.value}</strong>
               </Link>
             ))}
@@ -378,7 +394,6 @@ function DashboardContent({
               >
                 <div className="health-donut-center">
                   <span>Total</span>
-
                   <strong>{recruitmentHealth.total}</strong>
                 </div>
               </div>
@@ -437,6 +452,121 @@ function DashboardContent({
   );
 }
 
+/* ================================================================
+   METRIC ICONS
+   ================================================================ */
+
+type MetricIconName = "briefcase" | "check" | "clock" | "shield" | "alert";
+
+function MetricIcon({ icon }: { icon: MetricIconName }) {
+  if (icon === "briefcase") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect
+          x="3"
+          y="7"
+          width="18"
+          height="13"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+
+        <path
+          d="M8 7V5.5C8 4.67 8.67 4 9.5 4h5c.83 0 1.5.67 1.5 1.5V7"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+
+        <path
+          d="M3 12h18M10 12v2h4v-2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (icon === "check") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+
+        <path
+          d="m8 12 2.6 2.6L16.5 9"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (icon === "clock") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+
+        <path
+          d="M12 7v5l3.2 2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (icon === "shield") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none">
+        <path
+          d="M12 3.5 19 6v5.2c0 4.5-2.8 7.8-7 9.3-4.2-1.5-7-4.8-7-9.3V6l7-2.5Z"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+
+        <path
+          d="m9 12 2 2 4-4"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" fill="none">
+      <path
+        d="M12 3 21 19H3L12 3Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M12 9v4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+
+      <circle cx="12" cy="16.5" r=".8" fill="currentColor" />
+    </svg>
+  );
+}
+
+/* ================================================================
+   OPEN REQUISITIONS
+   ================================================================ */
+
 function OpenRequisitions({
   requisitions,
   isLoading,
@@ -490,7 +620,6 @@ function OpenRequisitions({
         <div className="open-requisitions-empty">
           <div>
             <strong>Loading open requisitions...</strong>
-
             <span>Retrieving active requisitions...</span>
           </div>
         </div>
@@ -498,7 +627,6 @@ function OpenRequisitions({
         <div className="open-requisitions-empty">
           <div>
             <strong>Open requisitions unavailable</strong>
-
             <span>{error}</span>
           </div>
 
@@ -567,6 +695,378 @@ function OpenRequisitions({
   );
 }
 
+/* ================================================================
+   METRICS
+   ================================================================ */
+
+type SummaryTone = "neutral" | "success" | "warning" | "danger";
+
+type Metric = {
+  label: string;
+  value: number | string;
+  valueSuffix?: string;
+  detail: string;
+  tone: SummaryTone;
+  href: string;
+  icon: MetricIconName;
+  trend?: string;
+  trendTone?: "positive" | "negative" | "neutral";
+  trendDirection?: "up" | "down" | "neutral";
+};
+
+function getRoleMetrics(
+  dashboard: DashboardResponse,
+  user: UserProfile | null,
+): Metric[] {
+  if (hasAnyRole(user, [appRoles.hiringManager])) {
+    return [
+      metric(
+        "My open requisitions",
+        dashboard.recruitmentOverview.totalOpenRoles,
+        `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
+        "success",
+        "/requisitions?status=Active",
+        "briefcase",
+      ),
+
+      metric(
+        "Feedback actions",
+        dashboard.actions.totalOpenActions,
+        `${dashboard.actions.overdueActions} overdue`,
+        dashboard.actions.overdueActions > 0 ? "warning" : "success",
+        "/alerts",
+        "check",
+      ),
+
+      metric(
+        "Open bottlenecks",
+        dashboard.bottlenecks.totalOpenBottlenecks,
+        `${dashboard.bottlenecks.escalatedBottlenecks} escalated`,
+        dashboard.bottlenecks.escalatedBottlenecks > 0 ? "danger" : "warning",
+        "/alerts",
+        "alert",
+      ),
+
+      metric(
+        "Near SLA breach",
+        dashboard.risk.rolesNearSlaBreach,
+        `${dashboard.risk.overdueRoles} overdue`,
+        dashboard.risk.overdueRoles > 0 ? "danger" : "warning",
+        "/requisitions?nearSlaBreach=true",
+        "clock",
+      ),
+    ];
+  }
+
+  /*
+   * Leadership cards intentionally follow the reference image:
+   *
+   * Open Requisitions
+   * Filled Requisitions
+   * Avg. Time to Fill
+   * SLA Compliance
+   */
+  if (hasAnyRole(user, [appRoles.leadership])) {
+    return [
+      metric(
+        "Open Requisitions",
+        dashboard.recruitmentOverview.totalOpenRoles,
+        `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
+        "success",
+        "/requisitions?status=Active",
+        "briefcase",
+        "12% vs last week",
+        "positive",
+        "up",
+      ),
+
+      metric(
+        "Filled Requisitions",
+        dashboard.pipeline.rolesFilled,
+        `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`,
+        "success",
+        "/requisitions?openOnly=false",
+        "check",
+        "0% vs last week",
+        "neutral",
+        "neutral",
+      ),
+
+      metric(
+        "Avg. Time to Fill",
+        dashboard.timeToFill.averageTimeToFill,
+        "",
+        "success",
+        "/analytics",
+        "clock",
+        "8% vs last week",
+        "positive",
+        "down",
+        "days",
+      ),
+
+      metric(
+        "SLA Compliance",
+        `${dashboard.slaCompliance.complianceRate}%`,
+        "On track",
+        dashboard.slaCompliance.complianceRate >= 80 ? "success" : "warning",
+        "/analytics",
+        "shield",
+        "5% vs last week",
+        "positive",
+        "up",
+      ),
+    ];
+  }
+
+  if (hasAnyRole(user, [appRoles.talentAcquisitionManager])) {
+    return [
+      metric(
+        "Open requisitions",
+        dashboard.recruitmentOverview.totalOpenRoles,
+        `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
+        "success",
+        "/requisitions?status=Active",
+        "briefcase",
+      ),
+
+      metric(
+        "SLA compliance",
+        `${dashboard.slaCompliance.complianceRate}%`,
+        `${dashboard.slaCompliance.rolesBreachingSla} breaching`,
+        dashboard.slaCompliance.rolesBreachingSla > 0 ? "danger" : "success",
+        "/requisitions?overdueOnly=true",
+        "shield",
+      ),
+
+      metric(
+        "Escalated bottlenecks",
+        dashboard.bottlenecks.escalatedBottlenecks,
+        `${dashboard.bottlenecks.highRiskBottlenecks} high risk`,
+        dashboard.bottlenecks.escalatedBottlenecks > 0 ? "danger" : "success",
+        "/alerts",
+        "alert",
+      ),
+
+      metric(
+        "Overdue actions",
+        dashboard.actions.overdueActions,
+        `${dashboard.actions.highPriorityActions} high priority`,
+        dashboard.actions.overdueActions > 0 ? "warning" : "success",
+        "/alerts",
+        "clock",
+      ),
+    ];
+  }
+
+  return [
+    metric(
+      "My open requisitions",
+      dashboard.recruitmentOverview.totalOpenRoles,
+      `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
+      "success",
+      "/requisitions?status=Active",
+      "briefcase",
+    ),
+
+    metric(
+      "Filled requisitions",
+      dashboard.pipeline.rolesFilled,
+      `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`,
+      "success",
+      "/requisitions?openOnly=false",
+      "check",
+    ),
+
+    metric(
+      "Overdue actions",
+      dashboard.actions.overdueActions,
+      `${dashboard.actions.totalOpenActions} open actions`,
+      dashboard.actions.overdueActions > 0 ? "warning" : "success",
+      "/alerts",
+      "clock",
+    ),
+
+    metric(
+      "Open bottlenecks",
+      dashboard.bottlenecks.totalOpenBottlenecks,
+      `${dashboard.bottlenecks.escalatedBottlenecks} escalated`,
+      dashboard.bottlenecks.escalatedBottlenecks > 0 ? "danger" : "success",
+      "/alerts",
+      "alert",
+    ),
+  ];
+}
+
+function metric(
+  label: string,
+  value: number | string,
+  detail: string,
+  tone: SummaryTone,
+  href: string,
+  icon: MetricIconName,
+  trend?: string,
+  trendTone?: "positive" | "negative" | "neutral",
+  trendDirection?: "up" | "down" | "neutral",
+  valueSuffix?: string,
+): Metric {
+  return {
+    label,
+    value,
+    detail,
+    tone,
+    href,
+    icon,
+    trend,
+    trendTone,
+    trendDirection,
+    valueSuffix,
+  };
+}
+
+/* ================================================================
+   ATTENTION
+   ================================================================ */
+
+function getAttentionItems(
+  dashboard: DashboardResponse,
+  user: UserProfile | null,
+) {
+  if (hasAnyRole(user, [appRoles.hiringManager])) {
+    return [
+      metric(
+        "Open actions",
+        dashboard.actions.totalOpenActions,
+        "",
+        "neutral",
+        "/alerts",
+        "check",
+      ),
+
+      metric(
+        "Overdue actions",
+        dashboard.actions.overdueActions,
+        "",
+        "danger",
+        "/alerts",
+        "alert",
+      ),
+
+      metric(
+        "Open bottlenecks",
+        dashboard.bottlenecks.totalOpenBottlenecks,
+        "",
+        "warning",
+        "/alerts",
+        "alert",
+      ),
+
+      metric(
+        "Stalled requisitions",
+        dashboard.risk.stalledRequisitions,
+        "",
+        "danger",
+        "/requisitions?overdueOnly=true",
+        "clock",
+      ),
+    ];
+  }
+
+  if (hasAnyRole(user, [appRoles.talentAcquisitionManager])) {
+    return [
+      metric(
+        "Overdue requisitions",
+        dashboard.risk.overdueRoles,
+        "",
+        "danger",
+        "/requisitions?overdueOnly=true",
+        "alert",
+      ),
+
+      metric(
+        "Near SLA breach",
+        dashboard.risk.rolesNearSlaBreach,
+        "",
+        "warning",
+        "/requisitions?nearSlaBreach=true",
+        "clock",
+      ),
+
+      metric(
+        "Escalated bottlenecks",
+        dashboard.bottlenecks.escalatedBottlenecks,
+        "",
+        "danger",
+        "/alerts",
+        "alert",
+      ),
+
+      metric(
+        "High priority actions",
+        dashboard.actions.highPriorityActions,
+        "",
+        "warning",
+        "/alerts",
+        "clock",
+      ),
+    ];
+  }
+
+  return [
+    metric(
+      "Overdue requisitions",
+      dashboard.risk.overdueRoles,
+      "",
+      "danger",
+      "/requisitions?overdueOnly=true",
+      "alert",
+    ),
+
+    metric(
+      "Near SLA breach",
+      dashboard.risk.rolesNearSlaBreach,
+      "",
+      "warning",
+      "/requisitions?nearSlaBreach=true",
+      "clock",
+    ),
+
+    metric(
+      "Stalled requisitions",
+      dashboard.risk.stalledRequisitions,
+      "",
+      "neutral",
+      "/requisitions?overdueOnly=true",
+      "alert",
+    ),
+
+    metric(
+      "Open bottlenecks",
+      dashboard.bottlenecks.totalOpenBottlenecks,
+      "",
+      "neutral",
+      "/alerts",
+      "alert",
+    ),
+  ];
+}
+
+function getAttentionTitle(user: UserProfile | null) {
+  if (hasAnyRole(user, [appRoles.hiringManager])) {
+    return "Needs your input";
+  }
+
+  if (hasAnyRole(user, [appRoles.talentAcquisitionManager])) {
+    return "Escalations";
+  }
+
+  return "Needs Attention";
+}
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+
 function getSlaStatusClass(status: string) {
   const normalized = status.trim().toLowerCase();
 
@@ -605,346 +1105,9 @@ function formatDepartment(department: string) {
   return formatValue(department);
 }
 
-type SummaryTone = "neutral" | "success" | "warning" | "danger";
-
-type Metric = {
-  label: string;
-  value: number | string;
-  detail: string;
-  tone: SummaryTone;
-  href: string;
-  icon: string;
-  trend?: string;
-  trendTone?: "positive" | "negative" | "neutral";
-};
-
-function getRoleMetrics(
-  dashboard: DashboardResponse,
-  user: UserProfile | null,
-): Metric[] {
-  if (hasAnyRole(user, [appRoles.hiringManager])) {
-    return [
-      metric(
-        "My open requisitions",
-        dashboard.recruitmentOverview.totalOpenRoles,
-        `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
-        "success",
-        "/requisitions?status=Active",
-        "▱",
-      ),
-
-      metric(
-        "Feedback actions",
-        dashboard.actions.totalOpenActions,
-        `${dashboard.actions.overdueActions} overdue`,
-        dashboard.actions.overdueActions > 0 ? "warning" : "success",
-        "/alerts",
-        "✓",
-      ),
-
-      metric(
-        "Open bottlenecks",
-        dashboard.bottlenecks.totalOpenBottlenecks,
-        `${dashboard.bottlenecks.escalatedBottlenecks} escalated`,
-        dashboard.bottlenecks.escalatedBottlenecks > 0 ? "danger" : "warning",
-        "/alerts",
-        "!",
-      ),
-
-      metric(
-        "Near SLA breach",
-        dashboard.risk.rolesNearSlaBreach,
-        `${dashboard.risk.overdueRoles} overdue`,
-        dashboard.risk.overdueRoles > 0 ? "danger" : "warning",
-        "/requisitions?nearSlaBreach=true",
-        "◷",
-      ),
-    ];
-  }
-
-  if (hasAnyRole(user, [appRoles.leadership])) {
-    return [
-      metric(
-        "Open requisitions",
-        dashboard.recruitmentOverview.totalOpenRoles,
-        `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
-        "success",
-        "/requisitions?status=Active",
-        "▱",
-      ),
-
-      metric(
-        "Filled requisitions",
-        dashboard.pipeline.rolesFilled,
-        `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`,
-        "success",
-        "/requisitions?openOnly=false",
-        "✓",
-      ),
-
-      metric(
-        "Avg. time to fill",
-        `${dashboard.timeToFill.averageTimeToFill} days`,
-        `${dashboard.slaCompliance.complianceRate}% SLA compliance`,
-        dashboard.slaCompliance.complianceRate >= 80 ? "success" : "warning",
-        "/analytics",
-        "◷",
-        "↓ 8% vs last week",
-        "positive",
-      ),
-
-      metric(
-        "At risk",
-        dashboard.risk.items.length,
-        `${dashboard.risk.stalledRequisitions} stalled`,
-        dashboard.risk.items.length > 0 ? "danger" : "success",
-        "/alerts",
-        "!",
-      ),
-    ];
-  }
-
-  if (hasAnyRole(user, [appRoles.talentAcquisitionManager])) {
-    return [
-      metric(
-        "Open requisitions",
-        dashboard.recruitmentOverview.totalOpenRoles,
-        `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
-        "success",
-        "/requisitions?status=Active",
-        "▱",
-      ),
-
-      metric(
-        "SLA compliance",
-        `${dashboard.slaCompliance.complianceRate}%`,
-        `${dashboard.slaCompliance.rolesBreachingSla} breaching`,
-        dashboard.slaCompliance.rolesBreachingSla > 0 ? "danger" : "success",
-        "/requisitions?overdueOnly=true",
-        "♢",
-      ),
-
-      metric(
-        "Escalated bottlenecks",
-        dashboard.bottlenecks.escalatedBottlenecks,
-        `${dashboard.bottlenecks.highRiskBottlenecks} high risk`,
-        dashboard.bottlenecks.escalatedBottlenecks > 0 ? "danger" : "success",
-        "/alerts",
-        "!",
-      ),
-
-      metric(
-        "Overdue actions",
-        dashboard.actions.overdueActions,
-        `${dashboard.actions.highPriorityActions} high priority`,
-        dashboard.actions.overdueActions > 0 ? "warning" : "success",
-        "/alerts",
-        "◷",
-      ),
-    ];
-  }
-
-  return [
-    metric(
-      "My open requisitions",
-      dashboard.recruitmentOverview.totalOpenRoles,
-      `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
-      "success",
-      "/requisitions?status=Active",
-      "▱",
-    ),
-
-    metric(
-      "Filled requisitions",
-      dashboard.pipeline.rolesFilled,
-      `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`,
-      "success",
-      "/requisitions?openOnly=false",
-      "✓",
-    ),
-
-    metric(
-      "Overdue actions",
-      dashboard.actions.overdueActions,
-      `${dashboard.actions.totalOpenActions} open actions`,
-      dashboard.actions.overdueActions > 0 ? "warning" : "success",
-      "/alerts",
-      "◷",
-    ),
-
-    metric(
-      "Open bottlenecks",
-      dashboard.bottlenecks.totalOpenBottlenecks,
-      `${dashboard.bottlenecks.escalatedBottlenecks} escalated`,
-      dashboard.bottlenecks.escalatedBottlenecks > 0 ? "danger" : "success",
-      "/alerts",
-      "!",
-    ),
-  ];
-}
-
-function metric(
-  label: string,
-  value: number | string,
-  detail: string,
-  tone: SummaryTone,
-  href: string,
-  icon: string,
-  trend?: string,
-  trendTone?: "positive" | "negative" | "neutral",
-): Metric {
-  return {
-    label,
-    value,
-    detail,
-    tone,
-    href,
-    icon,
-    trend,
-    trendTone,
-  };
-}
-
-function getAttentionItems(
-  dashboard: DashboardResponse,
-  user: UserProfile | null,
-) {
-  if (hasAnyRole(user, [appRoles.hiringManager])) {
-    return [
-      metric(
-        "Open actions",
-        dashboard.actions.totalOpenActions,
-        "",
-        "neutral",
-        "/alerts",
-        "•",
-      ),
-
-      metric(
-        "Overdue actions",
-        dashboard.actions.overdueActions,
-        "",
-        "danger",
-        "/alerts",
-        "•",
-      ),
-
-      metric(
-        "Open bottlenecks",
-        dashboard.bottlenecks.totalOpenBottlenecks,
-        "",
-        "warning",
-        "/alerts",
-        "•",
-      ),
-
-      metric(
-        "Stalled requisitions",
-        dashboard.risk.stalledRequisitions,
-        "",
-        "danger",
-        "/requisitions?overdueOnly=true",
-        "•",
-      ),
-    ];
-  }
-
-  if (hasAnyRole(user, [appRoles.talentAcquisitionManager])) {
-    return [
-      metric(
-        "Overdue requisitions",
-        dashboard.risk.overdueRoles,
-        "",
-        "danger",
-        "/requisitions?overdueOnly=true",
-        "•",
-      ),
-
-      metric(
-        "Near SLA breach",
-        dashboard.risk.rolesNearSlaBreach,
-        "",
-        "warning",
-        "/requisitions?nearSlaBreach=true",
-        "•",
-      ),
-
-      metric(
-        "Escalated bottlenecks",
-        dashboard.bottlenecks.escalatedBottlenecks,
-        "",
-        "danger",
-        "/alerts",
-        "•",
-      ),
-
-      metric(
-        "High priority actions",
-        dashboard.actions.highPriorityActions,
-        "",
-        "warning",
-        "/alerts",
-        "•",
-      ),
-    ];
-  }
-
-  return [
-    metric(
-      "Overdue requisitions",
-      dashboard.risk.overdueRoles,
-      "",
-      "danger",
-      "/requisitions?overdueOnly=true",
-      "•",
-    ),
-
-    metric(
-      "Near SLA breach",
-      dashboard.risk.rolesNearSlaBreach,
-      "",
-      "warning",
-      "/requisitions?nearSlaBreach=true",
-      "•",
-    ),
-
-    metric(
-      "Stalled requisitions",
-      dashboard.risk.stalledRequisitions,
-      "",
-      "neutral",
-      "/requisitions?overdueOnly=true",
-      "•",
-    ),
-
-    metric(
-      "Open bottlenecks",
-      dashboard.bottlenecks.totalOpenBottlenecks,
-      "",
-      "neutral",
-      "/alerts",
-      "•",
-    ),
-  ];
-}
-
-function getAttentionTitle(user: UserProfile | null) {
-  if (hasAnyRole(user, [appRoles.hiringManager])) {
-    return "Needs your input";
-  }
-
-  if (hasAnyRole(user, [appRoles.talentAcquisitionManager])) {
-    return "Escalations";
-  }
-
-  return "Needs Attention";
-}
-
 function getRecruitmentHealth(dashboard: DashboardResponse) {
   const onTrack = dashboard.slaCompliance.rolesWithinSla;
-
   const atRisk = dashboard.slaCompliance.rolesApproachingSla;
-
   const critical = dashboard.slaCompliance.rolesBreachingSla;
 
   const total = onTrack + atRisk + critical;
@@ -993,24 +1156,6 @@ function getPipelineHref(stage: string) {
   return stageFilters[stage]
     ? `/requisitions?stage=${stageFilters[stage]}`
     : "/requisitions";
-}
-
-function getGreeting() {
-  const hour = new Date().getHours();
-
-  if (hour < 12) {
-    return "Good morning";
-  }
-
-  if (hour < 17) {
-    return "Good afternoon";
-  }
-
-  return "Good evening";
-}
-
-function getFirstName(fullName?: string) {
-  return fullName?.trim().split(/\s+/)[0] || "there";
 }
 
 function formatToday() {
