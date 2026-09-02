@@ -53,7 +53,7 @@
   border-radius: 9px;
   outline: none;
   background-color: #ffffff;
-  color: var(-color-text);
+  color: var(--color-text);
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
