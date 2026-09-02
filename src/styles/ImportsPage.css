@@ -31,7 +31,7 @@
       rgba(37, 99, 235, 0.07),
       transparent 28%
     ),
-    linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
+    linear-gradient(135deg, var(--color-brand-lighter) 0%, var(--color-brand-light) 100%);
 }
 
 .import-toolbar > label {
@@ -39,8 +39,8 @@
   flex-direction: column;
   gap: 8px;
   min-width: 230px;
-  color: #667287;
-  font-size: 11px;
+  color: var(--color-brand);
+  font-size: 13px;
   font-weight: 750;
   letter-spacing: 0.055em;
   text-transform: uppercase;
@@ -53,10 +53,10 @@
   border-radius: 9px;
   outline: none;
   background-color: #ffffff;
-  color: #273246;
+  color: var(-color-text);
   font-family: inherit;
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 500;
   cursor: pointer;
   transition:
     border-color 0.18s ease,
@@ -76,8 +76,8 @@
   padding: 0 15px;
   border: 1px solid #d8e2f7;
   border-radius: 9px;
-  background: #f5f8ff;
-  color: #2563eb;
+  background: var(--color-brand);
+  color: var(--color-brand-lighter);
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
@@ -99,8 +99,9 @@
 }
 
 .import-template-action:hover {
-  border-color: #bfd0f4;
-  background: #edf3ff;
+  border-color: var(--color-brand);
+  background: var(--color-brand-light);
+  color: var(--color-brand);
   transform: translateY(-1px);
 }
 
@@ -116,8 +117,8 @@
   background:
     linear-gradient(
       135deg,
-      #f7faff 0%,
-      #f1f6ff 100%
+      var(--color-brand-lighter) 0%,
+      var(--color-brand-light) 100%
     );
 }
 
@@ -130,7 +131,7 @@
 .smartrecruiters-sync-copy > span {
   width: fit-content;
   margin-bottom: 5px;
-  color: #2563eb;
+  color: var(--color-brand);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -138,14 +139,14 @@
 }
 
 .smartrecruiters-sync-copy strong {
-  color: #1d2a3e;
+  color: var(--color-text-primary);
   font-size: 15px;
   font-weight: 750;
 }
 
 .smartrecruiters-sync-copy p {
   margin: 4px 0 0;
-  color: #718096;
+  color: var(--color-text-muted);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -160,7 +161,7 @@
 }
 
 .smartrecruiters-sync-meta span {
-  color: #8995a8;
+  color: var(--color-text-muted);
   font-size: 9px;
   font-weight: 750;
   letter-spacing: 0.07em;
@@ -168,7 +169,7 @@
 }
 
 .smartrecruiters-sync-meta strong {
-  color: #3b4658;
+  color: var(--color-text-muted);
   font-size: 12px;
   font-weight: 700;
 }
@@ -178,8 +179,8 @@
   padding: 0 17px;
   border: 0;
   border-radius: 8px;
-  background: #2563eb;
-  color: #ffffff;
+  background: var(--color-brand);
+  color: var(--color-brand-lighter);
   font-family: inherit;
   font-size: 12px;
   font-weight: 700;
@@ -192,7 +193,8 @@
 }
 
 .smartrecruiters-sync-panel button:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(37, 99, 235, 0.23);
 }
@@ -207,7 +209,7 @@
   padding: 22px;
   border: 1px solid #e7ebf1;
   border-radius: 13px;
-  background: #fbfcfe;
+  background: var(--color-brand-light);
 }
 
 .csv-import-heading {
@@ -218,7 +220,7 @@
 }
 
 .csv-import-heading span {
-  color: #2563eb;
+  color: var(--color-brand);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -226,7 +228,7 @@
 }
 
 .csv-import-heading strong {
-  color: #273246;
+  color: var(--color-text-primary);
   font-size: 15px;
   font-weight: 750;
 }
@@ -241,7 +243,7 @@
   padding: 25px;
   border: 1.5px dashed #cbd6e6;
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--color-brand-lighter);
   text-align: center;
   cursor: pointer;
   transition:
@@ -259,20 +261,20 @@
   height: 42px;
   margin-bottom: 10px;
   border-radius: 11px;
-  background: #eef4ff;
-  color: #2563eb;
+  background: var(--color-brand-lighter);
+  color: var(--color-brand);
   font-size: 20px;
   font-weight: 800;
 }
 
 .import-upload-box:hover {
-  border-color: #8eb1f7;
-  background: #fbfdff;
+  border-color: var(--color-brand-lighter);
+  background: var(--color-brand-lighter);
   box-shadow: 0 4px 15px rgba(37, 99, 235, 0.06);
 }
 
 .import-upload-box > span {
-  color: #7d8899;
+  color: var(--color-brand);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.07em;
@@ -283,7 +285,7 @@
   max-width: 90%;
   margin-top: 5px;
   overflow: hidden;
-  color: #2b3547;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -318,8 +320,8 @@
 }
 
 .import-preview span {
-  color: #8993a3;
-  font-size: 9px;
+  color: var(--color-text-muted);
+  font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -327,7 +329,7 @@
 
 .import-preview strong {
   overflow: hidden;
-  color: #354054;
+  color: var(--color-text-primary);
   font-size: 12px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -365,8 +367,8 @@
 }
 
 .preview-row.table-head span {
-  color: #8a95a6;
-  font-size: 9px;
+  color: var(--color-text-muted);
+  font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.065em;
   text-transform: uppercase;
@@ -381,14 +383,14 @@
 }
 
 .preview-row strong {
-  color: #293548;
+  color: var(--color-brand);
   font-size: 12px;
   font-weight: 700;
 }
 
 .preview-row > span {
-  color: #68758a;
-  font-size: 12px;
+  color: var(--color-text-primary);
+  font-size: 13px;
 }
 
 .preview-row:not(.table-head):hover {
@@ -400,8 +402,8 @@
   padding: 11px 13px;
   border: 1px solid #fecdd3;
   border-radius: 9px;
-  background: #fff5f6;
-  color: #be123c;
+  background: var(--color-brand-lighter);
+  color: var(--color-brand);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
@@ -426,8 +428,8 @@
   padding: 0 15px;
   border: 1px solid #dce2eb;
   border-radius: 8px;
-  background: #ffffff;
-  color: #596579;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
@@ -439,8 +441,7 @@
 
 .cancel-link:hover {
   border-color: #cbd3df;
-  background: #f8fafc;
-  color: #293548;
+  background: var(--color-brand-lighter);
 }
 
 .form-actions.import-actions > button {
@@ -448,8 +449,8 @@
   padding: 0 20px;
   border: 0;
   border-radius: 8px;
-  background: #2563eb;
-  color: #ffffff;
+  background: var(--color-brand);
+  color: var(--color-brand-lighter);
   font-family: inherit;
   font-size: 12px;
   font-weight: 700;
@@ -462,7 +463,8 @@
 }
 
 .form-actions.import-actions > button:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
 }

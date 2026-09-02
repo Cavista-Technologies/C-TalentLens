@@ -66,13 +66,11 @@ export function Sidebar({
       path: "/dashboard",
       icon: <DashboardIcon />,
     },
-
     {
       label: "Requisitions",
       path: "/requisitions",
       icon: <BriefcaseIcon />,
     },
-
     {
       label: "Referrals",
       path: "/referrals",
@@ -135,45 +133,47 @@ export function Sidebar({
 
       <aside className={sidebarClasses} aria-label="Application sidebar">
         {/* ===================================================
-            HEADER / BRAND
+            HEADER
         =================================================== */}
 
         <div className="sidebar-header">
+          {/* =================================================
+              BRAND
+          ================================================= */}
+
           <div className="sidebar-brand">
-            {/* -------------------------------------------------
-                CSS LOGO
-
-                Expanded:
-                C-TalentLens
-
-                Collapsed:
-                C only
-            ------------------------------------------------- */}
-
-            <div className="talentlens-logo" aria-label="C-TalentLens">
-              {/* ===============================================
-                  STYLIZED C MARK
-              =============================================== */}
-
-              <div className="talentlens-mark" aria-hidden="true">
-                <span className="talentlens-coil talentlens-coil-one" />
-                <span className="talentlens-coil talentlens-coil-two" />
-                <span className="talentlens-coil talentlens-coil-three" />
-
-                <span className="talentlens-mark-core" />
+            <div className="talentlens-brand">
+              <div className="talentlens-logo-wrapper">
+                <img
+                  src="../CAVISTA ICON COLORED.svg"
+                  alt="TalentLens"
+                  className="talentlens-logo-image"
+                />
               </div>
 
-              {/* ===============================================
-                  WORDMARK
-              =============================================== */}
-
-              <div className="talentlens-wordmark">
-                <span className="talentlens-hyphen">-</span>
-
-                <span className="talentlens-name">TalentLens</span>
-              </div>
+              {!collapsed && (
+                <span className="talentlens-brand-name">TalentLens</span>
+              )}
             </div>
           </div>
+
+          {/* =================================================
+              DESKTOP COLLAPSE / EXPAND BUTTON
+
+              This button sits directly on the sidebar's
+              right border so it does not interfere with
+              the logo or brand.
+          ================================================= */}
+
+          <button
+            type="button"
+            className="sidebar-border-toggle"
+            onClick={onToggleCollapse}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          </button>
 
           {/* =================================================
               MOBILE CLOSE BUTTON
@@ -223,26 +223,6 @@ export function Sidebar({
         =================================================== */}
 
         <div className="sidebar-bottom">
-          {/* =================================================
-              COLLAPSE / EXPAND
-          ================================================= */}
-
-          <button
-            type="button"
-            className="sidebar-collapse-button"
-            onClick={onToggleCollapse}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <span className="sidebar-collapse-icon">
-              {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-            </span>
-
-            {!collapsed && (
-              <span className="sidebar-collapse-label">Collapse</span>
-            )}
-          </button>
-
           {/* =================================================
               USER SUMMARY
           ================================================= */}

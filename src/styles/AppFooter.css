@@ -1,26 +1,37 @@
+@import "./colors.css";
+
 .app-footer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 270px;
+  z-index: 1000;
+
   min-height: 52px;
 
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
   gap: 9px;
 
   padding: 0 36px;
 
   border-top: 1px solid var(--color-border);
 
-  background: var(--color-white);
+  background: rgba(255, 255, 255, 0.98);
 
   color: var(--color-text-muted);
 
-  font-size: 11px;
+  font-size: 13px;
+
+  box-shadow: 0 -4px 16px rgba(27, 42, 74, 0.05);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .app-footer strong {
-  color: var(--color-text-secondary);
-
+  color: var(--color-text-primary);
   font-weight: 650;
 }
 
@@ -28,9 +39,27 @@
   color: var(--color-border-brand);
 }
 
+.layout-sidebar-collapsed .app-footer {
+  left: 82px;
+}
+
+@media (max-width: 1200px) {
+  .app-footer {
+    left: 250px;
+    padding: 0 24px;
+  }
+
+  .layout-sidebar-collapsed .app-footer {
+    left: 82px;
+  }
+}
 
 @media (max-width: 768px) {
-  .app-footer {
+  .app-footer,
+  .layout-sidebar-collapsed .app-footer {
+    right: 0;
+    left: 0;
+
     min-height: 46px;
 
     justify-content: center;
@@ -41,13 +70,20 @@
   }
 }
 
-
 @media (max-width: 400px) {
   .app-footer {
+    min-height: 46px;
+
     flex-wrap: wrap;
 
     gap: 6px;
 
-    padding: 8px 12px;
+    padding: 7px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-footer {
+    transition: none;
   }
 }

@@ -124,7 +124,7 @@
   min-width: 100px;
   padding: 0 13px;
 
-  color: var(--color-text-labe);
+  color: var(--color-brand-light);
   font-family: inherit;
   font-size: 12px;
   font-weight: 750;
@@ -144,7 +144,7 @@
 
 .filter-menu-button:hover,
 .filter-menu-button[aria-expanded='true'] {
-  color: var(--color-primary-dark);
+  color: var(--color-brand-light);
   background: var(--color-brand);
   border-color: var(--color-success-border);
   box-shadow: 0 0 0 3px var(--color-focus);
@@ -152,6 +152,7 @@
 
 .filter-button-icon {
   font-size: 17px;
+  color: var(--color-background-light);
   line-height: 1;
   transform: rotate(90deg);
 }

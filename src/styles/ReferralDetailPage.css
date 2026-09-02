@@ -1,9 +1,5 @@
 @import "./colors.css";
 
-/* =========================================================
-   REFERRAL DETAIL PAGE
-   ========================================================= */
-
 .referral-detail-page {
   width: 100%;
   max-width: 1440px;
@@ -16,9 +12,6 @@
   width: 100%;
 }
 
-/* =========================================================
-   BACK LINK
-   ========================================================= */
 
 .referral-detail-back-link {
   display: inline-flex;
@@ -43,9 +36,6 @@
   flex-shrink: 0;
 }
 
-/* =========================================================
-   HERO
-   ========================================================= */
 
 .referral-detail-hero {
   display: flex;
@@ -59,10 +49,10 @@
   background:
     radial-gradient(
       circle at 90% 15%,
-      rgba(37, 99, 235, 0.09),
+      var(--color-brand-light),
       transparent 30%
     ),
-    linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+    linear-gradient(135deg, var(--color-brand-light) 0%, var(--color-brand-lighter) 100%);
   box-shadow: 0 8px 30px rgba(27, 42, 74, 0.055);
 }
 
@@ -81,8 +71,8 @@
   width: 76px;
   height: 76px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #2563eb, #4f46e5);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-brand-light), var(--color-brand-lighter));
+  color: var(--color-brand);
   font-size: 25px;
   font-weight: 750;
   letter-spacing: -0.04em;
@@ -107,10 +97,10 @@
   min-height: 25px;
   padding: 4px 9px;
   border-radius: 6px;
-  background: #eef3ff;
-  color: #315ec7;
+  background: var(--color-brand-lighter);
+  color: var(--color-text-muted);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -159,7 +149,7 @@
 
 .referral-hero-copy h1 {
   margin: 0;
-  color: #111827;
+  color: var(--color-text-primary);
   font-size: clamp(26px, 3vw, 34px);
   font-weight: 760;
   letter-spacing: -0.035em;
@@ -172,7 +162,7 @@
   flex-wrap: wrap;
   gap: 7px;
   margin: 10px 0 0;
-  color: #647084;
+  color: var(--color-text-muted);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -182,7 +172,7 @@
 }
 
 .hero-separator {
-  color: #b2bbc8;
+  color: var(--color-brand);
 }
 
 .referral-hero-side {
@@ -196,7 +186,7 @@
 
 .outcome-label {
   margin-bottom: 7px;
-  color: #8a95a6;
+  color: var(--color-text-muted);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -204,7 +194,7 @@
 }
 
 .outcome-badge {
-  color: #1f2937;
+  color: var(--color-text-primary);
   font-size: 17px;
   font-weight: 750;
 }
@@ -215,9 +205,6 @@
   font-size: 12px;
 }
 
-/* =========================================================
-   QUICK STATS
-   ========================================================= */
 
 .referral-quick-stats {
   display: grid;
@@ -234,7 +221,7 @@
   padding: 17px 18px;
   border: 1px solid #e7ebf1;
   border-radius: 13px;
-  background: #ffffff;
+  background: var(--color-brand-light);
   box-shadow: 0 3px 14px rgba(27, 42, 74, 0.035);
 }
 
@@ -246,8 +233,8 @@
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--color-brand-lighter);
+  color: var(--color-brand);
 }
 
 .quick-stat-icon.user {
@@ -273,7 +260,7 @@
 }
 
 .quick-stat span {
-  color: #8a95a6;
+  color: var(--color-text-muted);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -282,16 +269,13 @@
 
 .quick-stat strong {
   overflow: hidden;
-  color: #293548;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* =========================================================
-   MAIN GRID
-   ========================================================= */
 
 .referral-detail-grid {
   display: grid;
@@ -301,25 +285,18 @@
   align-items: start;
 }
 
-/*
- * Referral Context and History are the only panels
- * that occupy the entire row.
- */
 .referral-detail-panel-full {
   grid-column: 1 / -1;
   width: 100%;
 }
 
-/* =========================================================
-   DETAIL PANEL
-   ========================================================= */
 
 .referral-detail-panel {
   min-width: 0;
   overflow: hidden;
   border: 1px solid #e5e9f0;
   border-radius: 15px;
-  background: #ffffff;
+  background: var(--color-brand-light);
   box-shadow: 0 4px 18px rgba(27, 42, 74, 0.035);
 }
 
@@ -343,8 +320,8 @@
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
 }
 
 .detail-panel-icon.people {
@@ -364,7 +341,7 @@
 
 .detail-panel-title-wrap h2 {
   margin: 0;
-  color: #1b2638;
+  color: var(--color-text-primary);
   font-size: 15px;
   font-weight: 750;
   letter-spacing: -0.015em;
@@ -372,7 +349,7 @@
 
 .detail-panel-title-wrap p {
   margin: 3px 0 0;
-  color: #8993a3;
+  color: var(--color-text-muted);
   font-size: 11px;
   line-height: 1.4;
 }
@@ -381,9 +358,6 @@
   padding: 20px 22px 22px;
 }
 
-/* =========================================================
-   DETAIL LIST
-   ========================================================= */
 
 .referral-detail-list {
   display: grid;
@@ -410,7 +384,7 @@
 
 .referral-detail-item dt {
   margin-bottom: 5px;
-  color: #8993a3;
+  color: var(--color-text-muted);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.055em;
@@ -420,16 +394,12 @@
 .referral-detail-item dd {
   margin: 0;
   overflow-wrap: anywhere;
-  color: #2b3547;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 650;
   line-height: 1.45;
 }
 
-/*
- * Referral Context is full width, so its four fields
- * can sit comfortably across the entire panel.
- */
 .referral-context-list {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -446,9 +416,6 @@
   border-top: 0;
 }
 
-/* =========================================================
-   RESUME BUTTON
-   ========================================================= */
 
 .resume-button {
   display: inline-flex;
@@ -460,8 +427,8 @@
   padding: 0 15px;
   border: 1px solid #d8e2f7;
   border-radius: 8px;
-  background: #f5f8ff;
-  color: #2563eb;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
@@ -472,21 +439,18 @@
 }
 
 .resume-button:hover {
-  border-color: #bfd0f4;
-  background: #edf3ff;
+  border-color: var(--color-brand-lighter);
+  background: var(--color-brand-lighter);
   transform: translateY(-1px);
 }
 
-/* =========================================================
-   ALIGNMENT NOTE
-   ========================================================= */
 
 .alignment-note {
   margin-top: 16px;
   padding: 14px 16px;
   border: 1px solid #dbeafe;
   border-radius: 10px;
-  background: #f8fbff;
+  background: #ffffff;
 }
 
 .alignment-note-heading {
@@ -494,7 +458,7 @@
   align-items: center;
   gap: 7px;
   margin-bottom: 7px;
-  color: #2858b9;
+  color: var(--color-text-primary);
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.04em;
@@ -503,14 +467,11 @@
 
 .alignment-note p {
   margin: 0;
-  color: #536176;
+  color: var(--color-text-primary);
   font-size: 13px;
   line-height: 1.65;
 }
 
-/* =========================================================
-   HISTORY
-   ========================================================= */
 
 .referral-history {
   display: flex;
@@ -564,27 +525,24 @@
 }
 
 .history-main strong {
-  color: #273246;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 700;
 }
 
 .history-date {
   flex-shrink: 0;
-  color: #929baa;
+  color: var(--color-text-primary);
   font-size: 11px;
 }
 
 .history-user {
   display: block;
   margin-top: 4px;
-  color: #788497;
+  color: var(--color-text-primary);
   font-size: 11px;
 }
 
-/* =========================================================
-   EMPTY HISTORY
-   ========================================================= */
 
 .empty-history {
   display: flex;
@@ -604,25 +562,22 @@
   margin-bottom: 11px;
   border-radius: 50%;
   background: #f3f5f8;
-  color: #8993a3;
+  color: var(--color-brand);
 }
 
 .empty-history strong {
-  color: #3b4658;
+  color: var(--color-text-primary);
   font-size: 13px;
 }
 
 .empty-history p {
   max-width: 340px;
   margin: 5px 0 0;
-  color: #8a95a5;
+  color: var(--color-text-muted);
   font-size: 12px;
   line-height: 1.5;
 }
 
-/* =========================================================
-   LOADING / ERROR
-   ========================================================= */
 
 .referral-detail-state {
   display: flex;
@@ -634,9 +589,6 @@
   background: #ffffff;
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
 
 @media (max-width: 1100px) {
   .referral-quick-stats {
@@ -679,10 +631,6 @@
     grid-template-columns: 1fr;
   }
 
-  /*
-   * Full-width panels naturally become single-column
-   * panels on smaller screens.
-   */
   .referral-detail-panel-full {
     grid-column: auto;
   }
