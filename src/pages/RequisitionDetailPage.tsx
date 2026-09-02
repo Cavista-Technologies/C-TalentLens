@@ -1322,9 +1322,3 @@ function nullableValue(value: FormDataEntryValue | null) {
 
   return text ? text : null;
 }
-
-function uniqueUsers(users: OwnerOption[]) {
-  return [...new Map(users.map((user) => [user.id, user])).values()].sort(
-    (left, right) => left.name.localeCompare(right.name),
-  );
-}

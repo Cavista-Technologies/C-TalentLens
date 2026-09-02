@@ -152,7 +152,6 @@ function DashboardContent({
   isRequisitionsLoading,
   requisitionsError,
   search,
-  setSearch,
   department,
   setDepartment,
   recruiter,

@@ -10,11 +10,7 @@ type TopbarProps = {
   onOpenMobileMenu: () => void;
 };
 
-export function Topbar({
-  title,
-  sidebarCollapsed,
-  onOpenMobileMenu,
-}: TopbarProps) {
+export function Topbar({ sidebarCollapsed, onOpenMobileMenu }: TopbarProps) {
   const { user, logout } = useAuth();
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
