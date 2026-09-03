@@ -58,17 +58,14 @@ export function LoginPage() {
       <section className="auth-card">
         <div className="auth-brand">
           <div className="auth-logo-wrapper">
-            <img className="auth-logo" src="/cavista-logo.png" alt="Cavista" />
+            <img className="auth-logo" src="/CAVISTA HOLDINGS COLORED 2.svg" alt="Cavista" />
           </div>
 
-          <div className="brand-divider" />
-
-          <span className="brand-product">C-TalentLens</span>
         </div>
 
         <div className="auth-heading">
           <h1>Welcome back</h1>
-          <p>Sign in to continue to your C-TalentLens account.</p>
+          <p>Sign in to continue</p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
