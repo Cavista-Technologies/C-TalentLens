@@ -10,6 +10,10 @@ type TopbarProps = {
   onOpenMobileMenu: () => void;
 };
 
+export function Topbar({
+  sidebarCollapsed,
+  onOpenMobileMenu,
+}: TopbarProps) {
 export function Topbar({ sidebarCollapsed, onOpenMobileMenu }: TopbarProps) {
   const { user, logout } = useAuth();
 
@@ -71,7 +75,7 @@ export function Topbar({ sidebarCollapsed, onOpenMobileMenu }: TopbarProps) {
             {getGreeting()}, {getFirstName(user?.fullName)}
           </h1>
 
-          <p>{formatToday()}</p>
+          <span>Recruitment Overview for {formatToday()}</span>
         </div>
       </div>
 
@@ -133,14 +137,14 @@ function getGreeting() {
   const hour = new Date().getHours();
 
   if (hour < 12) {
-    return "Good morning";
+    return "Good Morning";
   }
 
   if (hour < 17) {
-    return "Good afternoon";
+    return "Good Afternoon";
   }
 
-  return "Good evening";
+  return "Good Evening";
 }
 
 function getFirstName(fullName?: string) {

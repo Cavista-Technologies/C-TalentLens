@@ -4,54 +4,35 @@
   --sidebar-brand: #b9243c;
   --sidebar-brand-dark: #941d31;
   --sidebar-white: #ffffff;
-
   --sidebar-outside: #ffffff;
-
   position: fixed;
-
   top: 0;
   left: 0;
   bottom: 0;
-
   z-index: 1100;
-
   width: 270px;
-
   display: flex;
   flex-direction: column;
-
   background: var(--sidebar-brand);
-
   border-right: 1px solid rgba(255, 255, 255, 0.16);
-
   box-shadow:
     6px 0 24px rgba(16, 24, 40, 0.12);
-
   overflow: visible;
-
   transition:
     width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-
-
 .sidebar-collapsed {
   width: 82px;
 }
 
-
-
 .sidebar-header {
   position: relative;
-
   min-height: 104px;
-
   display: flex;
   align-items: center;
-
   padding: 16px 18px;
-
   background:
     linear-gradient(
       180deg,
@@ -65,91 +46,45 @@
   flex-shrink: 0;
 }
 
-
-
 .sidebar-brand {
   width: 100%;
   min-width: 0;
-
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
   overflow: hidden;
 }
 
-
-
 .talentlens-brand {
   min-width: 0;
-
   display: flex;
   align-items: center;
-
-  gap: 11px;
-
+  gap: 0;
   color: var(--sidebar-white);
-
   user-select: none;
-
   white-space: nowrap;
-
   transition:
     gap 0.28s ease;
 }
 
 
 .talentlens-logo-wrapper {
-  width: 58px;
-  height: 58px;
-
+  width: 70px;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  flex-shrink: 0;
-
-  border-radius: 50%;
-
-  background: var(--sidebar-white);
-
-  box-shadow:
-    0 4px 12px rgba(70, 5, 20, 0.18),
-    0 0 0 3px rgba(255, 255, 255, 0.12);
-
-  overflow: hidden;
-
-  transition:
-    width 0.28s ease,
-    height 0.28s ease,
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
 }
-
 
 .talentlens-logo-image {
-  width: 46px;
-  height: 46px;
-
-  display: block;
-
-  flex-shrink: 0;
-
-  object-fit: contain;
-
+  width: 200px;
+  height: auto;
   object-position: center;
-
-  transition:
-    transform 0.25s ease;
+  margin-left: 8rem;
 }
 
-
-
-
-.talentlens-brand:hover
-.talentlens-logo-wrapper {
+.cavista-logo:hover {
   transform: scale(1.035);
-
   box-shadow:
     0 6px 16px rgba(70, 5, 20, 0.22),
     0 0 0 3px rgba(255, 255, 255, 0.16);
@@ -161,37 +96,24 @@
   transform: scale(1.025);
 }
 
-
-
 .talentlens-brand-name {
   min-width: 0;
-
   overflow: hidden;
-
   color: var(--sidebar-white);
-
   font-family:
     Inter,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-
   font-size: 22px;
-
   font-weight: 750;
-
   letter-spacing: -0.045em;
-
   line-height: 1;
-
   white-space: nowrap;
-
   text-overflow: ellipsis;
-
   text-shadow:
     0 1px 1px rgba(80, 8, 22, 0.14);
-
   transition:
     opacity 0.2s ease,
     transform 0.28s ease;
