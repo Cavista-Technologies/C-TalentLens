@@ -143,16 +143,16 @@ export function Sidebar({
 
           <div className="sidebar-brand">
             <div className="talentlens-brand">
+              {collapsed ? (
+                <img src="/cavista colored bacground2.svg" className="cavista-logo" alt="cavistalogo" />
+              ) : (
               <div className="talentlens-logo-wrapper">
                 <img
-                  src="../CAVISTA ICON COLORED.svg"
+                  src="../talentlens.svg"
                   alt="TalentLens"
                   className="talentlens-logo-image"
                 />
               </div>
-
-              {!collapsed && (
-                <span className="talentlens-brand-name">TalentLens</span>
               )}
             </div>
           </div>
@@ -195,7 +195,6 @@ export function Sidebar({
         =================================================== */}
 
         <nav className="sidebar-navigation" aria-label="Main navigation">
-          <div className="sidebar-navigation-label">MENU</div>
 
           {navigationItems.map((item) => (
             <NavLink

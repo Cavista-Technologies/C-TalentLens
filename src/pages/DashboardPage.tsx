@@ -152,7 +152,6 @@ function DashboardContent({
   isRequisitionsLoading,
   requisitionsError,
   search,
-  setSearch,
   department,
   setDepartment,
   recruiter,
@@ -196,13 +195,11 @@ function DashboardContent({
   return (
     <div className="dashboard-page">
       <section className="dashboard-toolbar">
-        <div className="dashboard-subtitle">
-          Recruitment overview for {formatToday()}
-        </div>
+        <div className="dashboard-subtitle"></div>
 
         {/* <div className="dashboard-toolbar-actions">
           <div className="dashboard-search">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">S
               <path
                 d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
                 fill="none"
@@ -356,12 +353,19 @@ function DashboardContent({
           <div className="attention-list">
             {attentionItems.map((item) => (
               <Link
-                className={`attention-row attention-${item.tone} dashboard-link-card`}
+                className={`attention-row attention-${item.tone} attention-level-${getAttentionColor(Number(item.value))} dashboard-link-card`}
                 key={item.label}
                 to={item.href}
-              >
+              >  
                 <span className="attention-dot" />
-                <span className="attention-label">{item.label}</span>
+              
+                  <div className="attention-label">
+                    <h4> {item.label} </h4>
+                    <p>
+                      {item.value} {""}
+                      {Number(item.value) > 0 ? "requisitions" : "requisition"}
+                    </p>
+                </div>
                 <strong className="attention-value">{item.value}</strong>
               </Link>
             ))}
@@ -612,7 +616,7 @@ function OpenRequisitions({
         <h2>Open Requisitions</h2>
 
         <Link to="/requisitions?status=Active" className="view-all-link">
-          View all open requisitions
+          View all requisitions &#8594;
         </Link>
       </div>
 
@@ -1061,6 +1065,12 @@ function getAttentionTitle(user: UserProfile | null) {
   }
 
   return "Needs Attention";
+}
+
+function getAttentionColor(value: number) {
+  const num = Number(value);
+  if (num === 0) return "low";
+  return "high"
 }
 
 /* ================================================================

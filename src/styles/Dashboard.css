@@ -30,11 +30,9 @@
   width: 260px;
   height: 38px;
   padding: 0 11px;
-
   background: #ffffff;
   border: 1px solid #dfe3e8;
   border-radius: 7px;
-
   color: #98a2b3;
 }
 
@@ -48,11 +46,9 @@
 .dashboard-search input {
   width: 100%;
   min-width: 0;
-
   border: 0;
   outline: 0;
   background: transparent;
-
   color: #344054;
   font-size: 12px;
 }
@@ -66,20 +62,15 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-
   height: 38px;
   padding: 0 15px;
-
   border-radius: 7px;
   border: 1px solid #5746d8;
-
   background: #5746d8;
   color: #ffffff;
-
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
-
   transition:
     background 150ms ease,
     border-color 150ms ease,
@@ -139,31 +130,23 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-
   width: 100%;
   margin-top: 14px;
 }
 
 .metric-card {
   position: relative;
-
   display: flex;
-  align-items: center;
-
+  align-items: right;
   min-width: 0;
   height: 120px;
-
   padding: 17px 15px;
-
   overflow: hidden;
-
   background: #ffffff;
   border: 1px solid #e7eaf0;
   border-radius: 9px;
-
   color: #172033;
   text-decoration: none;
-
   box-shadow:
     0 1px 2px rgba(15, 23, 42, 0.025),
     0 2px 8px rgba(15, 23, 42, 0.025);
@@ -176,9 +159,7 @@
 
 .metric-card:hover {
   transform: translateY(-1px);
-
   border-color: #dce1e9;
-
   box-shadow:
     0 2px 5px rgba(15, 23, 42, 0.04),
     0 8px 20px rgba(15, 23, 42, 0.055);
@@ -189,20 +170,15 @@
   outline-offset: 2px;
 }
 
-
 .metric-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-
   flex: 0 0 52px;
-
   width: 52px;
   height: 52px;
-
   margin-right: 15px;
   margin-top: 0;
-
   background: transparent;
   border-radius: 11px;
 }
@@ -216,17 +192,31 @@
   position: static;
 }
 
-
 .metric-icon-briefcase {
-  color: #35a853 !important;
+  color: #b9243c !important;
+  background: #e3b0b9;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  padding: 5px;
 }
 
 .metric-icon-check {
   color: #35a853 !important;
+  background: #c9f1d4;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  padding: 5px;
 }
 
 .metric-icon-clock {
-  color: #5746d8 !important;
+  color: #dfa000 !important;
+  background: #ebd49b;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  padding: 5px;
 }
 
 .metric-icon-shield {
@@ -235,98 +225,82 @@
 
 .metric-icon-alert {
   color: #dc4b52 !important;
+  background: #f3bcc0;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  padding: 5px;
 }
 
 .metric-card-content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
- 
   min-width: 0;
   height: 100%;
-
-  padding: 0;
 }
 
 
 .metric-label {
   display: block;
-
   width: 100%;
   max-width: 100%;
-
-  overflow: hidden;
-
   color: #252b38;
-
-  font-size: 11px;
+  font-size: .9rem;
   line-height: 15px;
   font-weight: 600;
-
   white-space: nowrap;
   text-overflow: ellipsis;
+  text-transform: capitalize;
 }
 
 .metric-value {
   display: flex;
   align-items: baseline;
   gap: 5px;
-
   margin-top: 1px;
-
   color: #101828;
-
   font-size: 25px;
   line-height: 30px;
   font-weight: 600;
-
   letter-spacing: -0.55px;
+  padding: 5px 0;
 }
 
 
 .metric-value-suffix {
   color: #1f2937;
-
   font-size: 11px;
   line-height: 15px;
   font-weight: 500;
-
   letter-spacing: 0;
+
 }
 
 .metric-detail {
   display: block;
-
   width: 100%;
   max-width: 100%;
-
   margin-top: 0;
-
   overflow: hidden;
-
   color: #727988;
-
   font-size: 10px;
   line-height: 15px;
   font-weight: 400;
-
   white-space: nowrap;
   text-overflow: ellipsis;
+   text-transform: capitalize;
 }
 
 .metric-trend {
   display: flex;
   align-items: center;
   gap: 3px;
-
   margin-top: auto;
-
   color: #35a853;
-
   font-size: 10px;
   line-height: 14px;
   font-weight: 500;
-
   white-space: nowrap;
 }
 
@@ -334,7 +308,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   font-size: 13px;
   line-height: 12px;
   font-weight: 700;
@@ -383,25 +356,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   min-height: 52px;
   padding: 0 17px;
-
   border-bottom: 1px solid #edf0f3;
 }
 
 .dashboard-card-header h2 {
   margin: 0;
-
   color: #172033;
-
-  font-size: 14px;
+  font-size: 1.1rem;
   line-height: 20px;
   font-weight: 600;
 }
 
 .hiring-pipeline-list {
   padding: 9px 17px 13px;
+  font-size: 1rem;
 }
 
 .hiring-pipeline-row {
@@ -419,15 +389,15 @@
 .hiring-pipeline-row:hover {
   color: #5746d8;
 }
+.pipeline-stage-label:hover {
+  color: #de7385;
+}
 
 .pipeline-stage-label {
   overflow: hidden;
-
   color: #475467;
-
-  font-size: 11px;
+  font-size: .9rem;
   font-weight: 500;
-
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -477,11 +447,20 @@
   grid-template-columns: 9px minmax(0, 1fr) auto;
   align-items: center;
   gap: 9px;
-
   min-height: 37px;
-
   color: var(--color-text-dark);
   text-decoration: none;
+  background: #fae8e9;
+  border-radius: 5px;
+  margin: 3px 0;
+  padding: 2px 15px;
+}
+
+.attention-level-high {
+  background: #fae8e9;
+}
+.attention-level-low {
+  background: #fff3d5;
 }
 
 .attention-row:hover .attention-label {
@@ -489,21 +468,37 @@
 }
 
 .attention-dot {
-  width: 7px;
-  height: 7px;
-
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #98a2b3;
 }
 
 .attention-label {
   overflow: hidden;
-
-  font-size: 13px;
   font-weight: 500;
-
   white-space: nowrap;
   text-overflow: ellipsis;
+  padding: 5px 5px;
+}
+
+.attention-label h4,.attention-label p{
+  padding: 0;
+  margin: 0;
+}
+
+.attention-label h4 {
+  font-size: .9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+}
+
+.attention-label p {
+  color: var(--color-text-muted);
+  font-size: .8rem;
+  margin-top: 2px;
 }
 
 .attention-value {
@@ -667,29 +662,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   min-height: 54px;
   padding: 0 17px;
-
   border-bottom: 1px solid #edf0f3;
 }
 
 .open-requisitions-header h2 {
   margin: 0;
-
   color: var(--color-text);
-
-  font-size: 13px;
+  font-size: 1rem;
   line-height: 20px;
   font-weight: 600;
 }
 
 .view-all-link {
   color: var(--color-brand);
-
-  font-size: 11px;
+  font-size: .9rem;
   font-weight: 600;
-
   text-decoration: none;
 }
 
@@ -705,20 +694,15 @@
 .requisitions-table {
   width: 100%;
   min-width: 850px;
-
   border-collapse: collapse;
 }
 
 .requisitions-table th {
   height: 40px;
   padding: 0 14px;
-
   background: #fafbfc;
   border-bottom: 1px solid #edf0f3;
-
-  color: var(--color-text-muted);
-
-  font-size: 14px;
+  font-size: .9rem;
   line-height: 14px;
   font-weight: 600;
   text-align: left;
@@ -727,11 +711,8 @@
 .requisitions-table td {
   height: 47px;
   padding: 0 14px;
-
   border-bottom: 1px solid #f0f2f5;
-
   color: var(--color-text);
-
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
