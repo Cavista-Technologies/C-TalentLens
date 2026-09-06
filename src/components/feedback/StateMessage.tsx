@@ -13,8 +13,7 @@ export function LoadingState({ message = "Loading" }: LoadingStateProps) {
   return (
     <div className="page-loader">
       <div className="brand-loader" role="status" aria-live="polite">
-        <img src="/cavista-logo.png" alt="Cavista" />
-        <strong>C-TalentLens</strong>
+        <img src="/TALENTLENS BG.svg" alt="talentlens logo" />
         <span>{message}</span>
         <div />
       </div>

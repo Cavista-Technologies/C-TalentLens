@@ -5,28 +5,24 @@ import { ErrorState, LoadingState } from "../components/feedback/StateMessage";
 import { AppLayout } from "../components/layout/AppLayout";
 import { PageContainer } from "../components/layout/PageContainer";
 import { useAuth } from "../features/auth/authContext";
-import { appRoles, hasAnyRole } from "../features/auth/roleAccess";
+import { appRoles, canReassignRecruiter, canUseRecruitmentWrite, hasAnyRole } from "../features/auth/roleAccess";
 import { getDashboard } from "../features/dashboard/dashboardApi";
 import type { DashboardResponse } from "../features/dashboard/dashboardTypes";
 import { getRequisitions } from "../features/requisitions/requisitionApi";
 import { formatValue } from "../features/requisitions/requisitionDisplay";
 import type { Requisition } from "../features/requisitions/requisitionTypes";
 import type { UserProfile } from "../features/auth/authTypes";
-
 import "../styles/Dashboard.css";
+import { Eye, Pencil, UserRoundCog } from "lucide-react";
 
 export function DashboardPage() {
   const { user } = useAuth();
-
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
-
   const [isLoading, setIsLoading] = useState(true);
   const [isRequisitionsLoading, setIsRequisitionsLoading] = useState(true);
-
   const [error, setError] = useState("");
   const [requisitionsError, setRequisitionsError] = useState("");
-
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All Departments");
   const [recruiter, setRecruiter] = useState("All Recruiters");
@@ -189,8 +185,8 @@ function DashboardContent({
     () => getDepartments(requisitions),
     [requisitions],
   );
-
   const recruiters = useMemo(() => getRecruiters(requisitions), [requisitions]);
+
 
   return (
     <div className="dashboard-page">
@@ -356,15 +352,15 @@ function DashboardContent({
                 className={`attention-row attention-${item.tone} attention-level-${getAttentionColor(Number(item.value))} dashboard-link-card`}
                 key={item.label}
                 to={item.href}
-              >  
+              >
                 <span className="attention-dot" />
-              
-                  <div className="attention-label">
-                    <h4> {item.label} </h4>
-                    <p>
-                      {item.value} {""}
-                      {Number(item.value) > 0 ? "requisitions" : "requisition"}
-                    </p>
+
+                <div className="attention-label">
+                  <h4> {item.label} </h4>
+                  <p>
+                    {item.value} {""}
+                    {Number(item.value) > 0 ? "requisitions" : "requisition"}
+                  </p>
                 </div>
                 <strong className="attention-value">{item.value}</strong>
               </Link>
@@ -586,6 +582,10 @@ function OpenRequisitions({
   department: string;
   recruiter: string;
 }) {
+  const { user } = useAuth();
+  const canWrite = canUseRecruitmentWrite(user);
+  const canReassign = canReassignRecruiter(user);
+  const [reassigning, setReassigning] = useState<Requisition | null>(null);
   const displayedRequisitions = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -662,6 +662,10 @@ function OpenRequisitions({
                 <th scope="col">Stage</th>
                 <th scope="col">Days Open</th>
                 <th scope="col">SLA Status</th>
+                <th scope="col">Priority</th>
+                <th scope="col" className="actions-column">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -688,6 +692,83 @@ function OpenRequisitions({
                     <span className={getSlaStatusClass(requisition.slaState)}>
                       {formatValue(requisition.slaState)}
                     </span>
+                  </td>
+                  <td>
+                    <span
+                      className={`priority-pill ${requisition.priority.toLowerCase()}`}
+                    >
+                      {formatValue(requisition.priority)}
+                    </span>
+                  </td>
+                  <td>
+                   <div className="icon-actions">
+                            <Link
+                              to={`/requisitions/${requisition.id}`}
+                              title="View requisition"
+                              aria-label={`View ${requisition.roleName}`}
+                            >
+                              <Eye
+                                size={16}
+                                strokeWidth={1.8}
+                                aria-hidden="true"
+                              />
+                            </Link>
+
+                            {canWrite ? (
+                              <Link
+                                to={`/requisitions/${requisition.id}/edit`}
+                                title="Edit requisition"
+                                aria-label={`Edit ${requisition.roleName}`}
+                              >
+                                <Pencil
+                                  size={16}
+                                  strokeWidth={1.8}
+                                  aria-hidden="true"
+                                />
+                              </Link>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled
+                                title="Only recruiters and Talent Acquisition Managers can edit requisitions"
+                                aria-label={`Edit ${requisition.roleName}`}
+                              >
+                                <Pencil
+                                  size={16}
+                                  strokeWidth={1.8}
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            )}
+
+                            {canReassign ? (
+                              <button
+                                type="button"
+                                title="Reassign recruiter"
+                                aria-label={`Reassign recruiter for ${requisition.roleName}`}
+                                onClick={() => setReassigning(requisition)}
+                              >
+                                <UserRoundCog
+                                  size={16}
+                                  strokeWidth={1.8}
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled
+                                title="Only Talent Acquisition Managers can reassign recruiters"
+                                aria-label={`Reassign recruiter for ${requisition.roleName}`}
+                              >
+                                <UserRoundCog
+                                  size={16}
+                                  strokeWidth={1.8}
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            )}
+                          </div>
                   </td>
                 </tr>
               ))}
@@ -1070,7 +1151,7 @@ function getAttentionTitle(user: UserProfile | null) {
 function getAttentionColor(value: number) {
   const num = Number(value);
   if (num === 0) return "low";
-  return "high"
+  return "high";
 }
 
 /* ================================================================
@@ -1168,11 +1249,11 @@ function getPipelineHref(stage: string) {
     : "/requisitions";
 }
 
-function formatToday() {
-  return new Intl.DateTimeFormat("en", {
-    weekday: "long",
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(new Date());
-}
+// function formatToday() {
+//   return new Intl.DateTimeFormat("en", {
+//     weekday: "long",
+//     day: "2-digit",
+//     month: "long",
+//     year: "numeric",
+//   }).format(new Date());
+// }
