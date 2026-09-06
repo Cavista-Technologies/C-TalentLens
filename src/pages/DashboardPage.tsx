@@ -185,11 +185,8 @@ function DashboardContent({
     () => getDepartments(requisitions),
     [requisitions],
   );
-
   const recruiters = useMemo(() => getRecruiters(requisitions), [requisitions]);
-  const canWrite = canUseRecruitmentWrite(user);
-  const canReassign = canReassignRecruiter(user);
-  const [reassigning, setReassigning] = useState<Requisition | null>(null);
+
 
   return (
     <div className="dashboard-page">
@@ -585,7 +582,7 @@ function OpenRequisitions({
   department: string;
   recruiter: string;
 }) {
-    const { user } = useAuth();
+  const { user } = useAuth();
   const canWrite = canUseRecruitmentWrite(user);
   const canReassign = canReassignRecruiter(user);
   const [reassigning, setReassigning] = useState<Requisition | null>(null);
