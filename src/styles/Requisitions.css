@@ -431,18 +431,14 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-
   min-height: 44px;
   padding: 0 16px;
-
   flex-shrink: 0;
-
   color: var(--color-white);
   font-family: inherit;
   font-size: 12px;
   font-weight: 750;
   text-decoration: none;
-
   background: linear-gradient(
     135deg,
     var(--color-brand),
@@ -451,11 +447,8 @@
 
   border: 0;
   border-radius: var(--radius-md);
-
   box-shadow: 0 5px 14px var(--color-brand-shadow-light);
-
   cursor: pointer;
-
   transition:
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
