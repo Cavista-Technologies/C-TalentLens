@@ -13,7 +13,7 @@ import { RequisitionFormPage } from "../pages/RequisitionFormPage";
 import { RequisitionsPage } from "../pages/RequisitionsPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 
-const analyticsRoles = ["TalentAcquisitionManager", "Leadership"];
+// const analyticsRoles = ["TalentAcquisitionManager", "Leadership"];
 const recruitmentWriteRoles = ["Recruiter", "TalentAcquisitionManager"];
 
 export function AppRoutes() {

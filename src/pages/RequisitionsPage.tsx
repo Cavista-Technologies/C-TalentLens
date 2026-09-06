@@ -29,41 +29,30 @@ import "../styles/Requisitions.css";
 export function RequisitionsPage() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-
   const canWrite = canUseRecruitmentWrite(user);
   const canReassign = canReassignRecruiter(user);
-
   const initialSearch = searchParams.get("search") ?? "";
-
   const [response, setResponse] = useState<PagedResponse<Requisition> | null>(
     null,
   );
-
   const [search, setSearch] = useState(initialSearch);
   const [submittedSearch, setSubmittedSearch] = useState(initialSearch);
-
   const [openOnly, setOpenOnly] = useState(
     getBooleanParam(searchParams, "openOnly", false),
   );
-
   const [overdueOnly, setOverdueOnly] = useState(
     getBooleanParam(searchParams, "overdueOnly", false),
   );
-
   const [nearSlaBreach, setNearSlaBreach] = useState(
     getBooleanParam(searchParams, "nearSlaBreach", false),
   );
-
   const [status, setStatus] = useState(searchParams.get("status") ?? "");
   const [stage, setStage] = useState(searchParams.get("stage") ?? "");
-
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [reassigning, setReassigning] = useState<Requisition | null>(null);
-
   const filterRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -489,8 +478,6 @@ export function RequisitionsPage() {
                           <span
                             className={`priority-pill ${requisition.priority.toLowerCase()}`}
                           >
-                            <span className="pill-dot" aria-hidden="true" />
-
                             {formatValue(requisition.priority)}
                           </span>
                         </td>
