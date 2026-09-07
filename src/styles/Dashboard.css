@@ -727,8 +727,7 @@
 }
 
 .role-cell {
-  color: var(--color-brand) !important;
-  font-weight: 700;
+  font-weight: bold !important;
   font-size: 13px;
 }
 
