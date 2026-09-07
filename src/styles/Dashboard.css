@@ -194,7 +194,7 @@
 
 .metric-icon-briefcase {
   color: #b9243c !important;
-  background: #e3b0b9;
+  background: #fde0e5;
   display: flex;
   align-items: center;
   justify-items: center;
@@ -203,7 +203,7 @@
 
 .metric-icon-check {
   color: #35a853 !important;
-  background: #c9f1d4;
+  background: #e5fcec;
   display: flex;
   align-items: center;
   justify-items: center;
@@ -212,7 +212,7 @@
 
 .metric-icon-clock {
   color: #dfa000 !important;
-  background: #ebd49b;
+  background: #fff5dc;
   display: flex;
   align-items: center;
   justify-items: center;
@@ -225,7 +225,7 @@
 
 .metric-icon-alert {
   color: #dc4b52 !important;
-  background: #f3bcc0;
+  background: #fbd9db;
   display: flex;
   align-items: center;
   justify-items: center;
@@ -727,23 +727,18 @@
 }
 
 .role-cell {
-  color: var(--color-brand) !important;
-  font-weight: 700;
+  font-weight: bold !important;
   font-size: 13px;
 }
 
 .stage-pill {
   display: inline-flex;
   align-items: center;
-
   min-height: 23px;
   padding: 0 8px;
-
   border-radius: 999px;
-
   background: var(--color-brand-light);
   color: var(--color-brand);
-
   font-size: 13px;
   font-weight: 600;
 }
@@ -751,12 +746,9 @@
 .sla-status {
   display: inline-flex;
   align-items: center;
-
   min-height: 23px;
   padding: 0 8px;
-
   border-radius: 999px;
-
   font-size: 9px;
   font-weight: 600;
 }
@@ -781,7 +773,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-
   min-height: 110px;
   padding: 20px;
 }
@@ -794,23 +785,19 @@
 
 .open-requisitions-empty strong {
   color: #344054;
-
   font-size: 12px;
   font-weight: 600;
 }
 
 .open-requisitions-empty span {
   color: #98a2b3;
-
   font-size: 11px;
 }
 
 .open-requisitions-empty a {
   color: #5746d8;
-
   font-size: 11px;
   font-weight: 600;
-
   text-decoration: none;
 }
 
@@ -820,18 +807,48 @@
 
 .sr-only {
   position: absolute;
-
   width: 1px;
   height: 1px;
   padding: 0;
   margin: -1px;
-
   overflow: hidden;
-
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-
   border: 0;
+}
+
+.on-track-div {
+  display: flex;
+  gap: 10px;
+  padding: 10px 20px;
+  margin: 0 15px;
+  font-size: .7rem;
+  border-radius: 5px;
+}
+.on-track-head {
+  font-weight: 600;
+}
+.on-track-text {
+  font-size: .6rem;
+}
+.chart-icon {
+  border-radius: 5px;
+  padding: 4px;
+}
+
+.on-track {
+  background: #cef5da;
+  color: #2e7d32;
+}
+
+.at-risk {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.critical {
+  background: #ffebee;
+  color: #c62828;
 }
 
 @media (max-width: 1200px) {

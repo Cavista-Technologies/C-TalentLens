@@ -14,6 +14,7 @@ import type { Requisition } from "../features/requisitions/requisitionTypes";
 import type { UserProfile } from "../features/auth/authTypes";
 import "../styles/Dashboard.css";
 import { Eye, Pencil, UserRoundCog } from "lucide-react";
+import { ChartIcon } from "../components/layout/LayoutIcons";
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -178,47 +179,41 @@ function DashboardContent({
   ] as const;
 
   const totalPipeline = pipeline.reduce((total, [, count]) => total + count, 0);
-
   const recruitmentHealth = getRecruitmentHealth(dashboard);
-
   const departments = useMemo(
     () => getDepartments(requisitions),
     [requisitions],
   );
   const recruiters = useMemo(() => getRecruiters(requisitions), [requisitions]);
+  const healthStatus = 
+    recruitmentHealth.criticalPercent > 0 ? "critical"
+    : recruitmentHealth.atRisk > 30 ? "at-risk"
+    : "good"
 
+    const healthStatusCheck = {
+      good: {
+        title: "Recruitment health is good",
+        description: `${recruitmentHealth.onTrackPercent}% of requisitions are on track`,
+        className: "on-track",
+      },
+      "at-risk": {
+        title: "Recruitment health needs attention",
+        description: `${recruitmentHealth.atRiskPercent}% of requisitions are at risk`,
+        className: "at-risk",
+      },
+      critical: {
+        title: "Recruitment health is critical",
+        description: `${recruitmentHealth.criticalPercent}% of requisitions are critical`,
+        className: "critical",
+      },
+    };
+
+    const currentHealth = healthStatusCheck[healthStatus];
 
   return (
     <div className="dashboard-page">
       <section className="dashboard-toolbar">
         <div className="dashboard-subtitle"></div>
-
-        {/* <div className="dashboard-toolbar-actions">
-          <div className="dashboard-search">
-            <svg viewBox="0 0 24 24" aria-hidden="true">S
-              <path
-                d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search requisitions, roles..."
-              aria-label="Search requisitions and roles"
-            />
-          </div>
-
-          <Link className="new-requisition-button" to="/requisitions/new">
-            <span>+</span>
-            New Requisition
-          </Link>
-        </div> */}
       </section>
 
       <section className="dashboard-filters" aria-label="Dashboard filters">
@@ -436,6 +431,18 @@ function DashboardContent({
                 </span>
               </Link>
             </div>
+          </div>
+          <div className={`on-track-div ${currentHealth.className}`}>
+            <span className="chart-icon">
+              <ChartIcon />
+            </span>
+
+            <span>
+              <span className="on-track-head">{currentHealth.title}</span>
+              <br />
+
+              <span className="on-track-text">{currentHealth.description}</span>
+            </span>
           </div>
         </article>
       </section>
