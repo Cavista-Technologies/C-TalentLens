@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../features/auth/authContext";
 import { ChevronDownIcon, LogoutIcon } from "./LayoutIcons";
-
 import "../../styles/Topbar.css";
 
 type TopbarProps = {
@@ -14,11 +13,8 @@ export function Topbar({
   sidebarCollapsed,
   onOpenMobileMenu,
 }: TopbarProps) {
-export function Topbar({ sidebarCollapsed, onOpenMobileMenu }: TopbarProps) {
   const { user, logout } = useAuth();
-
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

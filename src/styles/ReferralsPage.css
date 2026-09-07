@@ -151,7 +151,6 @@
   border: 1px solid var(--color-border-input);
   border-radius: 10px;
   outline: none;
-  background: var(--color-brand-lighter);
   color: var(--color-text);
   font: inherit;
   font-size: 13px;
@@ -498,6 +497,7 @@
 .referrer-cell strong {
   display: block;
   overflow: hidden;
+  color: var(--color-text-strong);
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
