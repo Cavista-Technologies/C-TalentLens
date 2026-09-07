@@ -14,6 +14,7 @@ export function Topbar({
   sidebarCollapsed,
   onOpenMobileMenu,
 }: TopbarProps) {
+export function Topbar({ sidebarCollapsed, onOpenMobileMenu }: TopbarProps) {
   const { user, logout } = useAuth();
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
