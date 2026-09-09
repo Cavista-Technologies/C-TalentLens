@@ -210,17 +210,13 @@
   padding: 5px;
 }
 
-.metric-icon-clock {
+.metric-icon-clock, .metric-icon-shield{
   color: #dfa000 !important;
   background: #fff5dc;
   display: flex;
   align-items: center;
   justify-items: center;
   padding: 5px;
-}
-
-.metric-icon-shield {
-  color: #dfa000 !important;
 }
 
 .metric-icon-alert {
@@ -302,6 +298,8 @@
   line-height: 14px;
   font-weight: 500;
   white-space: nowrap;
+  padding: 5px 0;
+  text-transform: lowercase;
 }
 
 .metric-trend-arrow {
@@ -336,7 +334,6 @@
   display: grid;
   grid-template-columns: 1.35fr 1fr 1fr;
   gap: 14px;
-
   margin-top: 14px;
 }
 
@@ -737,10 +734,33 @@
   min-height: 23px;
   padding: 0 8px;
   border-radius: 999px;
-  background: var(--color-brand-light);
   color: var(--color-brand);
   font-size: 13px;
   font-weight: 600;
+}
+.request-to-hire {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.sourcing {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.job-posting {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.interview {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.stage-offer {
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .sla-status {

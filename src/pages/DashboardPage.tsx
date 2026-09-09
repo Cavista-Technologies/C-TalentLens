@@ -5,7 +5,7 @@ import { ErrorState, LoadingState } from "../components/feedback/StateMessage";
 import { AppLayout } from "../components/layout/AppLayout";
 import { PageContainer } from "../components/layout/PageContainer";
 import { useAuth } from "../features/auth/authContext";
-import { appRoles, canReassignRecruiter, canUseRecruitmentWrite, hasAnyRole } from "../features/auth/roleAccess";
+import { appRoles, hasAnyRole } from "../features/auth/roleAccess";
 import { getDashboard } from "../features/dashboard/dashboardApi";
 import type { DashboardResponse } from "../features/dashboard/dashboardTypes";
 import { getRequisitions } from "../features/requisitions/requisitionApi";
@@ -13,7 +13,6 @@ import { formatValue } from "../features/requisitions/requisitionDisplay";
 import type { Requisition } from "../features/requisitions/requisitionTypes";
 import type { UserProfile } from "../features/auth/authTypes";
 import "../styles/Dashboard.css";
-import { Eye, Pencil, UserRoundCog } from "lucide-react";
 import { ChartIcon } from "../components/layout/LayoutIcons";
 
 export function DashboardPage() {
@@ -166,16 +165,17 @@ function DashboardContent({
   recruiter: string;
   setRecruiter: (value: string) => void;
 }) {
+  const haveAllAccess = hasAnyRole(user, [appRoles.talentAcquisitionManager])
   const metrics = getRoleMetrics(dashboard, user);
   const attentionItems = getAttentionItems(dashboard, user);
 
   const pipeline = [
-    ["JD / Job Posting", dashboard.pipeline.rolesInJobPosting],
-    ["Pipelining / Sourcing", dashboard.pipeline.rolesInPipeliningSourcing],
+    ["Job Posting", dashboard.pipeline.rolesInJobPosting],
+    ["Sourcing", dashboard.pipeline.rolesInPipeliningSourcing],
     ["Spark Hire", dashboard.pipeline.rolesInSparkHire],
     ["Interview", dashboard.pipeline.rolesInInterviewStage],
     ["Request-to-Hire", dashboard.pipeline.rolesInRequestToHire],
-    ["Offered / Hired", dashboard.pipeline.rolesOfferedOrHired],
+    ["Hired", dashboard.pipeline.rolesOfferedOrHired],
   ] as const;
 
   const totalPipeline = pipeline.reduce((total, [, count]) => total + count, 0);
@@ -216,7 +216,7 @@ function DashboardContent({
         <div className="dashboard-subtitle"></div>
       </section>
 
-      <section className="dashboard-filters" aria-label="Dashboard filters">
+    { haveAllAccess  &&  <section className="dashboard-filters" aria-label="Dashboard filters">
         <label className="dashboard-select">
           <span className="sr-only">Department</span>
 
@@ -250,7 +250,7 @@ function DashboardContent({
             ))}
           </select>
         </label>
-      </section>
+      </section>}
 
       {/* =========================================================
           METRIC CARDS
@@ -463,7 +463,7 @@ function DashboardContent({
    METRIC ICONS
    ================================================================ */
 
-type MetricIconName = "briefcase" | "check" | "clock" | "shield" | "alert";
+type MetricIconName = "briefcase" | "check" | "clock" | "shield" | "alert" | "warning";
 
 function MetricIcon({ icon }: { icon: MetricIconName }) {
   if (icon === "briefcase") {
@@ -549,6 +549,23 @@ function MetricIcon({ icon }: { icon: MetricIconName }) {
     );
   }
 
+  if (icon === "warning") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+
+        <path
+          d="M12 8v5"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+
+        <circle cx="12" cy="16.5" r=".8" fill="currentColor" />
+      </svg>
+    );
+  }
+
   return (
     <svg viewBox="0 0 24 24" fill="none">
       <path
@@ -589,13 +606,36 @@ function OpenRequisitions({
   department: string;
   recruiter: string;
 }) {
-  const { user } = useAuth();
-  const canWrite = canUseRecruitmentWrite(user);
-  const canReassign = canReassignRecruiter(user);
-  const [reassigning, setReassigning] = useState<Requisition | null>(null);
-  const displayedRequisitions = useMemo(() => {
-    const query = search.trim().toLowerCase();
+    const { user } = useAuth();
+    const haveAllAccess = hasAnyRole(user, [appRoles.talentAcquisitionManager])
+    function getStageClass(stage: string) {
+      switch (stage.toLowerCase()) {
+        case "requesttohire":
+          return "stage-pill request-to-hire";
 
+        case "pipeliningsourcing":
+          return "stage-pill sourcing";
+
+        case "jobposting":
+          return "stage-pill job-posting";
+
+        case "interview":
+          return "stage-pill interview";
+          
+        case "sparkhire":
+          return "stage-pill spark-hire";
+          
+        case "offeredhired":
+          return "stage-pill stage-offer";
+
+        default:
+          return "stage-pill";
+      }
+    }
+    
+    
+    const displayedRequisitions = useMemo(() => {
+    const query = search.trim().toLowerCase();
     const filtered = requisitions.filter((requisition) => {
       const matchesSearch =
         !query ||
@@ -664,15 +704,12 @@ function OpenRequisitions({
               <tr>
                 <th scope="col">Role</th>
                 <th scope="col">Department</th>
-                <th scope="col">Recruiter</th>
-                <th scope="col">Hiring Manager</th>
+                {haveAllAccess && <th scope="col">Recruiter</th>}
+                {haveAllAccess && <th scope="col">Hiring Manager</th>}
                 <th scope="col">Stage</th>
                 <th scope="col">Days Open</th>
-                <th scope="col">SLA Status</th>
+                {haveAllAccess && <th scope="col">SLA Status</th>}
                 <th scope="col">Priority</th>
-                <th scope="col" className="actions-column">
-                  Actions
-                </th>
               </tr>
             </thead>
 
@@ -680,102 +717,26 @@ function OpenRequisitions({
               {displayedRequisitions.map((requisition) => (
                 <tr key={requisition.id}>
                   <td className="role-cell">{requisition.roleName}</td>
-
                   <td>{formatValue(requisition.department)}</td>
-
-                  <td>{requisition.recruiter}</td>
-
-                  <td>{requisition.hiringManager}</td>
-
+                  { haveAllAccess && <td>{requisition.recruiter}</td> }
+                  {haveAllAccess && <td>{requisition.hiringManager}</td>}
                   <td>
-                    <span className="stage-pill">
+                      <span className={getStageClass(requisition.currentStage)}>
                       {formatValue(requisition.currentStage)}
-                    </span>
+                      </span>
                   </td>
-
                   <td>{requisition.daysOpen}</td>
-
-                  <td>
+                  {haveAllAccess && <td>
                     <span className={getSlaStatusClass(requisition.slaState)}>
                       {formatValue(requisition.slaState)}
                     </span>
-                  </td>
+                  </td>}
                   <td>
                     <span
                       className={`priority-pill ${requisition.priority.toLowerCase()}`}
                     >
                       {formatValue(requisition.priority)}
                     </span>
-                  </td>
-                  <td>
-                   <div className="icon-actions">
-                            <Link
-                              to={`/requisitions/${requisition.id}`}
-                              title="View requisition"
-                              aria-label={`View ${requisition.roleName}`}
-                            >
-                              <Eye
-                                size={16}
-                                strokeWidth={1.8}
-                                aria-hidden="true"
-                              />
-                            </Link>
-
-                            {canWrite ? (
-                              <Link
-                                to={`/requisitions/${requisition.id}/edit`}
-                                title="Edit requisition"
-                                aria-label={`Edit ${requisition.roleName}`}
-                              >
-                                <Pencil
-                                  size={16}
-                                  strokeWidth={1.8}
-                                  aria-hidden="true"
-                                />
-                              </Link>
-                            ) : (
-                              <button
-                                type="button"
-                                disabled
-                                title="Only recruiters and Talent Acquisition Managers can edit requisitions"
-                                aria-label={`Edit ${requisition.roleName}`}
-                              >
-                                <Pencil
-                                  size={16}
-                                  strokeWidth={1.8}
-                                  aria-hidden="true"
-                                />
-                              </button>
-                            )}
-
-                            {canReassign ? (
-                              <button
-                                type="button"
-                                title="Reassign recruiter"
-                                aria-label={`Reassign recruiter for ${requisition.roleName}`}
-                                onClick={() => setReassigning(requisition)}
-                              >
-                                <UserRoundCog
-                                  size={16}
-                                  strokeWidth={1.8}
-                                  aria-hidden="true"
-                                />
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                disabled
-                                title="Only Talent Acquisition Managers can reassign recruiters"
-                                aria-label={`Reassign recruiter for ${requisition.roleName}`}
-                              >
-                                <UserRoundCog
-                                  size={16}
-                                  strokeWidth={1.8}
-                                  aria-hidden="true"
-                                />
-                              </button>
-                            )}
-                          </div>
                   </td>
                 </tr>
               ))}
@@ -817,7 +778,7 @@ function getRoleMetrics(
         dashboard.recruitmentOverview.totalOpenRoles,
         `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
         "success",
-        "/requisitions?status=Active",
+        "/requisitions?openOnly=true",
         "briefcase",
       ),
 
@@ -835,7 +796,7 @@ function getRoleMetrics(
         dashboard.bottlenecks.totalOpenBottlenecks,
         `${dashboard.bottlenecks.escalatedBottlenecks} escalated`,
         dashboard.bottlenecks.escalatedBottlenecks > 0 ? "danger" : "warning",
-        "/alerts",
+        "/alerts?type=OpenBottleneck",
         "alert",
       ),
 
@@ -865,7 +826,7 @@ function getRoleMetrics(
         dashboard.recruitmentOverview.totalOpenRoles,
         `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
         "success",
-        "/requisitions?status=Active",
+        "/requisitions?openOnly=true",
         "briefcase",
         "12% vs last week",
         "positive",
@@ -877,7 +838,7 @@ function getRoleMetrics(
         dashboard.pipeline.rolesFilled,
         `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`,
         "success",
-        "/requisitions?openOnly=false",
+        "/requisitions?status=Closed",
         "check",
         "0% vs last week",
         "neutral",
@@ -918,7 +879,7 @@ function getRoleMetrics(
         dashboard.recruitmentOverview.totalOpenRoles,
         `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
         "success",
-        "/requisitions?status=Active",
+        "/requisitions?openOnly=true",
         "briefcase",
       ),
 
@@ -945,7 +906,7 @@ function getRoleMetrics(
         dashboard.actions.overdueActions,
         `${dashboard.actions.highPriorityActions} high priority`,
         dashboard.actions.overdueActions > 0 ? "warning" : "success",
-        "/alerts",
+        "/alerts?type=OverdueAction",
         "clock",
       ),
     ];
@@ -957,7 +918,7 @@ function getRoleMetrics(
       dashboard.recruitmentOverview.totalOpenRoles,
       `${dashboard.recruitmentOverview.outstandingGoals} positions remaining`,
       "success",
-      "/requisitions?status=Active",
+      "/requisitions?openOnly=true",
       "briefcase",
     ),
 
@@ -966,7 +927,7 @@ function getRoleMetrics(
       dashboard.pipeline.rolesFilled,
       `${dashboard.recruitmentOverview.goalsFilled} hiring goals met`,
       "success",
-      "/requisitions?openOnly=false",
+      "/requisitions?status=Closed",
       "check",
     ),
 
@@ -975,7 +936,7 @@ function getRoleMetrics(
       dashboard.actions.overdueActions,
       `${dashboard.actions.totalOpenActions} open actions`,
       dashboard.actions.overdueActions > 0 ? "warning" : "success",
-      "/alerts",
+      "/alerts?type=OverdueAction",
       "clock",
     ),
 
@@ -984,7 +945,7 @@ function getRoleMetrics(
       dashboard.bottlenecks.totalOpenBottlenecks,
       `${dashboard.bottlenecks.escalatedBottlenecks} escalated`,
       dashboard.bottlenecks.escalatedBottlenecks > 0 ? "danger" : "success",
-      "/alerts",
+      "/alerts?type=OpenBottleneck",
       "alert",
     ),
   ];
@@ -1049,7 +1010,7 @@ function getAttentionItems(
         dashboard.bottlenecks.totalOpenBottlenecks,
         "",
         "warning",
-        "/alerts",
+        "/alerts?overdueOnly=true",
         "alert",
       ),
 
@@ -1243,12 +1204,12 @@ function getPercentExact(value: number, total: number) {
 
 function getPipelineHref(stage: string) {
   const stageFilters: Record<string, string> = {
-    "JD / Job Posting": "JobPosting",
-    "Pipelining / Sourcing": "PipeliningSourcing",
+    "Job Posting": "JobPosting",
+    "Sourcing": "PipeliningSourcing",
     "Spark Hire": "SparkHire",
     Interview: "Interview",
     "Request-to-Hire": "RequestToHire",
-    "Offered / Hired": "OfferedHired",
+    "Hired": "OfferedHired",
   };
 
   return stageFilters[stage]

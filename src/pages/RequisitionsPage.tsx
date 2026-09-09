@@ -144,9 +144,7 @@ export function RequisitionsPage() {
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const term = search.trim();
-
     setPage(1);
     setSubmittedSearch(term);
   }
@@ -158,13 +156,11 @@ export function RequisitionsPage() {
 
   function clearRequisitionFilters() {
     setPage(1);
-
     setOpenOnly(false);
     setNearSlaBreach(false);
     setOverdueOnly(false);
     setStatus("");
     setStage("");
-
     setIsFilterOpen(false);
   }
 
