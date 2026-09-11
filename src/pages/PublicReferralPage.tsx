@@ -3,6 +3,7 @@ import { formatValue, recruitmentTeams } from '../features/requisitions/requisit
 import { createPublicReferral, searchPublicRequisitions } from '../features/referrals/referralApi'
 import { uploadReferralResume } from '../features/referrals/resumeUpload'
 import type { PublicRequisition } from '../features/referrals/referralTypes'
+import "../styles/PublicReferralPage.css";
 
 export function PublicReferralPage() {
   const [selectedRequisition, setSelectedRequisition] = useState<PublicRequisition | null>(null)
@@ -61,13 +62,14 @@ export function PublicReferralPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
-    const referrerName = form.get('referrerName')?.toString().trim()
-    const referrerEmail = form.get('referrerEmail')?.toString().trim()
-    const referrerDepartment = form.get('referrerDepartment')?.toString().trim()
-    const candidateName = form.get('candidateName')?.toString().trim()
-    const candidateEmail = form.get('candidateEmail')?.toString().trim()
+    const referrerName = form.get('referrerName')?.toString().trim();
+    const referrerEmail = form.get('referrerEmail')?.toString().trim();
+    const referrerDepartment = form.get('referrerDepartment')?.toString().trim();
+    const candidateName = form.get('candidateName')?.toString().trim();
+    const candidateEmail = form.get('candidateEmail')?.toString().trim();
+    const roleReferedFor = form.get('roleReferedFor')?.toString().trim();
 
-    if (!selectedRequisition || !referrerName || !referrerEmail || !referrerDepartment || !candidateName || !candidateEmail) {
+    if (!selectedRequisition || !referrerName || !referrerEmail || !referrerDepartment || !candidateName || !candidateEmail || roleReferedFor) {
       setError('Complete the required fields.')
       return
     }
@@ -90,8 +92,8 @@ export function PublicReferralPage() {
         referrerDepartment,
         candidateName,
         candidateEmail,
-        candidatePhoneNumber: nullableValue(form.get('candidatePhoneNumber')),
         resumeUrl,
+        roleReferedFor,
         candidateRelationship: nullableValue(form.get('candidateRelationship')),
         candidateKnownDuration: nullableValue(form.get('candidateKnownDuration')),
         candidateAlignmentComment: nullableValue(form.get('candidateAlignmentComment')),
@@ -151,16 +153,56 @@ export function PublicReferralPage() {
           <div>
             <h1>Refer a candidate</h1>
           </div>
-        </header>
+          <p>Help us find great people. Your referral makes a difference.</p>
+          <p>
+            {" "}
+            Hi, . When you submit this form, the owner will see your name and
+            email address.
+          </p>
+          <p>
+            <strong>*</strong>Required
+          </p>
+          <p>
+            This form is used to officially record employee referrals for open
+            roles within the organization. To ensure no referrals are missed and
+            to allow accurate tracking of candidates and referral bonuses, all
+            employee referrals{" "}
+            <strong> must be submitted using this form. </strong>
+          </p>
+          <p>
+            Also, by filling this form you accept that referral bonuses are
+            subject to company policy, eligibility criteria, and successful
+            hiring outcomes.
+          </p>
+          <ul>
+            Please note that:
 
+            <li>
+              Referral bonus payments will be processed <strong>two months after the
+              referred employee has successfully completed four (4) months with
+              the company.</strong>
+            </li>
+            <li>
+              Any disciplinary issues involving the referred employee within the
+              two‑month payment window may result in forfeiture of the referral
+              bonus.
+            </li>
+          </ul>
+        </header>
         {isSubmitted ? (
           <section className="state-message success">
             <strong>Referral submitted</strong>
-            <p>The recruiting team can now review this referral in C-TalentLens.</p>
+            <p>
+              The recruiting team can now review this referral in C-TalentLens.
+            </p>
           </section>
         ) : (
-          <form className="form-panel public-referral-form" onSubmit={handleSubmit}>
+          <form
+            className="form-panel public-referral-form"
+            onSubmit={handleSubmit}
+          >
             <section className="form-section">
+              <div className="text-section"></div>
               <div className="form-section-heading">
                 <span>01</span>
                 <h2>Requisition</h2>
@@ -169,33 +211,51 @@ export function PublicReferralPage() {
                 Search open requisitions
                 <input
                   value={requisitionSearch}
-                  onChange={(event) => handleRequisitionSearch(event.target.value)}
+                  onChange={(event) =>
+                    handleRequisitionSearch(event.target.value)
+                  }
                   placeholder="Type at least 3 characters"
                   aria-describedby="public-requisition-search-status"
                   required
                 />
               </label>
 
-              <div className="search-picker" id="public-requisition-search-status">
+              <div
+                className="search-picker"
+                id="public-requisition-search-status"
+              >
                 {isSearchingRequisitions && <span>Searching...</span>}
-                {requisitionSearchError && <span>{requisitionSearchError}</span>}
-                {!selectedRequisition && requisitionSearch.trim().length > 0 && requisitionSearch.trim().length < 3 && (
-                  <span>Enter at least 3 characters.</span>
+                {requisitionSearchError && (
+                  <span>{requisitionSearchError}</span>
                 )}
-                {!selectedRequisition && !isSearchingRequisitions && requisitionSearch.trim().length >= 3 && requisitionResults.length === 0 && (
-                  <span>No matching requisitions.</span>
-                )}
+                {!selectedRequisition &&
+                  requisitionSearch.trim().length > 0 &&
+                  requisitionSearch.trim().length < 3 && (
+                    <span>Enter at least 3 characters.</span>
+                  )}
+                {!selectedRequisition &&
+                  !isSearchingRequisitions &&
+                  requisitionSearch.trim().length >= 3 &&
+                  requisitionResults.length === 0 && (
+                    <span>No matching requisitions.</span>
+                  )}
                 {requisitionResults.map((requisition) => (
-                  <button type="button" key={requisition.id} onClick={() => handleSelectRequisition(requisition)}>
+                  <button
+                    type="button"
+                    key={requisition.id}
+                    onClick={() => handleSelectRequisition(requisition)}
+                  >
                     <strong>{requisition.roleName}</strong>
                     <span>
-                      {requisition.requisitionCode} - {formatValue(requisition.department)}
+                      {requisition.requisitionCode} -{" "}
+                      {formatValue(requisition.department)}
                     </span>
                   </button>
                 ))}
                 {selectedRequisition && (
                   <span>
-                    Selected: {selectedRequisition.requisitionCode} - {selectedRequisition.roleName}
+                    Selected: {selectedRequisition.requisitionCode} -{" "}
+                    {selectedRequisition.roleName}
                   </span>
                 )}
               </div>
@@ -207,25 +267,31 @@ export function PublicReferralPage() {
                 <h2>Candidate</h2>
               </div>
               <div className="form-grid">
-                <label>
+                <label className='form-headers'>
                   Candidate name
-                  <input name="candidateName" required />
+                  <input name="candidateName" required placeholder='Enter your name'/>
                 </label>
-                <label>
+                <label className='form-headers'>
                   Candidate email
-                  <input name="candidateEmail" type="email" required />
+                  <input name="candidateEmail" type="email" required placeholder='Enter your name'/>
                 </label>
-                <label>
-                  Candidate phone
-                  <input name="candidatePhoneNumber" />
+                <label className='form-headers'>
+                  Role Referred For
+                  <input
+                    name="roleReferredFor"
+                    placeholder="Enter your answer"
+                    required
+                  />
                 </label>
                 <div className="file-field">
-                  <label htmlFor="publicResumeFile">Resume</label>
+                  <label htmlFor="publicResumeFile" className='form-headers'>Resume</label>
                   <input
                     id="publicResumeFile"
                     type="file"
                     accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    onChange={(event) => handleResumeChange(event.target.files?.[0])}
+                    onChange={(event) =>
+                      handleResumeChange(event.target.files?.[0])
+                    }
                   />
                   {resumeFile && <span>{resumeFile.name}</span>}
                 </div>
@@ -238,15 +304,15 @@ export function PublicReferralPage() {
                 <h2>Referrer</h2>
               </div>
               <div className="form-grid">
-                <label>
+                <label className='form-headers'>
                   Your name
-                  <input name="referrerName" required />
+                  <input name="referrerName" required placeholder='Enter your name'/>
                 </label>
-                <label>
+                <label className='form-headers'>
                   Your Cavista email
-                  <input name="referrerEmail" type="email" required />
+                  <input name="referrerEmail" type="email" required placeholder='Enter your name'/>
                 </label>
-                <label>
+                <label className='form-headers'>
                   Your team
                   <select name="referrerDepartment" defaultValue="" required>
                     <option value="">Select team</option>
@@ -257,10 +323,6 @@ export function PublicReferralPage() {
                     ))}
                   </select>
                 </label>
-                <label>
-                  Relationship to candidate
-                  <input name="candidateRelationship" />
-                </label>
               </div>
             </section>
 
@@ -269,27 +331,97 @@ export function PublicReferralPage() {
                 <span>04</span>
                 <h2>Recommendation</h2>
               </div>
-              <label>
-                Known duration
-                <input name="candidateKnownDuration" />
-              </label>
-              <label>
-                Why is this candidate a good fit?
-                <textarea name="candidateAlignmentComment" rows={4} />
-              </label>
+              <div className="recommendation-fields">
+                <fieldset className="radio-field">
+                  <legend className='form-headers'>How do you know this candidate?</legend>
+                  <div className="radio-options">
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="candidateRelationship"
+                        value="Worked with them"
+                        placeholder='Enter your name'
+                        required
+                      />
+                      <span>Previously worked together</span>
+                    </label>
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="candidateRelationship"
+                        value="Former colleague"
+                        placeholder="Enter your answer"
+                      />
+                      <span>Friend / Personal connection</span>
+                    </label>
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="candidateRelationship"
+                        value="Professional network"
+                        placeholder="Enter your answer"
+                      />
+                      <span>Professional network</span>
+                    </label>
+                    <div className="radio-other">
+                      <label className="radio-option">
+                        <input
+                          type="radio"
+                          name="candidateRelationship"
+                          value="Other"
+                        />
+                      </label>
+                      <input
+                        className="other-reason"
+                        type="text"
+                        name="candidateRelationship"
+                        placeholder="Others"
+                        aria-label="Other relationshipOther"
+                        onFocus={(event) => {
+                          const radio = event.currentTarget
+                            .closest(".radio-other")
+                            ?.querySelector<HTMLInputElement>(
+                              'input[type="radio"]',
+                            );
+                          if (radio) {
+                            radio.checked = true;
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                </fieldset>
+                <label>
+                  <label className='form-headers'>How long have you known the above candidate?</label>
+                  <input name="candidateKnownDuration" placeholder='Enter your name'/>
+                </label>
+                <label className='form-headers'>
+                  In line with Cavista Tech’s Employee Referral Policy,
+                  referrals must be genuine and based on a prior working
+                  relationship. <strong>Please briefly describe your professional
+                  relationship with this candidate and explain how you can vouch
+                  for their work ethic, technical capabilities, and cultural fit
+                  at Cavista Tech.</strong>
+                  <textarea
+                    name="candidateAlignmentComment"
+                    rows={4}
+                    placeholder="Enter your answer"
+                  />
+                </label>
+              </div>
             </section>
 
             {error && <p className="form-error">{error}</p>}
             <div className="form-actions">
               <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Submit referral'}
+                {isSubmitting ? "Submitting..." : "Submit Referral"}
               </button>
             </div>
           </form>
         )}
       </section>
     </main>
-  )
+  );
 }
 
 function nullableValue(value: FormDataEntryValue | null) {
