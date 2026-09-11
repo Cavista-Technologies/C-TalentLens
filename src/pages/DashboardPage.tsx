@@ -322,13 +322,11 @@ function DashboardContent({
                   to={getPipelineHref(label)}
                 >
                   <span className="pipeline-stage-label">{label}</span>
-
                   <div className="pipeline-bar" aria-label={`${percentage}%`}>
                     <span style={{ width: `${percentage}%` }} />
                   </div>
 
                   <span className="pipeline-percentage">{percentage}%</span>
-
                   <strong className="pipeline-count">{count}</strong>
                 </Link>
               );

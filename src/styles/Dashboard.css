@@ -401,9 +401,7 @@
 
 .pipeline-bar {
   height: 6px;
-
   overflow: hidden;
-
   border-radius: 99px;
   background: #edf0f4;
 }
@@ -411,25 +409,21 @@
 .pipeline-bar span {
   display: block;
   height: 100%;
-
+  width: auto;
   border-radius: inherit;
-
   background: var(--color-brand);
-
   transition: width 250ms ease;
 }
 
 .pipeline-percentage {
-  color: var(--color-brand);
-
+  color: #475467;
   font-size: 13px;
   font-weight: 500;
   text-align: right;
 }
 
 .pipeline-count {
-  color: var(--color-brand);
-
+  color: #475467;
   font-size: 13px;
   font-weight: 600;
   text-align: right;
