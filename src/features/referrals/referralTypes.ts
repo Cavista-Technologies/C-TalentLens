@@ -79,10 +79,10 @@ export type CreatePublicReferralRequest = {
   requisitionId: string
   referrerName: string
   referrerEmail: string
-  referrerDepartment: string
+  referrerDepartment: string;
+  roleReferedFor: string | undefined;
   candidateName: string
   candidateEmail: string
-  candidatePhoneNumber?: string | null
   resumeUrl?: string | null
   candidateRelationship?: string | null
   candidateKnownDuration?: string | null
