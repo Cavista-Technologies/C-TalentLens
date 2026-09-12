@@ -14,6 +14,7 @@ export type UserProfile = {
 
 export type LoginResponse = {
   accessToken: string
+  refreshToken: string
   tokenType: string
   expiresAt: string
   user: UserProfile

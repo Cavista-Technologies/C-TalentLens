@@ -694,3 +694,18 @@
     transition: none;
   }
 }
+
+.alert-group-unread-dot {
+  display: inline-block;
+
+  width: 6px;
+  height: 6px;
+
+  margin-left: 6px;
+
+  border-radius: 999px;
+
+  background: #dc2626;
+
+  vertical-align: middle;
+}

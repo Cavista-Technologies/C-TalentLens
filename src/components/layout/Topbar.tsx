@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../features/auth/authContext";
 import { ChevronDownIcon, LogoutIcon } from "./LayoutIcons";
+import { NotificationBell } from "./NotificationBell";
 import "../../styles/Topbar.css";
 
 type TopbarProps = {
@@ -76,6 +77,8 @@ export function Topbar({
       </div>
 
       <div className="topbar-profile" ref={profileRef}>
+        <NotificationBell />
+
         <button
           type="button"
           className={`topbar-profile-button ${isProfileOpen ? "open" : ""}`}

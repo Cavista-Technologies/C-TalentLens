@@ -159,7 +159,7 @@ export function ImportsPage() {
               </div>
               <div className="smartrecruiters-sync-meta">
                 <span>Source</span>
-                <strong>Mock API</strong>
+                <strong>SmartRecruiters</strong>
               </div>
               <button
                 type="button"

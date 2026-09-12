@@ -11,3 +11,10 @@ export function login(request: LoginRequest) {
 export function getCurrentUser() {
   return apiRequest<UserProfile>('/api/auth/me')
 }
+
+export function logout(refreshToken: string) {
+  return apiRequest<void>('/api/auth/logout', {
+    method: 'POST',
+    body: { refreshToken },
+  })
+}

@@ -521,12 +521,12 @@ export function ReferralsPage() {
                 <table className="referral-table">
                   <thead>
                     <tr>
-                      <th>Candidate</th>
-                      <th>Role</th>
-                      <th>Referrer</th>
-                      <th>Status</th>
+                      <th scope="col">Candidate</th>
+                      <th scope="col">Role</th>
+                      <th scope="col">Referrer</th>
+                      <th scope="col">Status</th>
                       <th>Resume</th>
-                      <th>Submitted</th>
+                      <th scope="col">Submitted</th>
                       <th>Resumption date</th>
                     </tr>
                   </thead>

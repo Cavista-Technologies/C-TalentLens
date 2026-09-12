@@ -37,10 +37,22 @@ export function AnalyticsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
+  const [debouncedFromDate, setDebouncedFromDate] = useState(fromDate);
+  const [debouncedToDate, setDebouncedToDate] = useState(toDate);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   const showLeadershipAnalytics = canViewLeadershipAnalytics(user);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setDebouncedFromDate(fromDate);
+      setDebouncedToDate(toDate);
+    }, 400);
+
+    return () => window.clearTimeout(handle);
+  }, [fromDate, toDate]);
 
   useEffect(() => {
     let isMounted = true;
@@ -50,14 +62,15 @@ export function AnalyticsPage() {
       setError("");
 
       try {
+        const range = { from: debouncedFromDate, to: debouncedToDate };
         const [leadershipData, sourceData, trendData, requisitionData] =
           await Promise.all([
             showLeadershipAnalytics
-              ? getLeadershipSummary()
+              ? getLeadershipSummary(range)
               : Promise.resolve<LeadershipSummary | null>(null),
-            getSourceAnalytics(),
-            getHiringTrends(),
-            getReportRequisitions(),
+            getSourceAnalytics(range),
+            getHiringTrends(range),
+            getReportRequisitions(range),
           ]);
 
         if (!isMounted) {
@@ -88,36 +101,19 @@ export function AnalyticsPage() {
     return () => {
       isMounted = false;
     };
-  }, [showLeadershipAnalytics]);
-
-  const filteredRequisitions = requisitions.filter((requisition) =>
-    requisitionMatchesDateRange(requisition, fromDate, toDate),
-  );
-
-  const filteredSourceMetrics = sources
-    ? getFilteredSourceMetrics(sources, fromDate, toDate)
-    : [];
-
-  const filteredHiringTrends =
-    trends?.monthlyTrends.filter((trend) =>
-      monthMatchesDateRange(trend.month, fromDate, toDate),
-    ) ?? [];
+  }, [showLeadershipAnalytics, debouncedFromDate, debouncedToDate]);
 
   const hasDateFilter = Boolean(fromDate || toDate);
 
-  const summaryMetrics = getSummaryMetrics(
-    filteredRequisitions,
-    leadership,
-    hasDateFilter,
-  );
+  const summaryMetrics = getSummaryMetrics(requisitions, leadership, hasDateFilter);
 
-  const riskSummary = getRiskSummary(filteredRequisitions, leadership);
+  const riskSummary = getRiskSummary(requisitions, leadership);
 
-  const timeToFillBreakdowns = getTimeToFillBreakdowns(filteredRequisitions);
+  const timeToFillBreakdowns = getTimeToFillBreakdowns(requisitions);
 
-  const recruiterPerformance = getRecruiterPerformance(filteredRequisitions);
+  const recruiterPerformance = getRecruiterPerformance(requisitions);
 
-  const stageDistribution = getStageDistribution(filteredRequisitions);
+  const stageDistribution = getStageDistribution(requisitions);
 
   return (
     <AppLayout title="Analytics">
@@ -209,7 +205,7 @@ export function AnalyticsPage() {
                   </div>
                 </div>
 
-                <SourcePerformanceChart sources={filteredSourceMetrics} />
+                <SourcePerformanceChart sources={sources?.sources ?? []} />
               </article>
 
               <article className="analytics-card">
@@ -269,7 +265,7 @@ export function AnalyticsPage() {
                   </div>
                 </div>
 
-                <HiringMovementChart trends={filteredHiringTrends} />
+                <HiringMovementChart trends={trends?.monthlyTrends ?? []} />
               </article>
 
               <article className="analytics-card">
@@ -841,47 +837,6 @@ function getRecruiterPerformance(
     );
 }
 
-function getFilteredSourceMetrics(
-  sources: SourceAnalytics,
-  fromDate: string,
-  toDate: string,
-): SourceMetric[] {
-  if (!fromDate && !toDate) {
-    return sources.sources;
-  }
-
-  const filteredTrends = sources.monthlyTrends.filter((trend) =>
-    monthMatchesDateRange(trend.month, fromDate, toDate),
-  );
-
-  const totalHires = filteredTrends.reduce(
-    (total, trend) => total + trend.hires,
-    0,
-  );
-
-  return groupBy(filteredTrends, (trend) => trend.source)
-    .map(([source, items]) => {
-      const activities = items.reduce(
-        (total, item) => total + item.activities,
-        0,
-      );
-
-      const hires = items.reduce((total, item) => total + item.hires, 0);
-
-      return {
-        source,
-        activities,
-        hires,
-        sourceContributionPercentage: percentage(hires, totalHires),
-        sourceToHireConversionRate: percentage(hires, activities),
-      };
-    })
-    .sort(
-      (first, second) =>
-        second.hires - first.hires || first.source.localeCompare(second.source),
-    );
-}
-
 function groupAverageTimeToFill(
   requisitions: Requisition[],
   selector: (requisition: Requisition) => string,
@@ -911,46 +866,6 @@ function groupBy<T>(
   }
 
   return [...groups.entries()];
-}
-
-function requisitionMatchesDateRange(
-  requisition: Requisition,
-  fromDate: string,
-  toDate: string,
-) {
-  if (!fromDate && !toDate) {
-    return true;
-  }
-
-  return [requisition.dateOpened, requisition.closedDate].some((date) =>
-    dateMatchesDateRange(date, fromDate, toDate),
-  );
-}
-
-function monthMatchesDateRange(
-  month: string,
-  fromDate: string,
-  toDate: string,
-) {
-  if (!fromDate && !toDate) {
-    return true;
-  }
-
-  const monthDate = `${month}-01`;
-
-  return dateMatchesDateRange(monthDate, fromDate, toDate);
-}
-
-function dateMatchesDateRange(
-  value: string | null | undefined,
-  fromDate: string,
-  toDate: string,
-) {
-  if (!value) {
-    return false;
-  }
-
-  return (!fromDate || value >= fromDate) && (!toDate || value <= toDate);
 }
 
 function isClosed(requisition: Requisition) {

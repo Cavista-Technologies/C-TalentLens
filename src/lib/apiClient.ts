@@ -1,5 +1,12 @@
 import { env } from '../config/env'
-import { getAccessToken } from './authToken'
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  setAccessToken,
+  setExpiresAt,
+  setRefreshToken,
+} from './authToken'
 
 type ApiRequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown
@@ -21,26 +28,97 @@ export class ApiError extends Error {
   }
 }
 
+type SessionEndedListener = () => void
+
+let sessionEndedListener: SessionEndedListener | null = null
+
+export function onSessionEnded(listener: SessionEndedListener | null) {
+  sessionEndedListener = listener
+}
+
+const authExemptPaths = ['/api/auth/login', '/api/auth/refresh', '/api/auth/logout']
+
+type RefreshResult = {
+  accessToken: string
+  refreshToken: string
+  expiresAt: string
+}
+
+let refreshPromise: Promise<RefreshResult | null> | null = null
+
+// Shared by apiClient's own reactive 401-retry and AuthProvider's proactive pre-expiry timer,
+// so the two never issue overlapping /api/auth/refresh calls against the same refresh token.
+export async function refreshAccessToken(): Promise<RefreshResult | null> {
+  const refreshToken = getRefreshToken()
+  if (!refreshToken) {
+    return null
+  }
+
+  refreshPromise ??= (async () => {
+    try {
+      const response = await fetch(`${env.apiBaseUrl}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      })
+
+      if (!response.ok) {
+        return null
+      }
+
+      const data = (await response.json()) as RefreshResult
+
+      setAccessToken(data.accessToken)
+      setRefreshToken(data.refreshToken)
+      setExpiresAt(data.expiresAt)
+      return data
+    } catch {
+      return null
+    } finally {
+      refreshPromise = null
+    }
+  })()
+
+  return refreshPromise
+}
+
 export async function apiRequest<TResponse>(
   path: string,
   options: ApiRequestOptions = {},
 ): Promise<TResponse> {
-  const headers = new Headers(options.headers)
-  const token = getAccessToken()
+  const normalizedPath = normalizePath(path)
+  const isAuthExempt = authExemptPaths.some((exempt) => normalizedPath.startsWith(exempt))
 
-  if (options.body !== undefined && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json')
+  const send = async () => {
+    const headers = new Headers(options.headers)
+    const token = getAccessToken()
+
+    if (options.body !== undefined && !headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json')
+    }
+
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`)
+    }
+
+    return fetch(`${env.apiBaseUrl}${normalizedPath}`, {
+      ...options,
+      headers,
+      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    })
   }
 
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`)
+  let response = await send()
+
+  if (response.status === 401 && !isAuthExempt) {
+    const refreshed = await refreshAccessToken()
+    response = refreshed ? await send() : response
   }
 
-  const response = await fetch(`${env.apiBaseUrl}${normalizePath(path)}`, {
-    ...options,
-    headers,
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
-  })
+  if (response.status === 401 && !isAuthExempt) {
+    clearTokens()
+    sessionEndedListener?.()
+  }
 
   if (!response.ok) {
     const details = await readResponseBody(response)

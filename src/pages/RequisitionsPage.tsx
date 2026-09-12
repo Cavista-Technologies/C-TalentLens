@@ -125,7 +125,8 @@ export function RequisitionsPage() {
     status,
     stage,
   ]);
-  +useEffect(() => {
+
+  useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
       if (
         filterRef.current &&

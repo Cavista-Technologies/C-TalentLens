@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ErrorState, LoadingState } from "../components/feedback/StateMessage";
 import { AppLayout } from "../components/layout/AppLayout";
 import { PageContainer } from "../components/layout/PageContainer";
-import { getAlerts, getMyAlerts } from "../features/alerts/alertApi";
+import { getAlerts, markAlertRead, getMyAlerts } from "../features/alerts/alertApi";
 import type { Alert } from "../features/alerts/alertTypes";
 import { useAuth } from "../features/auth/authContext";
 import {
@@ -89,6 +89,32 @@ export function AlertsPage() {
   }, [activeScope, searchParams]);
 
   const alertGroups = getAlertGroups(alerts);
+  const highlightId = searchParams.get("highlight");
+  const hasHighlightedRef = useRef(false);
+
+  useEffect(() => {
+    if (!highlightId || hasHighlightedRef.current || alerts.length === 0) {
+      return;
+    }
+
+    const target = alerts.find((alert) => alert.id === highlightId);
+    if (!target) {
+      return;
+    }
+
+    hasHighlightedRef.current = true;
+    const groupKey = `${target.requisitionId}:${target.severity}`;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOpenGroups((current) => new Set(current).add(groupKey));
+    markGroupRead(groupKey);
+
+    requestAnimationFrame(() => {
+      document
+        .getElementById(`alert-group-${groupKey}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightId, alerts]);
 
   return (
     <AppLayout title="Alerts">
@@ -166,7 +192,11 @@ export function AlertsPage() {
             aria-label={activeScope === "all" ? "All alerts" : "My alerts"}
           >
             {alertGroups.map((group) => (
-              <article className="alert-group" key={group.key}>
+              <article
+                className="alert-group"
+                key={group.key}
+                id={`alert-group-${group.key}`}
+              >
                 <button
                   className="alert-group-header"
                   type="button"
@@ -188,7 +218,12 @@ export function AlertsPage() {
                   </span>
 
                   <div className="alert-group-requisition">
-                    <strong>{group.requisitionCode}</strong>
+                    <strong>
+                      {group.requisitionCode}
+                      {group.alerts.some((alert) => !alert.isRead) && (
+                        <span className="alert-group-unread-dot" aria-label="Unread" />
+                      )}
+                    </strong>
                     <span>{group.roleName}</span>
                   </div>
 
@@ -274,6 +309,8 @@ export function AlertsPage() {
   }
 
   function toggleAlertGroup(groupKey: string) {
+    const isOpening = !openGroups.has(groupKey);
+
     setOpenGroups((current) => {
       const next = new Set(current);
 
@@ -285,6 +322,30 @@ export function AlertsPage() {
 
       return next;
     });
+
+    if (isOpening) {
+      markGroupRead(groupKey);
+    }
+  }
+
+  function markGroupRead(groupKey: string) {
+    const group = alertGroups.find((candidate) => candidate.key === groupKey);
+    const unreadIds =
+      group?.alerts.filter((alert) => !alert.isRead).map((alert) => alert.id) ?? [];
+
+    if (unreadIds.length === 0) {
+      return;
+    }
+
+    void Promise.all(unreadIds.map((id) => markAlertRead(id)))
+      .then(() => {
+        setAlerts((current) =>
+          current.map((alert) =>
+            unreadIds.includes(alert.id) ? { ...alert, isRead: true } : alert,
+          ),
+        );
+      })
+      .catch(() => {});
   }
 }
 
@@ -318,22 +379,12 @@ function getAlertGroups(alerts: Alert[]): AlertGroup[] {
   }
 
   return [...groups.values()].sort(
-    (first, second) =>
-      getSeverityRank(first.severity) - getSeverityRank(second.severity) ||
-      first.requisitionCode.localeCompare(second.requisitionCode),
+    (first, second) => getMostRecentCreatedAt(second.alerts) - getMostRecentCreatedAt(first.alerts),
   );
 }
 
-function getSeverityRank(severity: string) {
-  if (severity === "Critical") {
-    return 0;
-  }
-
-  if (severity === "Warning") {
-    return 1;
-  }
-
-  return 2;
+function getMostRecentCreatedAt(alerts: Alert[]) {
+  return Math.max(...alerts.map((alert) => new Date(alert.createdAt).getTime()));
 }
 
 function formatValue(value: string) {
