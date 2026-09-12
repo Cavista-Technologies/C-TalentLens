@@ -464,6 +464,8 @@
 .role-cell,
 .referrer-cell {
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .candidate-name {
