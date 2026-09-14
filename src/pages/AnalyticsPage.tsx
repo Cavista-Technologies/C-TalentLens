@@ -34,8 +34,8 @@ export function AnalyticsPage() {
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
 
   // No filter selected by default.
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [fromDate, setFromDate] = useState(() => getDefaultFromDate());
+  const [toDate, setToDate] = useState(() => getDefaultToDate());
 
   const [debouncedFromDate, setDebouncedFromDate] = useState(fromDate);
   const [debouncedToDate, setDebouncedToDate] = useState(toDate);
@@ -927,6 +927,16 @@ function getChartHeight(value: number, total: number) {
   }
 
   return Math.max(12, percentage(value, total));
+}
+
+function getDefaultToDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getDefaultFromDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() - 3);
+  return date.toISOString().slice(0, 10);
 }
 
 function formatMonthLabel(month: string) {
