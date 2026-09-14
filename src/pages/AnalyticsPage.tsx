@@ -126,9 +126,6 @@ export function AnalyticsPage() {
 
         {!isLoading && sources && trends && (
           <div className="analytics-page">
-            {/* =====================================================
-                FILTERS
-               ===================================================== */}
 
             <section
               className="analytics-filter-panel"
@@ -177,10 +174,6 @@ export function AnalyticsPage() {
               </div>
             </section>
 
-            {/* =====================================================
-                KPI CARDS
-               ===================================================== */}
-
             <section className="metric-grid" aria-label="Executive KPIs">
               {summaryMetrics.map((metric) => (
                 <Metric
@@ -191,10 +184,6 @@ export function AnalyticsPage() {
                 />
               ))}
             </section>
-
-            {/* =====================================================
-                SOURCE + RISK
-               ===================================================== */}
 
             <section className="dashboard-grid">
               <article className="analytics-card">
@@ -252,10 +241,6 @@ export function AnalyticsPage() {
               </article>
             </section>
 
-            {/* =====================================================
-                MOVEMENT + PIPELINE
-               ===================================================== */}
-
             <section className="dashboard-grid">
               <article className="analytics-card">
                 <div className="panel-heading analytics-panel-heading">
@@ -279,10 +264,6 @@ export function AnalyticsPage() {
                 <PipelineStageChart stages={stageDistribution} />
               </article>
             </section>
-
-            {/* =====================================================
-                TIME TO FILL + RECRUITER PERFORMANCE
-               ===================================================== */}
 
             <section className="dashboard-grid">
               <article className="analytics-card">
@@ -350,10 +331,6 @@ export function AnalyticsPage() {
                 </div>
               </article>
             </section>
-
-            {/* =====================================================
-                EXECUTIVE NOTES
-               ===================================================== */}
 
             {leadership && (
               <section className="dashboard-grid dashboard-grid-single">
