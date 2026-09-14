@@ -288,7 +288,10 @@ export function RequisitionFormPage() {
                     <UserSelect
                       name="recruiterUserId"
                       users={recruiters}
-                      defaultValue={requisition?.recruiterUserId}
+                      defaultValue={
+                        requisition?.recruiterUserId ??
+                        (!canReassign ? user?.id : undefined)
+                      }
                       disabled={isEditing && !canReassign}
                     />
 
