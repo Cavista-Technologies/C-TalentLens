@@ -878,20 +878,9 @@ function ReassignRecruiterModal({
                   </div>
 
                   <div>
-                    <span>Selected recruiter</span>
                     <strong>{selectedRecruiter.fullName}</strong>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedRecruiter(null);
-                    setSearch("");
-                  }}
-                >
-                  Change
-                </button>
               </div>
             )}
           </div>

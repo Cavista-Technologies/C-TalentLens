@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   BriefcaseBusiness,
   FileText,
-  Save,
   Users,
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -29,6 +28,9 @@ import type { Requisition } from "../features/requisitions/requisitionTypes";
 import { getUsers } from "../features/users/userApi";
 import type { UserSummary } from "../features/users/userTypes";
 import "../styles/RequisitionFormPage.css";
+import { ApiError, apiRequest } from "../lib/apiClient";
+import { useToast } from "../components/feedback/toastContext";
+import { Tooltip } from "../components/common/Tooltip";
 
 export function RequisitionFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -45,6 +47,10 @@ export function RequisitionFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [openingReason, setOpeningReason] = useState("Other");
+  const [requisitionCode, setRequisitionCode] = useState('');
+  const [isCodeLoading, setIsCodeLoading] = useState(false);
+  const [codeError, setCodeError] = useState("");
+  const { showToast } = useToast();
 
   useEffect(() => {
     let isMounted = true;
@@ -101,11 +107,38 @@ export function RequisitionFormPage() {
     };
   }, [id]);
 
+useEffect(() => {
+  if (isEditing) return;
+  let isMounted = true;
+
+  const fetchNextCode = async () => {
+    setIsCodeLoading(true);
+    setCodeError("");
+
+    try {
+      const data = await apiRequest<{requisitionCode: string}> ("/api/requisitions/next-code",);
+      if (isMounted) setRequisitionCode(data.requisitionCode)
+
+    } catch (err) {
+      console.error("failed to fetch code", err)
+      if (isMounted) {
+        setCodeError(err instanceof ApiError ? err.message : "Couldn't autogenerate a code, manually enter one")
+      }
+    } finally {
+      if (isMounted) setIsCodeLoading(false)
+    }
+  };
+
+  fetchNextCode();
+  return () => {
+    isMounted = false
+  }
+}, [isEditing]);
+
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const form = new FormData(event.currentTarget);
-
     const roleName = value(form, "roleName");
     const department = value(form, "department");
     const hiringManagerUserId = value(form, "hiringManagerUserId");
@@ -150,10 +183,11 @@ export function RequisitionFormPage() {
             });
 
       navigate(`/requisitions/${saved.id}`);
+      showToast(isEditing ? "Requisition updated" : "Requisition created.", "success")
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Requisition could not be saved.",
-      );
+        const message = err instanceof Error ? err.message : "Requisition could not be saved."
+      setError(message)
+      showToast(message, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -230,12 +264,14 @@ export function RequisitionFormPage() {
                     <Field
                       label="Requisition code"
                       required
-                      hint="Use a unique internal reference."
+                      hint={codeError}
                     >
                       <input
                         name="requisitionCode"
+                        value={requisitionCode}
+                        readOnly
                         required
-                        placeholder="e.g. REQ-2026-001"
+                        placeholder={isCodeLoading ? "Generating.." : "e.g. REQ-2026-001"}
                       />
                     </Field>
                   </div>
@@ -279,7 +315,7 @@ export function RequisitionFormPage() {
                   <Field
                     label="Recruiter"
                     required
-                    hint={
+                    tooltip={
                       isEditing && !canReassign
                         ? "Only Talent Acquisition Managers can change the recruiter."
                         : undefined
@@ -462,7 +498,6 @@ export function RequisitionFormPage() {
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  <Save size={17} aria-hidden="true" />
                   <span>
                     {isSubmitting
                       ? "Saving..."
@@ -508,11 +543,13 @@ function Field({
   label,
   required = false,
   hint,
+  tooltip,
   children,
 }: {
   label: string;
   required?: boolean;
   hint?: string;
+  tooltip?: string
   children: React.ReactNode;
 }) {
   return (
@@ -525,6 +562,7 @@ function Field({
               *
             </span>
           )}
+          {tooltip && <Tooltip text={tooltip} />}
         </span>
 
         {children}

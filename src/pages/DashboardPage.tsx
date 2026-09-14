@@ -14,6 +14,7 @@ import type { Requisition } from "../features/requisitions/requisitionTypes";
 import type { UserProfile } from "../features/auth/authTypes";
 import "../styles/Dashboard.css";
 import { ChartIcon } from "../components/layout/LayoutIcons";
+import { AlertCircle } from "lucide-react";
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -346,7 +347,9 @@ function DashboardContent({
                 key={item.label}
                 to={item.href}
               >
-                <span className="attention-dot" />
+               <div className="attention-div">
+                <AlertCircle className="attention-icon" size={18} aria-hidden="true" />
+               </div>
 
                 <div className="attention-label">
                   <h4> {item.label} </h4>
@@ -1214,12 +1217,3 @@ function getPipelineHref(stage: string) {
     ? `/requisitions?stage=${stageFilters[stage]}`
     : "/requisitions";
 }
-
-// function formatToday() {
-//   return new Intl.DateTimeFormat("en", {
-//     weekday: "long",
-//     day: "2-digit",
-//     month: "long",
-//     year: "numeric",
-//   }).format(new Date());
-// }
