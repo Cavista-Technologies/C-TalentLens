@@ -31,6 +31,7 @@ import type { UserSummary } from "../features/users/userTypes";
 import "../styles/RequisitionFormPage.css";
 import { ApiError, apiRequest } from "../lib/apiClient";
 import { useToast } from "../components/feedback/toastContext";
+import { Tooltip } from "../components/common/Tooltip";
 
 export function RequisitionFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -315,7 +316,7 @@ useEffect(() => {
                   <Field
                     label="Recruiter"
                     required
-                    hint={
+                    tooltip={
                       isEditing && !canReassign
                         ? "Only Talent Acquisition Managers can change the recruiter."
                         : undefined
@@ -541,11 +542,13 @@ function Field({
   label,
   required = false,
   hint,
+  tooltip,
   children,
 }: {
   label: string;
   required?: boolean;
   hint?: string;
+  tooltip?: string
   children: React.ReactNode;
 }) {
   return (
@@ -558,6 +561,7 @@ function Field({
               *
             </span>
           )}
+          {tooltip && <Tooltip text={tooltip} />}
         </span>
 
         {children}

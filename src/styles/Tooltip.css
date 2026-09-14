@@ -1,0 +1,36 @@
+.field-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.35rem;
+  color: var(--color-brand);
+  cursor: help;
+}
+ 
+.field-tooltip-bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-brand);
+  color: white;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  white-space: normal;
+  width: max-content;
+  max-width: 220px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+ 
+.field-tooltip:hover .field-tooltip-bubble,
+.field-tooltip:focus .field-tooltip-bubble,
+.field-tooltip:focus-within .field-tooltip-bubble {
+  opacity: 1;
+  visibility: visible;
+}
