@@ -5,6 +5,7 @@ import { useAuth } from "../../features/auth/authContext";
 import {
   appRoles,
   canUseRecruitmentWrite,
+  canViewAllAlerts,
   canViewAnalytics,
   hasAnyRole,
 } from "../../features/auth/roleAccess";
@@ -24,10 +25,6 @@ import {
   UsersIcon,
 } from "./LayoutIcons";
 
-/* =========================================================
-   TYPES
-========================================================= */
-
 type SidebarProps = {
   collapsed: boolean;
   mobileOpen: boolean;
@@ -41,10 +38,6 @@ type NavigationItem = {
   icon: ReactNode;
 };
 
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
 export function Sidebar({
   collapsed,
   mobileOpen,
@@ -55,10 +48,8 @@ export function Sidebar({
 
   const showAnalytics = canViewAnalytics(user);
   const showImport = canUseRecruitmentWrite(user);
-
-  /* ---------------------------------------------------------
-     Navigation items
-  --------------------------------------------------------- */
+  const isManager = canViewAllAlerts(user) && !hasAnyRole(user, [appRoles.hiringManager]);
+  const alertsPath = isManager ? "/alerts?scope=all" : "/alerts";
 
   const navigationItems: NavigationItem[] = [
     {
@@ -96,13 +87,9 @@ export function Sidebar({
 
   navigationItems.push({
     label: "Alerts",
-    path: "/alerts",
+    path: alertsPath,
     icon: <BellIcon />,
   });
-
-  /* ---------------------------------------------------------
-     Sidebar classes
-  --------------------------------------------------------- */
 
   const sidebarClasses = [
     "app-sidebar",
@@ -114,9 +101,6 @@ export function Sidebar({
 
   return (
     <>
-      {/* =====================================================
-          MOBILE OVERLAY
-      ===================================================== */}
 
       {mobileOpen && (
         <button
@@ -127,19 +111,8 @@ export function Sidebar({
         />
       )}
 
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
-
       <aside className={sidebarClasses} aria-label="Application sidebar">
-        {/* ===================================================
-            HEADER
-        =================================================== */}
-
         <div className="sidebar-header">
-          {/* =================================================
-              BRAND
-          ================================================= */}
 
           <div className="sidebar-brand">
             <div className="talentlens-brand">
@@ -157,14 +130,6 @@ export function Sidebar({
             </div>
           </div>
 
-          {/* =================================================
-              DESKTOP COLLAPSE / EXPAND BUTTON
-
-              This button sits directly on the sidebar's
-              right border so it does not interfere with
-              the logo or brand.
-          ================================================= */}
-
           <button
             type="button"
             className="sidebar-border-toggle"
@@ -174,10 +139,6 @@ export function Sidebar({
           >
             {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </button>
-
-          {/* =================================================
-              MOBILE CLOSE BUTTON
-          ================================================= */}
 
           <button
             type="button"
@@ -189,10 +150,6 @@ export function Sidebar({
             <CloseIcon />
           </button>
         </div>
-
-        {/* ===================================================
-            NAVIGATION
-        =================================================== */}
 
         <nav className="sidebar-navigation" aria-label="Main navigation">
 
@@ -217,14 +174,7 @@ export function Sidebar({
           ))}
         </nav>
 
-        {/* ===================================================
-            BOTTOM
-        =================================================== */}
-
         <div className="sidebar-bottom">
-          {/* =================================================
-              USER SUMMARY
-          ================================================= */}
 
           {user && !collapsed && (
             <div className="sidebar-user-summary">
@@ -239,10 +189,6 @@ export function Sidebar({
               </div>
             </div>
           )}
-
-          {/* =================================================
-              LOGOUT
-          ================================================= */}
 
           <button
             type="button"
@@ -259,10 +205,6 @@ export function Sidebar({
     </>
   );
 }
-
-/* =========================================================
-   PRIMARY ROLE
-========================================================= */
 
 function getPrimaryRole(user: ReturnType<typeof useAuth>["user"]) {
   if (!user) {

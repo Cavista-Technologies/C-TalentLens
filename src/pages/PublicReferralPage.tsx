@@ -305,15 +305,15 @@ export function PublicReferralPage() {
               </div>
               <div className="form-grid">
                 <label className='form-headers'>
-                  Your name
+                  Your Name
                   <input name="referrerName" required placeholder='Enter your name'/>
                 </label>
                 <label className='form-headers'>
-                  Your Cavista email
+                  Your Axxess Email
                   <input name="referrerEmail" type="email" required placeholder='Enter your name'/>
                 </label>
                 <label className='form-headers'>
-                  Your team
+                  Your Team
                   <select name="referrerDepartment" defaultValue="" required>
                     <option value="">Select team</option>
                     {recruitmentTeams.map((team) => (
