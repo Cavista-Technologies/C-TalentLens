@@ -1,4 +1,10 @@
-import { type FormEvent, type ReactNode, useEffect, useState } from "react";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  type ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
   AlertTriangle,
@@ -26,6 +32,7 @@ import {
   completeActionItem,
   getRequisition,
   resolveBottleneck,
+  updateRequisitionStage,
 } from "../features/requisitions/requisitionApi";
 import {
   actionCategories,
@@ -35,6 +42,7 @@ import {
   formatDate,
   formatDateTime,
   formatValue,
+  pipelineStages,
 } from "../features/requisitions/requisitionDisplay";
 import type {
   ActionItem,
@@ -200,6 +208,9 @@ function RequisitionDetail({
 
   const [isAddingAction, setIsAddingAction] = useState(initialAddAction);
 
+  const [isUpdatingStage, setIsUpdatingStage] = useState(false);
+  const [stageError, setStageError] = useState("");
+
   const openBottlenecks = requisition.bottlenecks.filter(
     (bottleneck) => bottleneck.status !== "Resolved",
   );
@@ -241,6 +252,26 @@ function RequisitionDetail({
     await reload();
   }
 
+  async function handleStageChange(event: ChangeEvent<HTMLSelectElement>) {
+    const stage = event.target.value;
+    setIsUpdatingStage(true);
+    setStageError("");
+
+    try {
+      const updated = await updateRequisitionStage(requisition.id, {
+        stage,
+        effectiveDate: null,
+      });
+      onChanged(updated);
+    } catch (err) {
+      setStageError(
+        err instanceof Error ? err.message : "Stage could not be updated.",
+      );
+    } finally {
+      setIsUpdatingStage(false);
+    }
+  }
+
   return (
     <>
       <section className="requisition-detail-hero">
@@ -271,21 +302,47 @@ function RequisitionDetail({
           <div className="hero-status-label">Current status</div>
 
           <div className="hero-statuses">
-            <span
-              className={`detail-status-pill ${requisition.currentStatus.toLowerCase()}`}
-            >
-              {formatValue(requisition.currentStatus)}
-            </span>
+            <div className="status-field">
+              <span className="status-field-label">Status</span>
+              <span
+                className={`detail-status-pill ${requisition.currentStatus.toLowerCase()}`}
+              >
+                {formatValue(requisition.currentStatus)}
+              </span>
+            </div>
 
-            <span className="detail-status-pill stage">
-              {formatValue(requisition.currentStage)}
-            </span>
+            <div className="status-field">
+              <span className="status-field-label">Stage</span>
+              {canWrite ? (
+                <select
+                  className="stage-select"
+                  value={requisition.currentStage}
+                  onChange={handleStageChange}
+                  disabled={isUpdatingStage}
+                  aria-label="Pipeline stage"
+                >
+                  {pipelineStages.map((stage) => (
+                    <option value={stage} key={stage}>
+                      {formatValue(stage)}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="detail-status-pill stage">
+                  {formatValue(requisition.currentStage)}
+                </span>
+              )}
+              {stageError && <p className="hero-stage-error">{stageError}</p>}
+            </div>
 
-            <span
-              className={`detail-status-pill sla ${requisition.slaState.toLowerCase()}`}
-            >
-              {formatValue(requisition.slaState)}
-            </span>
+            <div className="status-field">
+              <span className="status-field-label">SLA</span>
+              <span
+                className={`detail-status-pill sla ${requisition.slaState.toLowerCase()}`}
+              >
+                {formatValue(requisition.slaState)}
+              </span>
+            </div>
           </div>
         </div>
       </section>
