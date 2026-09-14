@@ -24,7 +24,7 @@ import {
 } from "../features/requisitions/requisitionDisplay";
 import type { Requisition } from "../features/requisitions/requisitionTypes";
 import "../styles/Analytics.css";
-import { Briefcase, CheckCircle2, Clock, Icon, ShieldCheck, type LucideIcon } from "lucide-react";
+import { Briefcase, CheckCircle2, Clock, ShieldCheck, type LucideIcon } from "lucide-react";
 
 export function AnalyticsPage() {
   const { user } = useAuth();
