@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { LoadingState } from "../components/feedback/StateMessage";
 import { useAuth } from "../features/auth/authContext";
 
@@ -13,7 +13,6 @@ export function ProtectedRoute({
   children,
 }: ProtectedRouteProps) {
   const { status, user } = useAuth();
-  const location = useLocation();
 
   if (status === "loading") {
     return (
