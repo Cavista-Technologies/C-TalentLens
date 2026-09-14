@@ -24,25 +24,20 @@ import {
 } from "../features/requisitions/requisitionDisplay";
 import type { Requisition } from "../features/requisitions/requisitionTypes";
 import "../styles/Analytics.css";
+import { Briefcase, CheckCircle2, Clock, ShieldCheck, type LucideIcon } from "lucide-react";
 
 export function AnalyticsPage() {
   const { user } = useAuth();
-
   const [leadership, setLeadership] = useState<LeadershipSummary | null>(null);
   const [sources, setSources] = useState<SourceAnalytics | null>(null);
   const [trends, setTrends] = useState<HiringTrendResponse | null>(null);
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
-
-  // No filter selected by default.
   const [fromDate, setFromDate] = useState(() => getDefaultFromDate());
   const [toDate, setToDate] = useState(() => getDefaultToDate());
-
   const [debouncedFromDate, setDebouncedFromDate] = useState(fromDate);
   const [debouncedToDate, setDebouncedToDate] = useState(toDate);
-
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-
   const showLeadershipAnalytics = canViewLeadershipAnalytics(user);
 
   useEffect(() => {
@@ -102,17 +97,11 @@ export function AnalyticsPage() {
       isMounted = false;
     };
   }, [showLeadershipAnalytics, debouncedFromDate, debouncedToDate]);
-
   const hasDateFilter = Boolean(fromDate || toDate);
-
   const summaryMetrics = getSummaryMetrics(requisitions, leadership, hasDateFilter);
-
   const riskSummary = getRiskSummary(requisitions, leadership);
-
   const timeToFillBreakdowns = getTimeToFillBreakdowns(requisitions);
-
   const recruiterPerformance = getRecruiterPerformance(requisitions);
-
   const stageDistribution = getStageDistribution(requisitions);
 
   return (
@@ -180,6 +169,8 @@ export function AnalyticsPage() {
                   label={metric.label}
                   tone={metric.tone}
                   value={metric.value}
+                  detail={metric.detail}
+                  icon={metric.icon}
                   key={metric.label}
                 />
               ))}
@@ -430,9 +421,7 @@ function HiringMovementChart({
 
 function PipelineStageChart({ stages }: { stages: StageDistributionMetric[] }) {
   const total = stages.reduce((sum, stage) => sum + stage.count, 0);
-
   const maxValue = Math.max(1, ...stages.map((stage) => stage.count));
-
   if (total === 0) {
     return <p className="chart-empty">No requisitions in this period</p>;
   }
@@ -520,15 +509,26 @@ function Metric({
   label,
   tone,
   value,
+  detail,
+  icon: Icon,
 }: {
   label: string;
   tone: MetricTone;
   value: number | string;
+  detail?: string;
+  icon: LucideIcon
 }) {
   return (
     <article className={`metric-card metric-${tone}`}>
-      <span>{label}</span>
-      <strong>{value}</strong>
+      <span className="metric-icon" aria-hidden="true">
+        <Icon size={18} />
+      </span>
+
+      <span className="metric-card-content">
+        <span className="metric-label">{label}</span>
+        <strong className="metric-value">{value}</strong>
+        {detail && <span className="metric-detail">{detail}</span>}
+      </span>
     </article>
   );
 }
@@ -666,36 +666,40 @@ function getSummaryMetrics(
         label: "Open requisitions",
         value: leadership.executiveKpis.totalOpenRoles,
         tone: "brand" as const,
+        icon: Briefcase,
+        detail: "Active across all teams"
       },
       {
         label: "Filled",
         value: leadership.executiveKpis.totalFilledPositions,
         tone: "success" as const,
+        icon: CheckCircle2,
+        detail: "Position closed with a hire"
       },
       {
         label: "Avg. time to fill",
         value: `${leadership.executiveKpis.averageTimeToFill}d`,
         tone: getTimeToFillTone(leadership.executiveKpis.averageTimeToFill),
+        icon: Clock,
+        detail: "From opening to close"
       },
       {
         label: "SLA",
         value: `${leadership.executiveKpis.slaComplianceRate}%`,
         tone: getSlaTone(leadership.executiveKpis.slaComplianceRate),
+        icon: ShieldCheck,
+        detail: "Requisition with SLA target"
       },
     ];
   }
 
   const active = requisitions.filter((requisition) => !isClosed(requisition));
-
   const closed = requisitions.filter((requisition) => isClosed(requisition));
-
   const withinSla = active.filter(
     (requisition) =>
       requisition.slaState === "OnTrack" || requisition.slaState === "Closed",
   ).length;
-
   const averageFilledTimeToFill = averageTimeToFill(closed);
-
   const slaCompliance = percentage(withinSla, active.length);
 
   return [
@@ -703,6 +707,8 @@ function getSummaryMetrics(
       label: "Open requisitions",
       value: active.length,
       tone: "brand" as const,
+      icon: Briefcase,
+      detail: `${closed.length} closed this period`
     },
     {
       label: "Filled",
@@ -711,16 +717,22 @@ function getSummaryMetrics(
         0,
       ),
       tone: "success" as const,
+      icon: CheckCircle2,
+      detail: `Across ${requisitions.length} requisitions`
     },
     {
       label: "Avg. time to fill",
       value: `${averageFilledTimeToFill}d`,
       tone: getTimeToFillTone(averageFilledTimeToFill),
+      icon: Clock,
+      detail: `Based on ${closed.length} closed roles`
     },
     {
       label: "SLA",
       value: `${slaCompliance}%`,
       tone: getSlaTone(slaCompliance),
+      icon: ShieldCheck,
+      detail: `${withinSla} of ${active.length} on track`
     },
   ];
 }
