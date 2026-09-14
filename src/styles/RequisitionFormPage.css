@@ -233,7 +233,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-
   color: var(--color-text-label);
   font-size: 13px;
   font-weight: 700;
@@ -243,7 +242,6 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-
   color: var(--color-text-label);
 }
 
@@ -395,21 +393,15 @@
 .form-cancel-button,
 .form-save-button {
   min-height: 44px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-
   padding: 0 18px;
-
   border-radius: var(--radius-sm);
-
   font-size: 13px;
   font-weight: 700;
-
   text-decoration: none;
-
   transition:
     transform var(--transition-fast),
     background var(--transition-fast),
@@ -448,7 +440,6 @@
 
 .form-save-button:hover:not(:disabled) {
   transform: translateY(-1px);
-
   box-shadow:
     0 8px 18px var(--color-brand-shadow);
 }

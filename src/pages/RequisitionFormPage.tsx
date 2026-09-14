@@ -496,7 +496,6 @@ useEffect(() => {
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  <Save size={17} aria-hidden="true" />
                   <span>
                     {isSubmitting
                       ? "Saving..."
