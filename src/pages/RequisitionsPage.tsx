@@ -3,6 +3,7 @@ import { Eye, Pencil, UserRoundCog } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { ErrorState, LoadingState } from "../components/feedback/StateMessage";
+import { useToast } from "../components/feedback/useToast";
 import { AppLayout } from "../components/layout/AppLayout";
 import { PageContainer } from "../components/layout/PageContainer";
 import { useAuth } from "../features/auth/authContext";
@@ -674,6 +675,7 @@ function ReassignRecruiterModal({
   const [results, setResults] = useState<UserSummary[]>([]);
   const [selectedRecruiter, setSelectedRecruiter] =
     useState<UserSummary | null>(null);
+  const { showToast } = useToast();
 
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -746,12 +748,14 @@ function ReassignRecruiterModal({
       });
 
       onSaved(updated);
+      showToast("Recruiter reassigned", "success");
     } catch (err) {
-      setError(
+      const message =
         err instanceof Error
           ? err.message
-          : "Recruiter could not be reassigned.",
-      );
+          : "Recruiter could not be reassigned.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setIsSaving(false);
     }

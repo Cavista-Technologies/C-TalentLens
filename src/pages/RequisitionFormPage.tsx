@@ -29,7 +29,7 @@ import { getUsers } from "../features/users/userApi";
 import type { UserSummary } from "../features/users/userTypes";
 import "../styles/RequisitionFormPage.css";
 import { ApiError, apiRequest } from "../lib/apiClient";
-import { useToast } from "../components/feedback/toastContext";
+import { useToast } from "../components/feedback/useToast";
 import { Tooltip } from "../components/common/Tooltip";
 
 export function RequisitionFormPage() {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ErrorState, LoadingState } from "../components/feedback/StateMessage";
+import { useToast } from "../components/feedback/useToast";
 import { AppLayout } from "../components/layout/AppLayout";
 import { PageContainer } from "../components/layout/PageContainer";
 import { useAuth } from "../features/auth/authContext";
@@ -63,6 +64,7 @@ export function ReferralsPage() {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [page, setPage] = useState<number>(1);
+  const { showToast } = useToast();
 
   /*
    * Automatically search after 3+ characters.
@@ -250,12 +252,20 @@ export function ReferralsPage() {
 
         return next;
       });
+
+      showToast(
+        changedReferrals.length === 1
+          ? "Referral updated"
+          : `${changedReferrals.length} referrals updated`,
+        "success",
+      );
     } catch (err) {
-      setError(
+      const message =
         err instanceof Error
           ? err.message
-          : "Referral changes could not be saved.",
-      );
+          : "Referral changes could not be saved.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setIsSaving(false);
     }

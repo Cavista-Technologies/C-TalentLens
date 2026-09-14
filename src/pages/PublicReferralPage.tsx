@@ -74,8 +74,8 @@ export function PublicReferralPage() {
       return
     }
 
-    if (!referrerEmail.toLowerCase().endsWith('@cavista.com')) {
-      setError('Use your Cavista email address.')
+    if (!referrerEmail.toLowerCase().endsWith('@axxess.com')) {
+      setError('Use your Axxess email address.')
       return
     }
 
