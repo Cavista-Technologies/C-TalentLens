@@ -1,5 +1,6 @@
 import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import { ToastContext, type ToastTone } from './toastContext'
+import '../../styles/Toast.css'
 
 type Toast = {
   id: number

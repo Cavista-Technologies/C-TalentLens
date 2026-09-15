@@ -22,6 +22,7 @@ import {
   X,
 } from "lucide-react";
 import { ErrorState, LoadingState } from "../components/feedback/StateMessage";
+import { useToast } from "../components/feedback/useToast";
 import { AppLayout } from "../components/layout/AppLayout";
 import { PageContainer } from "../components/layout/PageContainer";
 import { useAuth } from "../features/auth/authContext";
@@ -199,6 +200,7 @@ function RequisitionDetail({
 }) {
   const { user } = useAuth();
   const canWrite = canUseRecruitmentWrite(user);
+  const { showToast } = useToast();
 
   const [activeSection, setActiveSection] =
     useState<RequisitionDetailSection>(initialSection);
@@ -245,11 +247,13 @@ function RequisitionDetail({
   async function handleBottleneckCreated() {
     setIsAddingBottleneck(false);
     await reload();
+    showToast("Bottleneck added", "success");
   }
 
   async function handleActionCreated() {
     setIsAddingAction(false);
     await reload();
+    showToast("Action item added", "success");
   }
 
   async function handleStageChange(event: ChangeEvent<HTMLSelectElement>) {
@@ -263,10 +267,12 @@ function RequisitionDetail({
         effectiveDate: null,
       });
       onChanged(updated);
+      showToast("Stage updated", "success");
     } catch (err) {
-      setStageError(
-        err instanceof Error ? err.message : "Stage could not be updated.",
-      );
+      const message =
+        err instanceof Error ? err.message : "Stage could not be updated.";
+      setStageError(message);
+      showToast(message, "error");
     } finally {
       setIsUpdatingStage(false);
     }
@@ -851,6 +857,7 @@ function BottleneckCard({
   requisitionId: string;
 }) {
   const [isSaving, setIsSaving] = useState(false);
+  const { showToast } = useToast();
 
   async function handleResolve() {
     if (!canResolve) {
@@ -865,6 +872,12 @@ function BottleneckCard({
       });
 
       await onResolved();
+      showToast("Bottleneck resolved", "success");
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Bottleneck could not be resolved.",
+        "error",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -937,6 +950,7 @@ function ActionCard({
   requisitionId: string;
 }) {
   const [isSaving, setIsSaving] = useState(false);
+  const { showToast } = useToast();
 
   async function handleComplete() {
     if (!canComplete) {
@@ -951,6 +965,12 @@ function ActionCard({
       });
 
       await onCompleted();
+      showToast("Action item completed", "success");
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Action item could not be completed.",
+        "error",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -1026,6 +1046,7 @@ function BottleneckForm({
   const [isSaving, setIsSaving] = useState(false);
   const [category, setCategory] = useState(bottleneckCategories[0]);
   const [error, setError] = useState("");
+  const { showToast } = useToast();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -1055,9 +1076,10 @@ function BottleneckForm({
       formElement.reset();
       await onCreated();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Bottleneck could not be added.",
-      );
+      const message =
+        err instanceof Error ? err.message : "Bottleneck could not be added.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setIsSaving(false);
     }
@@ -1162,6 +1184,7 @@ function ActionItemForm({
   const [isSaving, setIsSaving] = useState(false);
   const [category, setCategory] = useState(actionCategories[0]);
   const [error, setError] = useState("");
+  const { showToast } = useToast();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -1191,9 +1214,10 @@ function ActionItemForm({
       formElement.reset();
       await onCreated();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Action could not be added.",
-      );
+      const message =
+        err instanceof Error ? err.message : "Action could not be added.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setIsSaving(false);
     }

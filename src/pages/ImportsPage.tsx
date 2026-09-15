@@ -1,5 +1,6 @@
 import { type ChangeEvent, type FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
+import { useToast } from "../components/feedback/useToast";
 import { AppLayout } from "../components/layout/AppLayout";
 import { PageContainer } from "../components/layout/PageContainer";
 import {
@@ -35,6 +36,7 @@ export function ImportsPage() {
   const [isSyncingSmartRecruiters, setIsSyncingSmartRecruiters] =
     useState(false);
   const [error, setError] = useState("");
+  const { showToast } = useToast();
 
   function handleImportTypeChange(nextType: ImportType) {
     setImportType(nextType);
@@ -91,13 +93,19 @@ export function ImportsPage() {
     setSmartRecruitersResult(null);
 
     try {
-      setResult(
+      const importResult =
         importType === "requisitions"
           ? await importRequisitions(rows)
-          : await importReferrals(rows),
+          : await importReferrals(rows);
+      setResult(importResult);
+      showToast(
+        `${importResult.importedCount + importResult.updatedCount} ${importType} imported`,
+        importResult.failedCount > 0 ? "info" : "success",
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Import failed.");
+      const message = err instanceof Error ? err.message : "Import failed.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -110,11 +118,14 @@ export function ImportsPage() {
     setSmartRecruitersResult(null);
 
     try {
-      setSmartRecruitersResult(await syncSmartRecruitersJobs());
+      const syncResult = await syncSmartRecruitersJobs();
+      setSmartRecruitersResult(syncResult);
+      showToast("SmartRecruiters sync complete", "success");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "SmartRecruiters sync failed.",
-      );
+      const message =
+        err instanceof Error ? err.message : "SmartRecruiters sync failed.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setIsSyncingSmartRecruiters(false);
     }

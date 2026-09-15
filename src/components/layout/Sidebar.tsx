@@ -223,5 +223,9 @@ function getPrimaryRole(user: ReturnType<typeof useAuth>["user"]) {
     return "Hiring Manager";
   }
 
+  if (hasAnyRole(user, [appRoles.recruiter])) {
+    return "Recruiter";
+  }
+
   return "User";
 }

@@ -139,6 +139,11 @@ export function PublicReferralPage() {
       return;
     }
 
+    if (!referrerEmail.toLowerCase().endsWith('@axxess.com')) {
+      setError('Use your Axxess email address.')
+      return
+    }
+    
     if (!resumeFile) {
       setError("Please upload the candidate's resume.");
       return;
