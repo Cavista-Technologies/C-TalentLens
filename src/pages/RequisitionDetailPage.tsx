@@ -1051,7 +1051,8 @@ function BottleneckForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
 
     if (!value(form, "reason") || !value(form, "ownerUserId")) {
       setError("Please complete the required fields.");
@@ -1072,7 +1073,7 @@ function BottleneckForm({
         businessImpact: nullableValue(form.get("businessImpact")),
       });
 
-      event.currentTarget.reset();
+      formElement.reset();
       await onCreated();
     } catch (err) {
       const message =
@@ -1188,7 +1189,8 @@ function ActionItemForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
 
     if (!value(form, "description") || !value(form, "ownerUserId")) {
       setError("Please complete the required fields.");
@@ -1209,7 +1211,7 @@ function ActionItemForm({
         dueDate: nullableValue(form.get("dueDate")),
       });
 
-      event.currentTarget.reset();
+      formElement.reset();
       await onCreated();
     } catch (err) {
       const message =

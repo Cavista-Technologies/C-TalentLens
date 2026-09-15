@@ -24,7 +24,13 @@ import {
 } from "../features/requisitions/requisitionDisplay";
 import type { Requisition } from "../features/requisitions/requisitionTypes";
 import "../styles/Analytics.css";
-import { Briefcase, CheckCircle2, Clock, ShieldCheck, type LucideIcon } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle2,
+  Clock,
+  ShieldCheck,
+  type LucideIcon,
+} from "lucide-react";
 
 export function AnalyticsPage() {
   const { user } = useAuth();
@@ -34,20 +40,13 @@ export function AnalyticsPage() {
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
   const [fromDate, setFromDate] = useState(() => getDefaultFromDate());
   const [toDate, setToDate] = useState(() => getDefaultToDate());
-  const [debouncedFromDate, setDebouncedFromDate] = useState(fromDate);
-  const [debouncedToDate, setDebouncedToDate] = useState(toDate);
+
+  const [appliedFromDate, setAppliedFromDate] = useState(fromDate);
+  const [appliedToDate, setAppliedToDate] = useState(toDate);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const showLeadershipAnalytics = canViewLeadershipAnalytics(user);
-
-  useEffect(() => {
-    const handle = window.setTimeout(() => {
-      setDebouncedFromDate(fromDate);
-      setDebouncedToDate(toDate);
-    }, 400);
-
-    return () => window.clearTimeout(handle);
-  }, [fromDate, toDate]);
 
   useEffect(() => {
     let isMounted = true;
@@ -57,7 +56,10 @@ export function AnalyticsPage() {
       setError("");
 
       try {
-        const range = { from: debouncedFromDate, to: debouncedToDate };
+        const range = {
+          from: appliedFromDate,
+          to: appliedToDate,
+        };
         const [leadershipData, sourceData, trendData, requisitionData] =
           await Promise.all([
             showLeadershipAnalytics
@@ -96,9 +98,16 @@ export function AnalyticsPage() {
     return () => {
       isMounted = false;
     };
-  }, [showLeadershipAnalytics, debouncedFromDate, debouncedToDate]);
+  }, [showLeadershipAnalytics, appliedFromDate, appliedToDate]);
+
   const hasDateFilter = Boolean(fromDate || toDate);
-  const summaryMetrics = getSummaryMetrics(requisitions, leadership, hasDateFilter);
+
+  const summaryMetrics = getSummaryMetrics(
+    requisitions,
+    leadership,
+    hasDateFilter,
+  );
+
   const riskSummary = getRiskSummary(requisitions, leadership);
   const timeToFillBreakdowns = getTimeToFillBreakdowns(requisitions);
   const recruiterPerformance = getRecruiterPerformance(requisitions);
@@ -115,7 +124,6 @@ export function AnalyticsPage() {
 
         {!isLoading && sources && trends && (
           <div className="analytics-page">
-
             <section
               className="analytics-filter-panel"
               aria-label="Analytics reporting period"
@@ -151,6 +159,17 @@ export function AnalyticsPage() {
 
                 {hasDateFilter && (
                   <div className="analytics-filter-actions">
+                    <button
+                      className="primary-filter-action"
+                      type="button"
+                      onClick={handleApplyDateFilter}
+                      disabled={
+                        fromDate === appliedFromDate && toDate === appliedToDate
+                      }
+                    >
+                      Apply filters
+                    </button>
+
                     <button
                       className="secondary-filter-action"
                       type="button"
@@ -355,9 +374,23 @@ export function AnalyticsPage() {
     </AppLayout>
   );
 
+  function handleApplyDateFilter() {
+    if (fromDate && toDate && fromDate > toDate) {
+      setError("The From date cannot be later than the To date.");
+      return;
+    }
+
+    setError("");
+    setAppliedFromDate(fromDate);
+    setAppliedToDate(toDate);
+  }
+
   function handleClearDateFilter() {
     setFromDate("");
     setToDate("");
+    setAppliedFromDate("");
+    setAppliedToDate("");
+    setError("");
   }
 }
 
@@ -516,7 +549,7 @@ function Metric({
   tone: MetricTone;
   value: number | string;
   detail?: string;
-  icon: LucideIcon
+  icon: LucideIcon;
 }) {
   return (
     <article className={`metric-card metric-${tone}`}>
@@ -667,28 +700,28 @@ function getSummaryMetrics(
         value: leadership.executiveKpis.totalOpenRoles,
         tone: "brand" as const,
         icon: Briefcase,
-        detail: "Active across all teams"
+        detail: "Active across all teams",
       },
       {
         label: "Filled",
         value: leadership.executiveKpis.totalFilledPositions,
         tone: "success" as const,
         icon: CheckCircle2,
-        detail: "Position closed with a hire"
+        detail: "Position closed with a hire",
       },
       {
         label: "Avg. time to fill",
         value: `${leadership.executiveKpis.averageTimeToFill}d`,
         tone: getTimeToFillTone(leadership.executiveKpis.averageTimeToFill),
         icon: Clock,
-        detail: "From opening to close"
+        detail: "From opening to close",
       },
       {
         label: "SLA",
         value: `${leadership.executiveKpis.slaComplianceRate}%`,
         tone: getSlaTone(leadership.executiveKpis.slaComplianceRate),
         icon: ShieldCheck,
-        detail: "Requisition with SLA target"
+        detail: "Requisition with SLA target",
       },
     ];
   }
@@ -708,7 +741,7 @@ function getSummaryMetrics(
       value: active.length,
       tone: "brand" as const,
       icon: Briefcase,
-      detail: `${closed.length} closed this period`
+      detail: `${closed.length} closed this period`,
     },
     {
       label: "Filled",
@@ -718,21 +751,21 @@ function getSummaryMetrics(
       ),
       tone: "success" as const,
       icon: CheckCircle2,
-      detail: `Across ${requisitions.length} requisitions`
+      detail: `Across ${requisitions.length} requisitions`,
     },
     {
       label: "Avg. time to fill",
       value: `${averageFilledTimeToFill}d`,
       tone: getTimeToFillTone(averageFilledTimeToFill),
       icon: Clock,
-      detail: `Based on ${closed.length} closed roles`
+      detail: `Based on ${closed.length} closed roles`,
     },
     {
       label: "SLA",
       value: `${slaCompliance}%`,
       tone: getSlaTone(slaCompliance),
       icon: ShieldCheck,
-      detail: `${withinSla} of ${active.length} on track`
+      detail: `${withinSla} of ${active.length} on track`,
     },
   ];
 }
