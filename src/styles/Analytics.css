@@ -190,14 +190,10 @@
 
 .metric-grid {
   display: grid;
-
   grid-template-columns:
     repeat(4, minmax(0, 1fr));
-
   gap: 12px;
-
   width: 100%;
-
   margin-bottom: 16px;
 }
 
@@ -219,34 +215,42 @@
     border-color 0.18s ease;
 }
 
-.metric-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 52px;
+.card-icons{
+  display: flex !important;  
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 11px;
+  padding: 7px;
   width: 52px;
   height: 52px;
-  margin-right: 15px;
-  margin-top: 0;
-  background: transparent;
+}
+
+.card-icons .analytics-icon {
+  display: block;
+  width: 42px;
+  height: auto;
+  margin: 0;
+  position: static;
   border-radius: 11px;
 }
 
-.metric-brand .metric-icon {
-  color: var(--metric-brand-color, #b9243c);
-  background: var(--metric-brand-color, rgba(37, 99, 235, 0.12));
+.metric-brand .card-icons {
+  color: var(--metric-brand-color, rgb(56, 56, 250));
+  background: var(--metric-brand-color, rgb(219, 219, 250));
 }
 
-.metric-success .metric-icon {
+.metric-success .card-icons {
   color: var(--metric-success-color, #16a34a);
+  background: #e5fcec;
 }
 
-.metric-warning .metric-icon {
-  color: var(--metric-warning-color, #b7791f);
+.metric-warning .card-icons {
+  color: var(--metric-warning-color, #dfa000);
 }
 
-.metric-danger .metric-icon {
+.metric-danger .card-icons {
   color: var(--metric-danger-color, #b9243c);
+  background: #fed7de;
 }
 
 .metric-card:hover {
