@@ -44,8 +44,8 @@ export type ReferralQuery = {
   search?: string
   status?: string
   activeOnly?: boolean
-  submittedFrom?: string
-  submittedTo?: string
+  hiredFrom?: string
+  hiredTo?: string
 }
 
 export type CreateReferralRequest = {
@@ -152,11 +152,24 @@ export type ImportResult = {
   skippedCount: number
   failedCount: number
   errors: ImportRowError[]
-  importedIds: string[]
+  skipped: ImportRowSkip[]
+  importedItems: ImportRowOutcome[]
 }
 
 export type ImportRowError = {
   rowNumber: number
   errorCode: string
   message: string
+}
+
+export type ImportRowSkip = {
+  rowNumber: number
+  reason: string
+}
+
+export type ImportRowAction = 'Imported' | 'Updated'
+
+export type ImportRowOutcome = {
+  id: string
+  action: ImportRowAction
 }

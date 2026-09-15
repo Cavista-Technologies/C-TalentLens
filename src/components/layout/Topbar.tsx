@@ -171,7 +171,7 @@ function getRoleLabel(user: ReturnType<typeof useAuth>["user"]) {
   }
 
   if (roles.some((role) => String(role).toLowerCase().includes("talent"))) {
-    return "Talent Acquisition";
+    return "Talent Manager";
   }
 
   if (roles.some((role) => String(role).toLowerCase().includes("hiring"))) {

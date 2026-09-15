@@ -216,7 +216,7 @@ function getPrimaryRole(user: ReturnType<typeof useAuth>["user"]) {
   }
 
   if (hasAnyRole(user, [appRoles.talentAcquisitionManager])) {
-    return "Talent Acquisition";
+    return "Talent Manager";
   }
 
   if (hasAnyRole(user, [appRoles.hiringManager])) {

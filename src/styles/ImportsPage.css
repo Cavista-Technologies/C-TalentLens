@@ -475,11 +475,21 @@
   box-shadow: none;
 }
 
+.import-result-wrapper {
+  margin-top: 16px;
+}
+
+.import-result-heading {
+  margin: 0 0 10px;
+  color: #263246;
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .import-result {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 14px;
-  margin-top: 16px;
   padding: 20px;
   border: 1px solid #e4e9f1;
   border-radius: 15px;
@@ -513,19 +523,105 @@
   letter-spacing: -0.025em;
 }
 
-.import-errors {
+.import-errors,
+.import-skips {
   grid-column: 1 / -1;
   margin: 2px 0 0;
   padding: 13px 15px 13px 30px;
-  border: 1px solid #fecdd3;
   border-radius: 9px;
-  background: #fff6f7;
-  color: #9f1239;
   font-size: 12px;
   line-height: 1.6;
 }
 
-.import-errors li + li {
+.import-errors {
+  border: 1px solid #fecdd3;
+  background: #fff6f7;
+  color: #9f1239;
+}
+
+.import-skips {
+  border: 1px solid #fde4b8;
+  background: #fffaf0;
+  color: #92650c;
+}
+
+.import-result-items {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2px;
+  overflow: hidden;
+  border: 1px solid #e7ebf1;
+  border-radius: 10px;
+}
+
+.import-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 15px;
+  border-top: 1px solid #edf0f4;
+  color: inherit;
+  text-decoration: none;
+}
+
+.import-result-item:first-child {
+  border-top: none;
+}
+
+.import-result-item:hover {
+  background: #f8fafc;
+}
+
+.import-result-item-info {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.import-result-item-info strong {
+  overflow: hidden;
+  color: #263246;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.import-result-item-info span {
+  overflow: hidden;
+  color: #6c7789;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.import-result-item-badge {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.import-result-item-badge.badge-imported {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.import-result-item-badge.badge-updated {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.import-errors li + li,
+.import-skips li + li {
   margin-top: 4px;
 }
 

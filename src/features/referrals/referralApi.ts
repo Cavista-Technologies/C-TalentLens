@@ -29,12 +29,12 @@ export function getReferrals(query: ReferralQuery = {}) {
     params.set('activeOnly', 'true')
   }
 
-  if (query.submittedFrom) {
-    params.set('submittedFrom', query.submittedFrom)
+  if (query.hiredFrom) {
+    params.set('hiredFrom', query.hiredFrom)
   }
 
-  if (query.submittedTo) {
-    params.set('submittedTo', query.submittedTo)
+  if (query.hiredTo) {
+    params.set('hiredTo', query.hiredTo)
   }
 
   const queryString = params.toString()

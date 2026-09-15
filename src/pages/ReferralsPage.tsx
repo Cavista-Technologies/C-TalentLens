@@ -24,8 +24,8 @@ const referralFilterStorageKey = "c-talentlens:referral-filters";
 type ReferralFilters = {
   search: string;
   status: string;
-  submittedFrom: string;
-  submittedTo: string;
+  hiredFrom: string;
+  hiredTo: string;
 };
 
 type ReferralDraft = {
@@ -51,11 +51,11 @@ export function ReferralsPage() {
   );
 
   const [status, setStatus] = useState<string>(storedFilters.status);
-  const [submittedFrom, setSubmittedFrom] = useState<string>(
-    storedFilters.submittedFrom,
+  const [hiredFrom, setHiredFrom] = useState<string>(
+    storedFilters.hiredFrom,
   );
-  const [submittedTo, setSubmittedTo] = useState<string>(
-    storedFilters.submittedTo,
+  const [hiredTo, setHiredTo] = useState<string>(
+    storedFilters.hiredTo,
   );
 
   const [drafts, setDrafts] = useState<Record<string, ReferralDraft>>({});
@@ -98,7 +98,7 @@ export function ReferralsPage() {
     }, 150);
 
     return () => window.clearTimeout(timer);
-  }, [submittedFrom, submittedTo]);
+  }, [hiredFrom, hiredTo]);
 
   /*
    * Load referrals.
@@ -116,8 +116,8 @@ export function ReferralsPage() {
           pageSize: 10,
           search: submittedSearch.trim(),
           status,
-          submittedFrom,
-          submittedTo,
+          hiredFrom,
+          hiredTo,
         });
 
         if (!isMounted) {
@@ -157,7 +157,7 @@ export function ReferralsPage() {
     return () => {
       isMounted = false;
     };
-  }, [page, submittedSearch, status, submittedFrom, submittedTo]);
+  }, [page, submittedSearch, status, hiredFrom, hiredTo]);
 
   /*
    * Persist filters.
@@ -168,11 +168,11 @@ export function ReferralsPage() {
       JSON.stringify({
         search: submittedSearch,
         status,
-        submittedFrom,
-        submittedTo,
+        hiredFrom,
+        hiredTo,
       }),
     );
-  }, [submittedSearch, status, submittedFrom, submittedTo]);
+  }, [submittedSearch, status, hiredFrom, hiredTo]);
 
   /*
    * Update a referral draft.
@@ -278,8 +278,8 @@ export function ReferralsPage() {
     setSearch("");
     setSubmittedSearch("");
     setStatus("");
-    setSubmittedFrom("");
-    setSubmittedTo("");
+    setHiredFrom("");
+    setHiredTo("");
     setPage(1);
   }
 
@@ -290,8 +290,8 @@ export function ReferralsPage() {
   const activeFilterCount = [
     submittedSearch,
     status,
-    submittedFrom,
-    submittedTo,
+    hiredFrom,
+    hiredTo,
   ].filter(Boolean).length;
 
   const referralUpdateTitle = canUpdateStatus
@@ -428,13 +428,13 @@ export function ReferralsPage() {
 
               {/* FROM */}
               <label>
-                <span>Submitted from</span>
+                <span>Resumption</span>
 
                 <input
                   type="date"
-                  value={submittedFrom}
+                  value={hiredFrom}
                   onChange={(event) => {
-                    setSubmittedFrom(event.target.value);
+                    setHiredFrom(event.target.value);
                     setPage(1);
                   }}
                 />
@@ -442,13 +442,13 @@ export function ReferralsPage() {
 
               {/* TO */}
               <label>
-                <span>Submitted to</span>
+                <span>To</span>
 
                 <input
                   type="date"
-                  value={submittedTo}
+                  value={hiredTo}
                   onChange={(event) => {
-                    setSubmittedTo(event.target.value);
+                    setHiredTo(event.target.value);
                     setPage(1);
                   }}
                 />
@@ -815,8 +815,8 @@ function readStoredReferralFilters(): ReferralFilters {
   const fallback: ReferralFilters = {
     search: "",
     status: "",
-    submittedFrom: "",
-    submittedTo: "",
+    hiredFrom: "",
+    hiredTo: "",
   };
 
   try {
@@ -839,14 +839,14 @@ function readStoredReferralFilters(): ReferralFilters {
         typeof filters.search === "string" ? filters.search : fallback.search,
       status:
         typeof filters.status === "string" ? filters.status : fallback.status,
-      submittedFrom:
-        typeof filters.submittedFrom === "string"
-          ? filters.submittedFrom
-          : fallback.submittedFrom,
-      submittedTo:
-        typeof filters.submittedTo === "string"
-          ? filters.submittedTo
-          : fallback.submittedTo,
+      hiredFrom:
+        typeof filters.hiredFrom === "string"
+          ? filters.hiredFrom
+          : fallback.hiredFrom,
+      hiredTo:
+        typeof filters.hiredTo === "string"
+          ? filters.hiredTo
+          : fallback.hiredTo,
     };
   } catch {
     return fallback;

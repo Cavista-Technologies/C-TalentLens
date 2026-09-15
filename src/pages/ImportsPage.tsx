@@ -7,35 +7,50 @@ import {
   syncSmartRecruitersJobs,
   type SmartRecruitersSyncResult,
 } from "../features/integrations/smartRecruitersApi";
-import { importRequisitions } from "../features/requisitions/requisitionApi";
+import {
+  getRequisition,
+  importRequisitions,
+} from "../features/requisitions/requisitionApi";
 import {
   getRequisitionTemplateUrl,
   parseRequisitionCsv,
   type RequisitionImportRow,
 } from "../features/requisitions/requisitionImportCsv";
-import { importReferrals } from "../features/referrals/referralApi";
+import { getReferral, importReferrals } from "../features/referrals/referralApi";
 import {
   getReferralTemplateUrl,
   parseReferralCsv,
   type ReferralImportRow,
 } from "../features/referrals/referralImportCsv";
-import type { ImportResult } from "../features/referrals/referralTypes";
+import type {
+  ImportResult,
+  ImportRowAction,
+  ImportRowOutcome,
+} from "../features/referrals/referralTypes";
 import "../styles/ImportsPage.css";
 
 type ImportType = "requisitions" | "referrals";
 type ImportRow = RequisitionImportRow | ReferralImportRow;
+type ImportedItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  action: ImportRowAction;
+};
 
 export function ImportsPage() {
   const [importType, setImportType] = useState<ImportType>("requisitions");
   const [fileName, setFileName] = useState("");
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [result, setResult] = useState<ImportResult | null>(null);
+  const [importedItems, setImportedItems] = useState<ImportedItem[]>([]);
   const [smartRecruitersResult, setSmartRecruitersResult] =
     useState<SmartRecruitersSyncResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSyncingSmartRecruiters, setIsSyncingSmartRecruiters] =
     useState(false);
   const [error, setError] = useState("");
+  const [fileInputKey, setFileInputKey] = useState(0);
   const { showToast } = useToast();
 
   function handleImportTypeChange(nextType: ImportType) {
@@ -43,6 +58,7 @@ export function ImportsPage() {
     setFileName("");
     setRows([]);
     setResult(null);
+    setImportedItems([]);
     setSmartRecruitersResult(null);
     setError("");
   }
@@ -50,6 +66,7 @@ export function ImportsPage() {
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     setResult(null);
+    setImportedItems([]);
     setSmartRecruitersResult(null);
     setError("");
     setRows([]);
@@ -90,6 +107,7 @@ export function ImportsPage() {
     setIsSubmitting(true);
     setError("");
     setResult(null);
+    setImportedItems([]);
     setSmartRecruitersResult(null);
 
     try {
@@ -102,6 +120,10 @@ export function ImportsPage() {
         `${importResult.importedCount + importResult.updatedCount} ${importType} imported`,
         importResult.failedCount > 0 ? "info" : "success",
       );
+      setFileName("");
+      setRows([]);
+      setFileInputKey((key) => key + 1);
+      loadImportedItems(importType, importResult.importedItems);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Import failed.";
       setError(message);
@@ -109,6 +131,40 @@ export function ImportsPage() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  async function loadImportedItems(type: ImportType, outcomes: ImportRowOutcome[]) {
+    if (outcomes.length === 0) {
+      return;
+    }
+
+    const items = await Promise.all(
+      outcomes.slice(0, 20).map(async (outcome) => {
+        try {
+          if (type === "requisitions") {
+            const requisition = await getRequisition(outcome.id);
+            return {
+              id: outcome.id,
+              title: requisition.requisitionCode,
+              subtitle: requisition.roleName,
+              action: outcome.action,
+            };
+          }
+
+          const referral = await getReferral(outcome.id);
+          return {
+            id: outcome.id,
+            title: referral.candidateName,
+            subtitle: referral.roleAppliedFor,
+            action: outcome.action,
+          };
+        } catch {
+          return null;
+        }
+      }),
+    );
+
+    setImportedItems(items.filter((item): item is ImportedItem => item !== null));
   }
 
   async function handleSmartRecruitersSync() {
@@ -195,7 +251,7 @@ export function ImportsPage() {
               <span>{getImportLabel(importType)} CSV</span>
               <strong>{fileName || "Choose a CSV file"}</strong>
               <input
-                key={importType}
+                key={`${importType}-${fileInputKey}`}
                 type="file"
                 accept=".csv,text/csv"
                 onChange={handleFileChange}
@@ -243,32 +299,69 @@ export function ImportsPage() {
         </form>
 
         {result && (
-          <section className="import-result">
-            <div>
-              <span>Total</span>
-              <strong>{result.totalRows}</strong>
-            </div>
-            <div>
-              <span>Imported</span>
-              <strong>{result.importedCount}</strong>
-            </div>
-            <div>
-              <span>Skipped</span>
-              <strong>{result.skippedCount}</strong>
-            </div>
-            <div>
-              <span>Failed</span>
-              <strong>{result.failedCount}</strong>
+          <section className="import-result-wrapper" aria-label="Import result">
+            <h2 className="import-result-heading">Import result</h2>
+            <div className="import-result">
+              <div>
+                <span>Total</span>
+                <strong>{result.totalRows}</strong>
+              </div>
+              <div>
+                <span>Imported</span>
+                <strong>{result.importedCount}</strong>
+              </div>
+              <div>
+                <span>Updated</span>
+                <strong>{result.updatedCount}</strong>
+              </div>
+              <div>
+                <span>Skipped</span>
+                <strong>{result.skippedCount}</strong>
+              </div>
+              <div>
+                <span>Failed</span>
+                <strong>{result.failedCount}</strong>
+              </div>
+
+              {(result.skipped ?? []).length > 0 && (
+                <ul className="import-skips">
+                  {(result.skipped ?? []).map((item) => (
+                    <li key={`skip-${item.rowNumber}`}>
+                      Row {item.rowNumber}: {item.reason}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {result.errors.length > 0 && (
+                <ul className="import-errors">
+                  {result.errors.map((item) => (
+                    <li key={`${item.rowNumber}-${item.errorCode}`}>
+                      Row {item.rowNumber}: {item.message}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
-            {result.errors.length > 0 && (
-              <ul className="import-errors">
-                {result.errors.map((item) => (
-                  <li key={`${item.rowNumber}-${item.errorCode}`}>
-                    Row {item.rowNumber}: {item.message}
-                  </li>
+            {importedItems.length > 0 && (
+              <div className="import-result-items">
+                {importedItems.map((item) => (
+                  <Link
+                    to={`/${importType}/${item.id}`}
+                    key={item.id}
+                    className="import-result-item"
+                  >
+                    <span className="import-result-item-info">
+                      <strong>{item.title}</strong>
+                      <span>{item.subtitle}</span>
+                    </span>
+                    <span className={`import-result-item-badge badge-${item.action.toLowerCase()}`}>
+                      {item.action}
+                    </span>
+                  </Link>
                 ))}
-              </ul>
+              </div>
             )}
           </section>
         )}
