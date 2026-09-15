@@ -428,7 +428,7 @@ export function ReferralsPage() {
 
               {/* FROM */}
               <label>
-                <span>Resumption</span>
+                <span>Resumed from</span>
 
                 <input
                   type="date"
