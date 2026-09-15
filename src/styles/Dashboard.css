@@ -193,8 +193,8 @@
 }
 
 .metric-icon-briefcase {
-  color: #b9243c !important;
-  background: #fde0e5;
+  color: rgb(73, 73, 240) !important;
+  background: rgb(219, 219, 250);
   display: flex;
   align-items: center;
   justify-items: center;

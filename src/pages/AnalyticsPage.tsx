@@ -520,8 +520,8 @@ function Metric({
 }) {
   return (
     <article className={`metric-card metric-${tone}`}>
-      <span className="metric-icon" aria-hidden="true">
-        <Icon size={18} />
+      <span className="card-icons" aria-hidden="true">
+        <Icon className="analytics-icon" size={18} />
       </span>
 
       <span className="metric-card-content">
