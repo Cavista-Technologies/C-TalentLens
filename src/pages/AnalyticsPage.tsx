@@ -37,22 +37,13 @@ export function AnalyticsPage() {
   const [fromDate, setFromDate] = useState(() => getDefaultFromDate());
   const [toDate, setToDate] = useState(() => getDefaultToDate());
 
-  const [debouncedFromDate, setDebouncedFromDate] = useState(fromDate);
-  const [debouncedToDate, setDebouncedToDate] = useState(toDate);
+  const [appliedFromDate, setAppliedFromDate] = useState(fromDate);
+  const [appliedToDate, setAppliedToDate] = useState(toDate);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   const showLeadershipAnalytics = canViewLeadershipAnalytics(user);
-
-  useEffect(() => {
-    const handle = window.setTimeout(() => {
-      setDebouncedFromDate(fromDate);
-      setDebouncedToDate(toDate);
-    }, 400);
-
-    return () => window.clearTimeout(handle);
-  }, [fromDate, toDate]);
 
   useEffect(() => {
     let isMounted = true;
@@ -62,7 +53,10 @@ export function AnalyticsPage() {
       setError("");
 
       try {
-        const range = { from: debouncedFromDate, to: debouncedToDate };
+        const range = {
+          from: appliedFromDate,
+          to: appliedToDate,
+        };
         const [leadershipData, sourceData, trendData, requisitionData] =
           await Promise.all([
             showLeadershipAnalytics
@@ -101,11 +95,15 @@ export function AnalyticsPage() {
     return () => {
       isMounted = false;
     };
-  }, [showLeadershipAnalytics, debouncedFromDate, debouncedToDate]);
+  }, [showLeadershipAnalytics, appliedFromDate, appliedToDate]);
 
   const hasDateFilter = Boolean(fromDate || toDate);
 
-  const summaryMetrics = getSummaryMetrics(requisitions, leadership, hasDateFilter);
+  const summaryMetrics = getSummaryMetrics(
+    requisitions,
+    leadership,
+    hasDateFilter,
+  );
 
   const riskSummary = getRiskSummary(requisitions, leadership);
 
@@ -126,7 +124,6 @@ export function AnalyticsPage() {
 
         {!isLoading && sources && trends && (
           <div className="analytics-page">
-
             <section
               className="analytics-filter-panel"
               aria-label="Analytics reporting period"
@@ -162,6 +159,17 @@ export function AnalyticsPage() {
 
                 {hasDateFilter && (
                   <div className="analytics-filter-actions">
+                    <button
+                      className="primary-filter-action"
+                      type="button"
+                      onClick={handleApplyDateFilter}
+                      disabled={
+                        fromDate === appliedFromDate && toDate === appliedToDate
+                      }
+                    >
+                      Apply filters
+                    </button>
+
                     <button
                       className="secondary-filter-action"
                       type="button"
@@ -364,9 +372,23 @@ export function AnalyticsPage() {
     </AppLayout>
   );
 
+  function handleApplyDateFilter() {
+    if (fromDate && toDate && fromDate > toDate) {
+      setError("The From date cannot be later than the To date.");
+      return;
+    }
+
+    setError("");
+    setAppliedFromDate(fromDate);
+    setAppliedToDate(toDate);
+  }
+
   function handleClearDateFilter() {
     setFromDate("");
     setToDate("");
+    setAppliedFromDate("");
+    setAppliedToDate("");
+    setError("");
   }
 }
 
